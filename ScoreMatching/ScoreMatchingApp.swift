@@ -1,10 +1,3 @@
-//
-//  ScoreMatchingApp.swift
-//  ScoreMatching
-//
-//  Created by Matteo Comisso on 09/02/22.
-//
-
 import SwiftUI
 
 @main
@@ -13,5 +6,11 @@ struct ScoreMatchingApp: App {
         WindowGroup {
             ContentView()
         }
+    }
+}
+
+extension Color {
+    static var random: Color {
+        Color(hue: Double.random(in: (0...1)), saturation: Double.random(in: (0.8...1.0)), brightness: 1)
     }
 }
