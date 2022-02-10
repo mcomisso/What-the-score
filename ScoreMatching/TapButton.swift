@@ -7,6 +7,8 @@ struct TapButton: View {
     @Binding var count: Int
     @Binding var color: Color
     @Binding var name: String
+    @Binding var lastTapped: String?
+    @Binding var lastTimeTapped: Date
 
     private let feedbackGenerator = UIImpactFeedbackGenerator()
     private let warningGenerator = UINotificationFeedbackGenerator()
@@ -35,11 +37,12 @@ struct TapButton: View {
         ZStack {
             VStack {
                 Text("\(count)")
-                    .font(.largeTitle)
+                    .font(.system(size: 88))
                     .frame(maxWidth: .infinity,
                            maxHeight: .infinity)
                 Text(name)
-                    .font(.footnote)
+                    .bold()
+                    .font(.headline)
                     .padding(.bottom)
             }
             .foregroundColor(color)
@@ -52,6 +55,9 @@ struct TapButton: View {
                 count += 1
                 feedbackGenerator.prepare()
                 feedbackGenerator.impactOccurred()
+                self.lastTapped = name
+                self.lastTimeTapped = Date()
+                
             }
             .gesture(DragGesture()
                         .onEnded { valuee in
@@ -59,6 +65,7 @@ struct TapButton: View {
                     count -= 1
                     feedbackGenerator.prepare()
                     feedbackGenerator.impactOccurred()
+                    self.lastTimeTapped = Date()
                 } else {
                     warningGenerator.notificationOccurred(.warning)
                 }
@@ -77,7 +84,7 @@ struct TapButton: View {
 struct Previews_TapButton_Previews: PreviewProvider {
     @State static var count: Int = 0
     static var previews: some View {
-        TapButton(count: $count, color: .constant(.primary), name: .constant("Team Name"))
+        TapButton(count: $count, color: .constant(.primary), name: .constant("Team Name"), lastTapped: .constant(""), lastTimeTapped: .constant(Date()))
             .background(.gray)
     }
 }

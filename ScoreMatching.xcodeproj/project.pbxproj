@@ -7,6 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		B95C37E927B473D7009A2C5F /* ScoreboardPDFPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = B95C37E827B473D7009A2C5F /* ScoreboardPDFPage.swift */; };
+		B95C37EB27B4748A009A2C5F /* PDFGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = B95C37EA27B4748A009A2C5F /* PDFGenerator.swift */; };
+		B95C37EF27B474EA009A2C5F /* Connectivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = B95C37EE27B474EA009A2C5F /* Connectivity.swift */; };
+		B95C37F227B49369009A2C5F /* ConnectivityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B95C37F127B49369009A2C5F /* ConnectivityView.swift */; };
+		B95C37F427B4A9C2009A2C5F /* Color+Decodable.swift in Sources */ = {isa = PBXBuildFile; fileRef = B95C37F327B4A9C2009A2C5F /* Color+Decodable.swift */; };
 		B9788A2827B3CDA900EDF754 /* ScoreMatchingApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9788A2727B3CDA900EDF754 /* ScoreMatchingApp.swift */; };
 		B9788A2A27B3CDA900EDF754 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9788A2927B3CDA900EDF754 /* ContentView.swift */; };
 		B9788A2C27B3CDA900EDF754 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B9788A2B27B3CDA900EDF754 /* Assets.xcassets */; };
@@ -16,6 +21,12 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		B95C37E827B473D7009A2C5F /* ScoreboardPDFPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScoreboardPDFPage.swift; sourceTree = "<group>"; };
+		B95C37EA27B4748A009A2C5F /* PDFGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PDFGenerator.swift; sourceTree = "<group>"; };
+		B95C37EE27B474EA009A2C5F /* Connectivity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Connectivity.swift; sourceTree = "<group>"; };
+		B95C37F027B49144009A2C5F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		B95C37F127B49369009A2C5F /* ConnectivityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectivityView.swift; sourceTree = "<group>"; };
+		B95C37F327B4A9C2009A2C5F /* Color+Decodable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+Decodable.swift"; sourceTree = "<group>"; };
 		B9788A2427B3CDA900EDF754 /* ScoreMatching.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ScoreMatching.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B9788A2727B3CDA900EDF754 /* ScoreMatchingApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScoreMatchingApp.swift; sourceTree = "<group>"; };
 		B9788A2927B3CDA900EDF754 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -36,6 +47,24 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		B95C37EC27B474D4009A2C5F /* PDF */ = {
+			isa = PBXGroup;
+			children = (
+				B95C37EA27B4748A009A2C5F /* PDFGenerator.swift */,
+				B95C37E827B473D7009A2C5F /* ScoreboardPDFPage.swift */,
+			);
+			path = PDF;
+			sourceTree = "<group>";
+		};
+		B95C37ED27B474DF009A2C5F /* Multipeer */ = {
+			isa = PBXGroup;
+			children = (
+				B95C37EE27B474EA009A2C5F /* Connectivity.swift */,
+				B95C37F127B49369009A2C5F /* ConnectivityView.swift */,
+			);
+			path = Multipeer;
+			sourceTree = "<group>";
+		};
 		B9788A1B27B3CDA900EDF754 = {
 			isa = PBXGroup;
 			children = (
@@ -55,9 +84,13 @@
 		B9788A2627B3CDA900EDF754 /* ScoreMatching */ = {
 			isa = PBXGroup;
 			children = (
+				B95C37F027B49144009A2C5F /* Info.plist */,
 				B9788A2727B3CDA900EDF754 /* ScoreMatchingApp.swift */,
 				B9788A2927B3CDA900EDF754 /* ContentView.swift */,
+				B95C37F327B4A9C2009A2C5F /* Color+Decodable.swift */,
 				B9F9A8C927B3DAD900B4C805 /* SettingsView.swift */,
+				B95C37ED27B474DF009A2C5F /* Multipeer */,
+				B95C37EC27B474D4009A2C5F /* PDF */,
 				B9F9A8CB27B3DBCF00B4C805 /* TapButton.swift */,
 				B9788A2B27B3CDA900EDF754 /* Assets.xcassets */,
 				B9788A2D27B3CDA900EDF754 /* Preview Content */,
@@ -145,8 +178,13 @@
 			files = (
 				B9F9A8CA27B3DAD900B4C805 /* SettingsView.swift in Sources */,
 				B9788A2A27B3CDA900EDF754 /* ContentView.swift in Sources */,
+				B95C37EF27B474EA009A2C5F /* Connectivity.swift in Sources */,
+				B95C37F227B49369009A2C5F /* ConnectivityView.swift in Sources */,
+				B95C37EB27B4748A009A2C5F /* PDFGenerator.swift in Sources */,
 				B9788A2827B3CDA900EDF754 /* ScoreMatchingApp.swift in Sources */,
 				B9F9A8CC27B3DBCF00B4C805 /* TapButton.swift in Sources */,
+				B95C37E927B473D7009A2C5F /* ScoreboardPDFPage.swift in Sources */,
+				B95C37F427B4A9C2009A2C5F /* Color+Decodable.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -280,11 +318,14 @@
 				DEVELOPMENT_TEAM = B82WJF6RBY;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = ScoreMatching/Info.plist;
+				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "Find other devices running ScoreMatching";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.1;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -309,11 +350,14 @@
 				DEVELOPMENT_TEAM = B82WJF6RBY;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = ScoreMatching/Info.plist;
+				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "Find other devices running ScoreMatching";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.1;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
