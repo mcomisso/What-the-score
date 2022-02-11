@@ -35,47 +35,50 @@ struct TapButton: View {
 
     var body: some View {
         ZStack {
-            VStack {
-                Text("\(count)")
-                    .font(.system(size: 88))
-                    .frame(maxWidth: .infinity,
-                           maxHeight: .infinity)
-                Text(name)
-                    .bold()
-                    .font(.headline)
-                    .padding(.bottom)
-            }
-            .foregroundColor(color)
-            .colorInvert()
-            .frame(maxWidth: .infinity,
-                   maxHeight: .infinity)
-            .contentShape(Rectangle())
-            .onTapGesture {
-                justAdded = true
-                count += 1
-                feedbackGenerator.prepare()
-                feedbackGenerator.impactOccurred()
-                self.lastTapped = name
-                self.lastTimeTapped = Date()
-                
-            }
-            .gesture(DragGesture()
-                        .onEnded { valuee in
-                if count > 0 {
-                    count -= 1
+            GeometryReader { geometryProxy in
+                VStack {
+                    Text("\(count)")
+                        .font(.system(size: min(geometryProxy.size.width, geometryProxy.size.height) / 3.5))
+                        .frame(maxWidth: .infinity,
+                               maxHeight: .infinity)
+                    Text(name)
+                        .bold()
+                        .font(.headline)
+                        .padding(.bottom)
+                }
+                .foregroundColor(color)
+                .colorInvert()
+                .frame(maxWidth: .infinity,
+                       maxHeight: .infinity)
+                .contentShape(Rectangle())
+                .onTapGesture {
+                    justAdded = true
+                    count += 1
                     feedbackGenerator.prepare()
                     feedbackGenerator.impactOccurred()
+                    self.lastTapped = name
                     self.lastTimeTapped = Date()
-                } else {
-                    warningGenerator.notificationOccurred(.warning)
-                }
-            })
 
-            if justAdded {
-                Text("+1")
-                    .font(.largeTitle)
-                    .offset(x: 100, y: animationOffset)
-                    .opacity(animationAlpha)
+                }
+                .gesture(DragGesture()
+                            .onEnded { valuee in
+                    if count > 0 {
+                        count -= 1
+                        feedbackGenerator.prepare()
+                        feedbackGenerator.impactOccurred()
+                        self.lastTimeTapped = Date()
+                    } else {
+                        warningGenerator.notificationOccurred(.warning)
+                    }
+                })
+
+                if justAdded {
+                    Text("+1")
+                        .font(.largeTitle)
+                        .offset(x: 100, y: animationOffset)
+                        .opacity(animationAlpha)
+                }
+
             }
 
         }
