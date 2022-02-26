@@ -66,8 +66,8 @@ struct SettingsView: View {
 
                 Button("Dismiss") {
                     dimiss()
-                }
-            }
+                }.buttonStyle(.borderedProminent)
+            }.navigationTitle("Settings")
         }
     }
 
@@ -84,6 +84,7 @@ struct Previews_SettingsView_Previews: PreviewProvider {
     static var previews: some View {
         SettingsView(teams: .constant([TeamsData("Team A"),
                                        TeamsData("Team B")]))
+
         SettingsView(teams: .constant([TeamsData("Team A"),
                                        TeamsData("Team B")]))
             .previewInterfaceOrientation(.landscapeLeft)

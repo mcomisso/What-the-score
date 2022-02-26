@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		B919B9C027CAA67A00014942 /* IntervalsList.swift in Sources */ = {isa = PBXBuildFile; fileRef = B919B9BF27CAA67A00014942 /* IntervalsList.swift */; };
+		B919B9C527CAA6C700014942 /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = B919B9C427CAA6C700014942 /* Models.swift */; };
+		B919B9C727CAA6DD00014942 /* HomePageViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B919B9C627CAA6DD00014942 /* HomePageViewModel.swift */; };
 		B95C37E927B473D7009A2C5F /* ScoreboardPDFPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = B95C37E827B473D7009A2C5F /* ScoreboardPDFPage.swift */; };
 		B95C37EB27B4748A009A2C5F /* PDFGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = B95C37EA27B4748A009A2C5F /* PDFGenerator.swift */; };
 		B95C37EF27B474EA009A2C5F /* Connectivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = B95C37EE27B474EA009A2C5F /* Connectivity.swift */; };
@@ -21,6 +24,9 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		B919B9BF27CAA67A00014942 /* IntervalsList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IntervalsList.swift; sourceTree = "<group>"; };
+		B919B9C427CAA6C700014942 /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
+		B919B9C627CAA6DD00014942 /* HomePageViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomePageViewModel.swift; sourceTree = "<group>"; };
 		B95C37E827B473D7009A2C5F /* ScoreboardPDFPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScoreboardPDFPage.swift; sourceTree = "<group>"; };
 		B95C37EA27B4748A009A2C5F /* PDFGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PDFGenerator.swift; sourceTree = "<group>"; };
 		B95C37EE27B474EA009A2C5F /* Connectivity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Connectivity.swift; sourceTree = "<group>"; };
@@ -47,6 +53,31 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		B919B9C127CAA69B00014942 /* Features */ = {
+			isa = PBXGroup;
+			children = (
+				B919B9C327CAA6A500014942 /* Intervals */,
+				B919B9C227CAA6A000014942 /* Settings */,
+			);
+			path = Features;
+			sourceTree = "<group>";
+		};
+		B919B9C227CAA6A000014942 /* Settings */ = {
+			isa = PBXGroup;
+			children = (
+				B9F9A8C927B3DAD900B4C805 /* SettingsView.swift */,
+			);
+			path = Settings;
+			sourceTree = "<group>";
+		};
+		B919B9C327CAA6A500014942 /* Intervals */ = {
+			isa = PBXGroup;
+			children = (
+				B919B9BF27CAA67A00014942 /* IntervalsList.swift */,
+			);
+			path = Intervals;
+			sourceTree = "<group>";
+		};
 		B95C37EC27B474D4009A2C5F /* PDF */ = {
 			isa = PBXGroup;
 			children = (
@@ -87,8 +118,10 @@
 				B95C37F027B49144009A2C5F /* Info.plist */,
 				B9788A2727B3CDA900EDF754 /* ScoreMatchingApp.swift */,
 				B9788A2927B3CDA900EDF754 /* ContentView.swift */,
+				B919B9C627CAA6DD00014942 /* HomePageViewModel.swift */,
+				B919B9C427CAA6C700014942 /* Models.swift */,
 				B95C37F327B4A9C2009A2C5F /* Color+Decodable.swift */,
-				B9F9A8C927B3DAD900B4C805 /* SettingsView.swift */,
+				B919B9C127CAA69B00014942 /* Features */,
 				B95C37ED27B474DF009A2C5F /* Multipeer */,
 				B95C37EC27B474D4009A2C5F /* PDF */,
 				B9F9A8CB27B3DBCF00B4C805 /* TapButton.swift */,
@@ -176,10 +209,13 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B919B9C527CAA6C700014942 /* Models.swift in Sources */,
+				B919B9C727CAA6DD00014942 /* HomePageViewModel.swift in Sources */,
 				B9F9A8CA27B3DAD900B4C805 /* SettingsView.swift in Sources */,
 				B9788A2A27B3CDA900EDF754 /* ContentView.swift in Sources */,
 				B95C37EF27B474EA009A2C5F /* Connectivity.swift in Sources */,
 				B95C37F227B49369009A2C5F /* ConnectivityView.swift in Sources */,
+				B919B9C027CAA67A00014942 /* IntervalsList.swift in Sources */,
 				B95C37EB27B4748A009A2C5F /* PDFGenerator.swift in Sources */,
 				B9788A2827B3CDA900EDF754 /* ScoreMatchingApp.swift in Sources */,
 				B9F9A8CC27B3DBCF00B4C805 /* TapButton.swift in Sources */,

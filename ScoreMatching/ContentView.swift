@@ -1,63 +1,17 @@
 import SwiftUI
 
-class ViewModel: ObservableObject, Equatable {
-    static func == (lhs: ViewModel, rhs: ViewModel) -> Bool {
-        lhs.teamsViewModels == rhs.teamsViewModels
-    }
+struct FloaterText: View {
 
-    @Published var teamsViewModels: [TeamsData] = []
+    @Binding var text: String?
 
-    @Published var intervals: [Interval] = []
-
-    init() {
-        teamsViewModels = ["Team A", "Team B"]
-            .compactMap(TeamsData.init(_:))
-    }
-
-    func addInterval() {
-        let copy = teamsViewModels
-        let interval = Interval(id: 0, points: copy)
-        intervals.append(interval)
-    }
-
-    func removeInterval(_ index: Int) {
-        intervals.remove(at: index)
-    }
-}
-
-struct Interval {
-    var id: Int
-    var points: [TeamsData]
-}
-
-struct CodableTeamData: Codable {
-    let name: String
-    let color: Color
-    let count: Int
-}
-
-extension CodableTeamData: Identifiable {
-    var id: String { name }
-}
-
-class TeamsData: ObservableObject, Identifiable, Equatable {
-    static func == (lhs: TeamsData, rhs: TeamsData) -> Bool {
-        lhs.id == rhs.id &&
-        lhs.count == rhs.count &&
-        lhs.name == rhs.name
-    }
-
-    let id: UUID = UUID()
-    var count: Int = 0
-    @Published var name: String
-    @Published var color: Color = .random
-
-    init(_ name: String) {
-        self.name = name
-    }
-
-    func toCodable() -> CodableTeamData {
-        .init(name: name, color: color, count: count)
+    var body: some View {
+        VStack {
+            Text(text ?? "Info box")
+                .font(.subheadline)
+        }.padding()
+            .background(.thickMaterial, in: RoundedRectangle(cornerRadius: 16))
+            .padding()
+            .shadow(radius: 16)
     }
 }
 
@@ -95,49 +49,15 @@ struct ContentView: View {
                 connectivity.send(data: encodedData)
             }
         })
-        .sheet(isPresented: $isVisualisingSettings) {
-            // Do nothing on dismiss
-        } content: {
+        .sheet(isPresented: $isVisualisingSettings, onDismiss: nil, content: {
             SettingsView(teams: $viewModel.teamsViewModels)
+        })
+        .sheet(isPresented: $isShowingIntervals, onDismiss: nil, content: {
+            IntervalsList(viewModel: self.viewModel)
+        })
+        .overlay(alignment: .top) {
+            FloaterText(text: $lastTapped)
         }
-        .overlay(alignment: verticalSizeClass == .regular ? .center : .top) {
-            VStack {
-                if let lastTapped = lastTapped {
-                    Text("Last scored: \(lastTapped)")
-                        .font(.caption)
-                } else {
-                    Label("Intervals", systemImage: "timer")
-                }
-
-                if isShowingIntervals {
-
-                    List {
-                        ForEach(viewModel.intervals.indices, id: \.self) { intervalIdx in
-                            VStack(alignment: .leading) {
-                                Text("Interval \(intervalIdx)")
-
-                                Text("\(viewModel.intervals[intervalIdx].points.map { $0.count }.description)")
-                                    .font(.caption)
-                                    .foregroundColor(.secondary)
-                            }
-                        }.onDelete { indexSet in
-                            viewModel.removeInterval(indexSet.first!)
-                        }
-
-                        Section {
-                            Button("New interval") {
-                                viewModel.addInterval()
-                            }
-                        }
-                    }.listStyle(DefaultListStyle())
-                }
-            }.frame(maxWidth: 200)
-                .padding()
-                .background(.thickMaterial, in: RoundedRectangle(cornerRadius: 16))
-                .padding()
-                .shadow(radius: 16)
-        }
-
     }
 
     var bottomToolbar: some View {
@@ -150,11 +70,18 @@ struct ContentView: View {
                 Image(systemName: "timer")
                     .foregroundColor(.primary)
                     .imageScale(.large)
-                    .symbolRenderingMode(.hierarchical)
                     .padding()
                     .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 16))
                     .shadow(radius: 8)
             }
+            .contextMenu {
+                Text("Current interval: \(viewModel.intervals.count)")
+                Button("Start new") {
+                    viewModel.addInterval()
+                }
+            }
+
+
             Spacer()
 
             Button {
@@ -163,16 +90,17 @@ struct ContentView: View {
                 Image(systemName: "gear")
                     .foregroundColor(.primary)
                     .imageScale(.large)
-                    .symbolRenderingMode(.hierarchical)
                     .padding()
                     .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 16))
                     .shadow(radius: 8)
             }
-        }
+        }.symbolRenderingMode(.hierarchical)
     }
+
     var buttons: some View {
         ForEach($viewModel.teamsViewModels) { team in
-            TapButton(count: team.count, color: team.color, name: team.name, lastTapped: $lastTapped, lastTimeTapped: $lastTimeTapped)
+            TapButton(count: team.count, color: team.color, name: team.name,
+                      lastTapped: $lastTapped, lastTimeTapped: $lastTimeTapped)
                 .background(team.color.wrappedValue)
                 .id(team.name.wrappedValue)
         }
