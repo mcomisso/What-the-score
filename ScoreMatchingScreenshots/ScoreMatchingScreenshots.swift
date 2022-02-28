@@ -15,14 +15,29 @@ class ScoreMatchingScreenshots: XCTestCase {
         let app = XCUIApplication()
         setupSnapshot(app)
         app.launch()
-    }
 
-    func testLaunchPerformance() throws {
-        if #available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 7.0, *) {
-            // This measures how long it takes to launch your application.
-            measure(metrics: [XCTApplicationLaunchMetric()]) {
-                XCUIApplication().launch()
+        snapshot("Launch page")
+
+        (0...10).forEach { _ in
+            if Bool.random() {
+                app.tap()
             }
         }
+
+        snapshot("Scored")
+
+        // Settings
+        app.buttons.firstMatch.tap()
+
+        snapshot("Settings")
     }
+
+//    func testLaunchPerformance() throws {
+//        if #available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 7.0, *) {
+//            // This measures how long it takes to launch your application.
+//            measure(metrics: [XCTApplicationLaunchMetric()]) {
+//                XCUIApplication().launch()
+//            }
+//        }
+//    }
 }
