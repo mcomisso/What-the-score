@@ -2,17 +2,6 @@ import Foundation
 import SwiftUI
 import PDFKit
 
-struct EditView: View {
-
-    @Binding var team: TeamsData
-
-    var body: some View {
-        TextField(team.name, text: $team.name)
-            .textFieldStyle(.roundedBorder)
-            .padding()
-    }
-}
-
 struct SettingsView: View {
 
     @Environment(\.dismiss) var dimiss
@@ -59,9 +48,9 @@ struct SettingsView: View {
                         }
                     }
 
-                    Section("Export") {
-                        Button("Generate PDF of scoreboard") { }.disabled(true)
-                    }
+//                    Section("Export") {
+//                        Button("Generate PDF of scoreboard") { }.disabled(true)
+//                    }.featureFlag(.exportScorecard)
                 }
 
                 Button("Dismiss") {
