@@ -22,7 +22,6 @@
 		B9788A2F27B3CDA900EDF754 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B9788A2E27B3CDA900EDF754 /* Preview Assets.xcassets */; };
 		B9861D5727CC5D0100053D00 /* EditTeamName.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9861D5627CC5D0100053D00 /* EditTeamName.swift */; };
 		B9861D5F27CD485A00053D00 /* ScoreMatchingScreenshots.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9861D5E27CD485A00053D00 /* ScoreMatchingScreenshots.swift */; };
-		B9861D6127CD485A00053D00 /* ScoreMatchingScreenshotsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9861D6027CD485A00053D00 /* ScoreMatchingScreenshotsLaunchTests.swift */; };
 		B9861D6827CD487800053D00 /* SnapshotHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9861D6727CD487800053D00 /* SnapshotHelper.swift */; };
 		B9F9A8CA27B3DAD900B4C805 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9F9A8C927B3DAD900B4C805 /* SettingsView.swift */; };
 		B9F9A8CC27B3DBCF00B4C805 /* TapButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9F9A8CB27B3DBCF00B4C805 /* TapButton.swift */; };
@@ -49,7 +48,7 @@
 		B95C37F027B49144009A2C5F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		B95C37F127B49369009A2C5F /* ConnectivityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectivityView.swift; sourceTree = "<group>"; };
 		B95C37F327B4A9C2009A2C5F /* Color+Decodable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+Decodable.swift"; sourceTree = "<group>"; };
-		B9788A2427B3CDA900EDF754 /* ScoreMatching.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ScoreMatching.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		B9788A2427B3CDA900EDF754 /* What the score.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "What the score.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		B9788A2727B3CDA900EDF754 /* ScoreMatchingApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScoreMatchingApp.swift; sourceTree = "<group>"; };
 		B9788A2927B3CDA900EDF754 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		B9788A2B27B3CDA900EDF754 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -57,7 +56,6 @@
 		B9861D5627CC5D0100053D00 /* EditTeamName.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditTeamName.swift; sourceTree = "<group>"; };
 		B9861D5C27CD485A00053D00 /* ScoreMatchingScreenshots.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ScoreMatchingScreenshots.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		B9861D5E27CD485A00053D00 /* ScoreMatchingScreenshots.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScoreMatchingScreenshots.swift; sourceTree = "<group>"; };
-		B9861D6027CD485A00053D00 /* ScoreMatchingScreenshotsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScoreMatchingScreenshotsLaunchTests.swift; sourceTree = "<group>"; };
 		B9861D6727CD487800053D00 /* SnapshotHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SnapshotHelper.swift; path = fastlane/SnapshotHelper.swift; sourceTree = SOURCE_ROOT; };
 		B9F9A8C927B3DAD900B4C805 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		B9F9A8CB27B3DBCF00B4C805 /* TapButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TapButton.swift; sourceTree = "<group>"; };
@@ -137,7 +135,7 @@
 		B9788A2527B3CDA900EDF754 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				B9788A2427B3CDA900EDF754 /* ScoreMatching.app */,
+				B9788A2427B3CDA900EDF754 /* What the score.app */,
 				B9861D5C27CD485A00053D00 /* ScoreMatchingScreenshots.xctest */,
 			);
 			name = Products;
@@ -176,7 +174,6 @@
 			children = (
 				B9861D6727CD487800053D00 /* SnapshotHelper.swift */,
 				B9861D5E27CD485A00053D00 /* ScoreMatchingScreenshots.swift */,
-				B9861D6027CD485A00053D00 /* ScoreMatchingScreenshotsLaunchTests.swift */,
 			);
 			path = ScoreMatchingScreenshots;
 			sourceTree = "<group>";
@@ -184,9 +181,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		B9788A2327B3CDA900EDF754 /* ScoreMatching */ = {
+		B9788A2327B3CDA900EDF754 /* What the score */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = B9788A3227B3CDA900EDF754 /* Build configuration list for PBXNativeTarget "ScoreMatching" */;
+			buildConfigurationList = B9788A3227B3CDA900EDF754 /* Build configuration list for PBXNativeTarget "What the score" */;
 			buildPhases = (
 				B9788A2027B3CDA900EDF754 /* Sources */,
 				B9788A2127B3CDA900EDF754 /* Frameworks */,
@@ -196,9 +193,9 @@
 			);
 			dependencies = (
 			);
-			name = ScoreMatching;
+			name = "What the score";
 			productName = ScoreMatching;
-			productReference = B9788A2427B3CDA900EDF754 /* ScoreMatching.app */;
+			productReference = B9788A2427B3CDA900EDF754 /* What the score.app */;
 			productType = "com.apple.product-type.application";
 		};
 		B9861D5B27CD485A00053D00 /* ScoreMatchingScreenshots */ = {
@@ -251,7 +248,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				B9788A2327B3CDA900EDF754 /* ScoreMatching */,
+				B9788A2327B3CDA900EDF754 /* What the score */,
 				B9861D5B27CD485A00053D00 /* ScoreMatchingScreenshots */,
 			);
 		};
@@ -302,7 +299,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				B9861D6127CD485A00053D00 /* ScoreMatchingScreenshotsLaunchTests.swift in Sources */,
 				B9861D5F27CD485A00053D00 /* ScoreMatchingScreenshots.swift in Sources */,
 				B9861D6827CD487800053D00 /* SnapshotHelper.swift in Sources */,
 			);
@@ -313,7 +309,7 @@
 /* Begin PBXTargetDependency section */
 		B9861D6327CD485A00053D00 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = B9788A2327B3CDA900EDF754 /* ScoreMatching */;
+			target = B9788A2327B3CDA900EDF754 /* What the score */;
 			targetProxy = B9861D6227CD485A00053D00 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
@@ -447,7 +443,6 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = ScoreMatching/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "Score!";
 				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "Find other devices running ScoreMatching";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -479,7 +474,6 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = ScoreMatching/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "Score!";
 				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "Find other devices running ScoreMatching";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -545,7 +539,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		B9788A3227B3CDA900EDF754 /* Build configuration list for PBXNativeTarget "ScoreMatching" */ = {
+		B9788A3227B3CDA900EDF754 /* Build configuration list for PBXNativeTarget "What the score" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				B9788A3327B3CDA900EDF754 /* Debug */,
