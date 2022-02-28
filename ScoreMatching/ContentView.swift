@@ -5,13 +5,51 @@ struct FloaterText: View {
     @Binding var text: String?
 
     var body: some View {
-        VStack {
-            Text(text ?? "Info box")
-                .font(.subheadline)
-        }.padding()
-            .background(.thickMaterial, in: RoundedRectangle(cornerRadius: 16))
-            .padding()
-            .shadow(radius: 16)
+        if let text = text {
+            VStack {
+                Text(text)
+                    .font(.subheadline)
+            }.padding()
+                .background(.thickMaterial,
+                            in: RoundedRectangle(cornerRadius: 16))
+                .padding()
+                .shadow(radius: 16)
+        } else {
+            EmptyView()
+        }
+    }
+}
+
+enum FeatureFlag: String {
+    case intervalsFeature
+    case exportScorecard
+
+    var isActive: Bool {
+        UserDefaults.standard.bool(forKey: self.rawValue)
+    }
+}
+
+extension View {
+    func featureFlag(_ featureFlag: FeatureFlag) -> some View {
+        self.modifier(FeatureFlagModifier(featureFlag))
+    }
+}
+
+struct FeatureFlagModifier: ViewModifier {
+
+    private var featureFlag: FeatureFlag
+
+    init(_ featureFlag: FeatureFlag) {
+        self.featureFlag = featureFlag
+    }
+
+    func body(content: Content) -> some View {
+        if featureFlag.isActive {
+            content
+        } else {
+            content
+                .hidden()
+        }
     }
 }
 
@@ -80,7 +118,7 @@ struct ContentView: View {
                     viewModel.addInterval()
                 }
             }
-
+            .featureFlag(.intervalsFeature)
 
             Spacer()
 
