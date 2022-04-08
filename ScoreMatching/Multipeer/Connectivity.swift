@@ -1,10 +1,3 @@
-//
-//  File.swift
-//  ScoreMatching
-//
-//  Created by Matteo Comisso on 09/02/22.
-//
-
 import Foundation
 import MultipeerConnectivity
 
@@ -24,7 +17,8 @@ class Connectivity: NSObject, ObservableObject {
     @Published var readOnlyData: [CodableTeamData] = []
 
     override init() {
-        self.session = MCSession(peer: devicePeerID, securityIdentity: nil, encryptionPreference: .none)
+
+        self.session = MCSession(peer: devicePeerID, securityIdentity: nil, encryptionPreference: .required)
         self.serviceBrowser = MCNearbyServiceBrowser(peer: devicePeerID, serviceType: serviceType)
         self.serviceAdvertiser = MCNearbyServiceAdvertiser.init(peer: devicePeerID, discoveryInfo: nil, serviceType: serviceType)
         super.init()

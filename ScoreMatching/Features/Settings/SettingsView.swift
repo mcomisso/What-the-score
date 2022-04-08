@@ -56,6 +56,8 @@ struct SettingsView: View {
                 Button("Dismiss") {
                     dimiss()
                 }.buttonStyle(.borderedProminent)
+                    .padding()
+                
             }.navigationTitle("Settings")
         }
     }

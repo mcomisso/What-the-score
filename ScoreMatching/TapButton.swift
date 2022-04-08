@@ -2,7 +2,6 @@ import Foundation
 import SwiftUI
 
 struct TapButton: View {
-    @State var isEditing: Bool = false
 
     @Binding var count: Int
     @Binding var color: Color
@@ -10,9 +9,14 @@ struct TapButton: View {
     @Binding var lastTapped: String?
     @Binding var lastTimeTapped: Date
 
+    var isEnabled: Bool = true
+
     private let feedbackGenerator = UIImpactFeedbackGenerator()
     private let warningGenerator = UINotificationFeedbackGenerator()
 
+    @State var shadowRadius: Double = 10
+
+    @State var isEditing: Bool = false
     @State var animationOffset: CGFloat = 0
     @State var animationAlpha: Double = 0
     @State var justAdded: Bool = false {
@@ -52,13 +56,14 @@ struct TapButton: View {
                        maxHeight: .infinity)
                 .contentShape(Rectangle())
                 .onTapGesture {
-                    justAdded = true
-                    count += 1
-                    feedbackGenerator.prepare()
-                    feedbackGenerator.impactOccurred()
-                    self.lastTapped = name
-                    self.lastTimeTapped = Date()
-
+                    if isEnabled {
+                        justAdded = true
+                        count += 1
+                        feedbackGenerator.prepare()
+                        feedbackGenerator.impactOccurred()
+                        self.lastTapped = name
+                        self.lastTimeTapped = Date()
+                    }
                 }
                 .gesture(DragGesture()
                             .onEnded { valuee in
@@ -78,9 +83,7 @@ struct TapButton: View {
                         .offset(x: 100, y: animationOffset)
                         .opacity(animationAlpha)
                 }
-
             }
-
         }
     }
 }

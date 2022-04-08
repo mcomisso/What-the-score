@@ -134,7 +134,7 @@ struct ContentView: View {
             }
         }.symbolRenderingMode(.hierarchical)
     }
-
+    @State var shadowRadius: Double = 10
     var buttons: some View {
         ForEach($viewModel.teamsViewModels) { team in
             TapButton(count: team.count, color: team.color, name: team.name,
