@@ -17,8 +17,10 @@ class TeamsData: ObservableObject, Identifiable {
     @Published var name: String
     @Published var color: Color = .random
 
-    init(_ name: String) {
+    init(_ name: String, score: [Score] = [], color: Color = .random) {
         self.name = name
+        self.score = score
+        self.color = color
     }
 
     func toCodable() -> CodableTeamData {

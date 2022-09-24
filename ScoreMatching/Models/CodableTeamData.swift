@@ -10,3 +10,9 @@ struct CodableTeamData: Codable {
 extension CodableTeamData: Identifiable {
     var id: String { name }
 }
+
+extension CodableTeamData {
+    func toTeamData() -> TeamsData {
+        TeamsData(name, score: score, color: color)
+    }
+}
