@@ -1,9 +1,9 @@
 import Foundation
 import MultipeerConnectivity
 
-class Connectivity: NSObject, ObservableObject {
+final class Connectivity: NSObject, ObservableObject {
 
-    let devicePeerID = MCPeerID(displayName: UIDevice.current.name)
+    private let devicePeerID = MCPeerID(displayName: UIDevice.current.name)
     private let serviceType = "com-scorekpr"
 
     private var session: MCSession

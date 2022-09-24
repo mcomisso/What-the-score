@@ -1,10 +1,3 @@
-//
-//  IntervalsList.swift
-//  ScoreMatching
-//
-//  Created by Matteo Comisso on 26/02/22.
-//
-
 import Foundation
 import SwiftUI
 
@@ -21,7 +14,7 @@ struct IntervalsList: View {
                             ForEach(viewModel.intervals[intervalIdx].points.map { $0.count }, id: \.self) { points in
                                 Text("\(points)")
                                     .font(.title)
-                                    .foregroundColor(.secondary)
+                                    .foregroundStyle(.secondary)
                             }
                     }
                 }

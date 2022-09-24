@@ -1,10 +1,3 @@
-//
-//  PDFGenerator.swift
-//  ScoreMatching
-//
-//  Created by Matteo Comisso on 09/02/22.
-//
-
 import Foundation
 import PDFKit
 

@@ -106,7 +106,7 @@ struct ContentView: View {
                 }
             } label: {
                 Image(systemName: "timer")
-                    .foregroundColor(.primary)
+                    .foregroundStyle(.primary)
                     .imageScale(.large)
                     .padding()
                     .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 16))
@@ -126,7 +126,7 @@ struct ContentView: View {
                 isVisualisingSettings.toggle()
             } label: {
                 Image(systemName: "gear")
-                    .foregroundColor(.primary)
+                    .foregroundStyle(.primary)
                     .imageScale(.large)
                     .padding()
                     .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 16))
