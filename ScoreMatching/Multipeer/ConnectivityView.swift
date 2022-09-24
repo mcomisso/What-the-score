@@ -7,7 +7,7 @@ struct ConnectivityView: View {
     @EnvironmentObject var connectivity: Connectivity
     @Environment(\.verticalSizeClass) var verticalSizeClass
 
-@ViewBuilder
+    @ViewBuilder
     var connectedView: some View {
         if verticalSizeClass == .regular {
             VStack(spacing: 0) {
@@ -17,9 +17,9 @@ struct ConnectivityView: View {
                               name: .constant(element.name),
                               lastTapped: .constant(nil),
                               lastTimeTapped: .constant(Date()))
-                        .background(element.color)
-                        .colorInvert()
-                        .colorInvert()
+                    .background(element.color)
+                    .colorInvert()
+                    .colorInvert()
                 }
             }.ignoresSafeArea()
         } else {
@@ -30,9 +30,9 @@ struct ConnectivityView: View {
                               name: .constant(element.name),
                               lastTapped: .constant(nil),
                               lastTimeTapped: .constant(Date()))
-                        .background(element.color)
-                        .colorInvert()
-                        .colorInvert()
+                    .background(element.color)
+                    .colorInvert()
+                    .colorInvert()
                 }
             }.ignoresSafeArea()
         }
@@ -40,32 +40,32 @@ struct ConnectivityView: View {
 
     var searchingView: some View {
 
-            List {
-                Section("Found") {
-                    ForEach(Array(connectivity.peers), id: \.displayName) { peer in
-                        Button {
-                            connectivity.connect(to: peer)
-                        } label: {
-                            Text(peer.displayName)
-                        }
+        List {
+            Section("Found") {
+                ForEach(Array(connectivity.peers), id: \.displayName) { peer in
+                    Button {
+                        connectivity.connect(to: peer)
+                    } label: {
+                        Text(peer.displayName)
                     }
-
-                    ProgressView()
-                        .progressViewStyle(CircularProgressViewStyle())
                 }
 
-                Section("Connected") {
-                    if connectivity.connectedPeers.isEmpty {
-                        Text("Select a device in the found list to connect")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                    } else {
-                        ForEach(Array(connectivity.connectedPeers), id: \.displayName) { peer in
-                            Text(peer.displayName)
-                        }
+                ProgressView()
+                    .progressViewStyle(CircularProgressViewStyle())
+            }
+
+            Section("Connected") {
+                if connectivity.connectedPeers.isEmpty {
+                    Text("Select a device in the found list to connect")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                } else {
+                    ForEach(Array(connectivity.connectedPeers), id: \.displayName) { peer in
+                        Text(peer.displayName)
                     }
                 }
             }
+        }
     }
 
     var body: some View {

@@ -8,57 +8,75 @@ struct SettingsView: View {
 
     @Binding var teams: [TeamsData]
 
-    @State var isShowingNameChangeAlert: Bool = false
-    @State var selection: TeamsData.ID?
-
-    @State var isEditing: Bool = false
+    @State private var isShowingNameChangeAlert: Bool = false
+    @State private var selection: TeamsData.ID?
+    @State private var isEditing: Bool = false
+    @State private var showResetAlert: Bool = false
 
     @SceneStorage("isReceiverMode") var isReceiverMode: Bool = false
 
     var body: some View {
         NavigationView {
 
-            ZStack(alignment: .bottom) {
+            VStack {
                 List(selection: $selection) {
-                    ForEach($teams) { team in
-                        ColorPicker(selection: team.color,
-                                    supportsOpacity: false) {
-                            NavigationLink(destination: EditView(team: team)) {
-                                Text(team.name.wrappedValue)
+                    Section("Teams") {
+                        ForEach($teams) { team in
+                            ColorPicker(selection: team.color,
+                                        supportsOpacity: false) {
+                                NavigationLink(destination: EditView(team: team)) {
+                                    Text(team.name.wrappedValue)
+                                }
                             }
-                        }
-                    }.onDelete(perform: remove(_:))
+                        }.onDelete(perform: remove(_:))
 
-                    Button("Add team") {
-                        teams.append(TeamsData("Team \(teams.count + 1)"))
+                        Button("Add team") {
+                            teams.append(TeamsData("Team \(teams.count + 1)"))
+                        }.buttonStyle(.borderless)
                     }
 
                     Section("Utils") {
-                        Button("Reset scores") {
-                            teams.forEach { team in
-                                team.count = 0
-                            }
-                        }
                         NavigationLink(destination: ConnectivityView()) {
-                            Text("Sync and view on network")
+                            Text("Broadcast to other devices")
                         }
 
-                        Button("Open receiver mode") {
+                        Button("Receive scores from other devices") {
                             isReceiverMode = true
                         }
                     }
 
-//                    Section("Export") {
-//                        Button("Generate PDF of scoreboard") { }.disabled(true)
-//                    }.featureFlag(.exportScorecard)
+                    Section("Danger zone") {
+                        Button("Reset scores", role: .destructive) {
+                            showResetAlert.toggle()
+                        }.alert("Are you sure?", isPresented: $showResetAlert) {
+                            Button("Yes, reset scores", role: .destructive) {
+                                let privateTeams = teams
+                                privateTeams.forEach { $0.count = 0 }
+                                self.teams = privateTeams
+                            }
+                        } message: {
+                            Text("The score will be set to 0.")
+                        }
+                    }
+
+                    #if DEBUG
+                    Section("Export") {
+                        Button("Generate PDF of scoreboard") { }
+                    }
+                    #endif
                 }
 
-                Button("Dismiss") {
+                Button {
                     dimiss()
-                }.buttonStyle(.borderedProminent)
-                    .padding()
+                } label: {
+                    Text("Dismiss")
+                        .frame(minWidth: 280, minHeight: 32)
+                }
+                .buttonStyle(.borderedProminent)
+                .padding()
                 
             }.navigationTitle("Settings")
+                .background(Color(uiColor: UIColor.systemGroupedBackground))
         }
     }
 
@@ -75,9 +93,5 @@ struct Previews_SettingsView_Previews: PreviewProvider {
     static var previews: some View {
         SettingsView(teams: .constant([TeamsData("Team A"),
                                        TeamsData("Team B")]))
-
-        SettingsView(teams: .constant([TeamsData("Team A"),
-                                       TeamsData("Team B")]))
-            .previewInterfaceOrientation(.landscapeLeft)
     }
 }

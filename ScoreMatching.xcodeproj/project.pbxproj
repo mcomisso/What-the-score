@@ -16,10 +16,23 @@
 		B95C37EF27B474EA009A2C5F /* Connectivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = B95C37EE27B474EA009A2C5F /* Connectivity.swift */; };
 		B95C37F227B49369009A2C5F /* ConnectivityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B95C37F127B49369009A2C5F /* ConnectivityView.swift */; };
 		B95C37F427B4A9C2009A2C5F /* Color+Decodable.swift in Sources */ = {isa = PBXBuildFile; fileRef = B95C37F327B4A9C2009A2C5F /* Color+Decodable.swift */; };
+		B96F151B28DE670E00349258 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B96F151A28DE670E00349258 /* WidgetKit.framework */; };
+		B96F151D28DE670E00349258 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B96F151C28DE670E00349258 /* SwiftUI.framework */; };
+		B96F152028DE670E00349258 /* Widget.swift in Sources */ = {isa = PBXBuildFile; fileRef = B96F151F28DE670E00349258 /* Widget.swift */; };
+		B96F152228DE670F00349258 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B96F152128DE670F00349258 /* Assets.xcassets */; };
+		B96F152628DE670F00349258 /* WidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = B96F151828DE670E00349258 /* WidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		B9788A2827B3CDA900EDF754 /* ScoreMatchingApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9788A2727B3CDA900EDF754 /* ScoreMatchingApp.swift */; };
 		B9788A2A27B3CDA900EDF754 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9788A2927B3CDA900EDF754 /* ContentView.swift */; };
 		B9788A2C27B3CDA900EDF754 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B9788A2B27B3CDA900EDF754 /* Assets.xcassets */; };
 		B9788A2F27B3CDA900EDF754 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B9788A2E27B3CDA900EDF754 /* Preview Assets.xcassets */; };
+		B97E44FE28DE8418001C9EF1 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = B97E44FD28DE8418001C9EF1 /* GoogleService-Info.plist */; };
+		B97E450128DE8499001C9EF1 /* FirebaseAnalyticsWithoutAdIdSupport in Frameworks */ = {isa = PBXBuildFile; productRef = B97E450028DE8499001C9EF1 /* FirebaseAnalyticsWithoutAdIdSupport */; };
+		B97E450328DE8499001C9EF1 /* FirebaseAppCheck in Frameworks */ = {isa = PBXBuildFile; productRef = B97E450228DE8499001C9EF1 /* FirebaseAppCheck */; };
+		B97E450528DE8499001C9EF1 /* FirebaseCrashlytics in Frameworks */ = {isa = PBXBuildFile; productRef = B97E450428DE8499001C9EF1 /* FirebaseCrashlytics */; };
+		B97E450728DE8499001C9EF1 /* FirebaseInstallations in Frameworks */ = {isa = PBXBuildFile; productRef = B97E450628DE8499001C9EF1 /* FirebaseInstallations */; };
+		B97E450928DE8499001C9EF1 /* FirebasePerformance in Frameworks */ = {isa = PBXBuildFile; productRef = B97E450828DE8499001C9EF1 /* FirebasePerformance */; };
+		B97E450B28DE84EE001C9EF1 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B97E450A28DE84EE001C9EF1 /* AppDelegate.swift */; };
+		B97E450D28DE8507001C9EF1 /* MainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B97E450C28DE8507001C9EF1 /* MainView.swift */; };
 		B9861D5727CC5D0100053D00 /* EditTeamName.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9861D5627CC5D0100053D00 /* EditTeamName.swift */; };
 		B9861D5F27CD485A00053D00 /* ScoreMatchingScreenshots.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9861D5E27CD485A00053D00 /* ScoreMatchingScreenshots.swift */; };
 		B9861D6827CD487800053D00 /* SnapshotHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9861D6727CD487800053D00 /* SnapshotHelper.swift */; };
@@ -28,6 +41,13 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		B96F152428DE670F00349258 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = B9788A1C27B3CDA900EDF754 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = B96F151728DE670E00349258;
+			remoteInfo = WidgetExtension;
+		};
 		B9861D6227CD485A00053D00 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = B9788A1C27B3CDA900EDF754 /* Project object */;
@@ -36,6 +56,20 @@
 			remoteInfo = ScoreMatching;
 		};
 /* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		B96F152728DE670F00349258 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				B96F152628DE670F00349258 /* WidgetExtension.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		B919B9BF27CAA67A00014942 /* IntervalsList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IntervalsList.swift; sourceTree = "<group>"; };
@@ -48,11 +82,20 @@
 		B95C37F027B49144009A2C5F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		B95C37F127B49369009A2C5F /* ConnectivityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectivityView.swift; sourceTree = "<group>"; };
 		B95C37F327B4A9C2009A2C5F /* Color+Decodable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+Decodable.swift"; sourceTree = "<group>"; };
+		B96F151828DE670E00349258 /* WidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = WidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		B96F151A28DE670E00349258 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
+		B96F151C28DE670E00349258 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
+		B96F151F28DE670E00349258 /* Widget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Widget.swift; sourceTree = "<group>"; };
+		B96F152128DE670F00349258 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		B96F152328DE670F00349258 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		B9788A2427B3CDA900EDF754 /* What the score.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "What the score.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		B9788A2727B3CDA900EDF754 /* ScoreMatchingApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScoreMatchingApp.swift; sourceTree = "<group>"; };
 		B9788A2927B3CDA900EDF754 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		B9788A2B27B3CDA900EDF754 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		B9788A2E27B3CDA900EDF754 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		B97E44FD28DE8418001C9EF1 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		B97E450A28DE84EE001C9EF1 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		B97E450C28DE8507001C9EF1 /* MainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainView.swift; sourceTree = "<group>"; };
 		B9861D5627CC5D0100053D00 /* EditTeamName.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditTeamName.swift; sourceTree = "<group>"; };
 		B9861D5C27CD485A00053D00 /* ScoreMatchingScreenshots.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ScoreMatchingScreenshots.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		B9861D5E27CD485A00053D00 /* ScoreMatchingScreenshots.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScoreMatchingScreenshots.swift; sourceTree = "<group>"; };
@@ -62,10 +105,24 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		B96F151528DE670E00349258 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B96F151D28DE670E00349258 /* SwiftUI.framework in Frameworks */,
+				B96F151B28DE670E00349258 /* WidgetKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		B9788A2127B3CDA900EDF754 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B97E450528DE8499001C9EF1 /* FirebaseCrashlytics in Frameworks */,
+				B97E450328DE8499001C9EF1 /* FirebaseAppCheck in Frameworks */,
+				B97E450928DE8499001C9EF1 /* FirebasePerformance in Frameworks */,
+				B97E450128DE8499001C9EF1 /* FirebaseAnalyticsWithoutAdIdSupport in Frameworks */,
+				B97E450728DE8499001C9EF1 /* FirebaseInstallations in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -123,11 +180,33 @@
 			path = Multipeer;
 			sourceTree = "<group>";
 		};
+		B96F151928DE670E00349258 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				B96F151A28DE670E00349258 /* WidgetKit.framework */,
+				B96F151C28DE670E00349258 /* SwiftUI.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		B96F151E28DE670E00349258 /* Widget */ = {
+			isa = PBXGroup;
+			children = (
+				B96F151F28DE670E00349258 /* Widget.swift */,
+				B96F152128DE670F00349258 /* Assets.xcassets */,
+				B96F152328DE670F00349258 /* Info.plist */,
+			);
+			path = Widget;
+			sourceTree = "<group>";
+		};
 		B9788A1B27B3CDA900EDF754 = {
 			isa = PBXGroup;
 			children = (
+				B97E44FD28DE8418001C9EF1 /* GoogleService-Info.plist */,
 				B9788A2627B3CDA900EDF754 /* ScoreMatching */,
 				B9861D5D27CD485A00053D00 /* ScoreMatchingScreenshots */,
+				B96F151E28DE670E00349258 /* Widget */,
+				B96F151928DE670E00349258 /* Frameworks */,
 				B9788A2527B3CDA900EDF754 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -137,6 +216,7 @@
 			children = (
 				B9788A2427B3CDA900EDF754 /* What the score.app */,
 				B9861D5C27CD485A00053D00 /* ScoreMatchingScreenshots.xctest */,
+				B96F151828DE670E00349258 /* WidgetExtension.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -146,6 +226,8 @@
 			children = (
 				B95C37F027B49144009A2C5F /* Info.plist */,
 				B9788A2727B3CDA900EDF754 /* ScoreMatchingApp.swift */,
+				B97E450C28DE8507001C9EF1 /* MainView.swift */,
+				B97E450A28DE84EE001C9EF1 /* AppDelegate.swift */,
 				B919B9C827CC591300014942 /* ReceiverModeView.swift */,
 				B9788A2927B3CDA900EDF754 /* ContentView.swift */,
 				B919B9C627CAA6DD00014942 /* HomePageViewModel.swift */,
@@ -181,6 +263,23 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		B96F151728DE670E00349258 /* WidgetExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = B96F152A28DE670F00349258 /* Build configuration list for PBXNativeTarget "WidgetExtension" */;
+			buildPhases = (
+				B96F151428DE670E00349258 /* Sources */,
+				B96F151528DE670E00349258 /* Frameworks */,
+				B96F151628DE670E00349258 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = WidgetExtension;
+			productName = WidgetExtension;
+			productReference = B96F151828DE670E00349258 /* WidgetExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 		B9788A2327B3CDA900EDF754 /* What the score */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = B9788A3227B3CDA900EDF754 /* Build configuration list for PBXNativeTarget "What the score" */;
@@ -188,12 +287,21 @@
 				B9788A2027B3CDA900EDF754 /* Sources */,
 				B9788A2127B3CDA900EDF754 /* Frameworks */,
 				B9788A2227B3CDA900EDF754 /* Resources */,
+				B96F152728DE670F00349258 /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				B96F152528DE670F00349258 /* PBXTargetDependency */,
 			);
 			name = "What the score";
+			packageProductDependencies = (
+				B97E450028DE8499001C9EF1 /* FirebaseAnalyticsWithoutAdIdSupport */,
+				B97E450228DE8499001C9EF1 /* FirebaseAppCheck */,
+				B97E450428DE8499001C9EF1 /* FirebaseCrashlytics */,
+				B97E450628DE8499001C9EF1 /* FirebaseInstallations */,
+				B97E450828DE8499001C9EF1 /* FirebasePerformance */,
+			);
 			productName = ScoreMatching;
 			productReference = B9788A2427B3CDA900EDF754 /* What the score.app */;
 			productType = "com.apple.product-type.application";
@@ -223,9 +331,12 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
-				LastSwiftUpdateCheck = 1320;
+				LastSwiftUpdateCheck = 1400;
 				LastUpgradeCheck = 1320;
 				TargetAttributes = {
+					B96F151728DE670E00349258 = {
+						CreatedOnToolsVersion = 14.0;
+					};
 					B9788A2327B3CDA900EDF754 = {
 						CreatedOnToolsVersion = 13.2.1;
 					};
@@ -244,23 +355,36 @@
 				Base,
 			);
 			mainGroup = B9788A1B27B3CDA900EDF754;
+			packageReferences = (
+				B97E44FF28DE8499001C9EF1 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+			);
 			productRefGroup = B9788A2527B3CDA900EDF754 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
 				B9788A2327B3CDA900EDF754 /* What the score */,
 				B9861D5B27CD485A00053D00 /* ScoreMatchingScreenshots */,
+				B96F151728DE670E00349258 /* WidgetExtension */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		B96F151628DE670E00349258 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B96F152228DE670F00349258 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		B9788A2227B3CDA900EDF754 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 				B9788A2F27B3CDA900EDF754 /* Preview Assets.xcassets in Resources */,
 				B9788A2C27B3CDA900EDF754 /* Assets.xcassets in Resources */,
+				B97E44FE28DE8418001C9EF1 /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -274,6 +398,14 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		B96F151428DE670E00349258 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B96F152028DE670E00349258 /* Widget.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		B9788A2027B3CDA900EDF754 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -281,11 +413,13 @@
 				B919B9C527CAA6C700014942 /* Models.swift in Sources */,
 				B9861D5727CC5D0100053D00 /* EditTeamName.swift in Sources */,
 				B919B9C727CAA6DD00014942 /* HomePageViewModel.swift in Sources */,
+				B97E450B28DE84EE001C9EF1 /* AppDelegate.swift in Sources */,
 				B9F9A8CA27B3DAD900B4C805 /* SettingsView.swift in Sources */,
 				B9788A2A27B3CDA900EDF754 /* ContentView.swift in Sources */,
 				B95C37EF27B474EA009A2C5F /* Connectivity.swift in Sources */,
 				B95C37F227B49369009A2C5F /* ConnectivityView.swift in Sources */,
 				B919B9C927CC591300014942 /* ReceiverModeView.swift in Sources */,
+				B97E450D28DE8507001C9EF1 /* MainView.swift in Sources */,
 				B919B9C027CAA67A00014942 /* IntervalsList.swift in Sources */,
 				B95C37EB27B4748A009A2C5F /* PDFGenerator.swift in Sources */,
 				B9788A2827B3CDA900EDF754 /* ScoreMatchingApp.swift in Sources */,
@@ -307,6 +441,11 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		B96F152528DE670F00349258 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = B96F151728DE670E00349258 /* WidgetExtension */;
+			targetProxy = B96F152428DE670F00349258 /* PBXContainerItemProxy */;
+		};
 		B9861D6327CD485A00053D00 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = B9788A2327B3CDA900EDF754 /* What the score */;
@@ -315,6 +454,64 @@
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
+		B96F152828DE670F00349258 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = B82WJF6RBY;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Widget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = Widget;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.mcomisso.ScoreMatching.Widget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		B96F152928DE670F00349258 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = B82WJF6RBY;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Widget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = Widget;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.mcomisso.ScoreMatching.Widget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
 		B9788A3027B3CDA900EDF754 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -434,6 +631,7 @@
 		B9788A3327B3CDA900EDF754 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
@@ -443,12 +641,13 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = ScoreMatching/Info.plist;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.lifestyle";
 				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "Find other devices running ScoreMatching";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 15.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -465,6 +664,7 @@
 		B9788A3427B3CDA900EDF754 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
@@ -474,12 +674,13 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = ScoreMatching/Info.plist;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.lifestyle";
 				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "Find other devices running ScoreMatching";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 15.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -530,6 +731,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		B96F152A28DE670F00349258 /* Build configuration list for PBXNativeTarget "WidgetExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				B96F152828DE670F00349258 /* Debug */,
+				B96F152928DE670F00349258 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		B9788A1F27B3CDA900EDF754 /* Build configuration list for PBXProject "ScoreMatching" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -558,6 +768,45 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		B97E44FF28DE8499001C9EF1 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 9.0.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		B97E450028DE8499001C9EF1 /* FirebaseAnalyticsWithoutAdIdSupport */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B97E44FF28DE8499001C9EF1 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAnalyticsWithoutAdIdSupport;
+		};
+		B97E450228DE8499001C9EF1 /* FirebaseAppCheck */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B97E44FF28DE8499001C9EF1 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAppCheck;
+		};
+		B97E450428DE8499001C9EF1 /* FirebaseCrashlytics */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B97E44FF28DE8499001C9EF1 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseCrashlytics;
+		};
+		B97E450628DE8499001C9EF1 /* FirebaseInstallations */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B97E44FF28DE8499001C9EF1 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseInstallations;
+		};
+		B97E450828DE8499001C9EF1 /* FirebasePerformance */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B97E44FF28DE8499001C9EF1 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebasePerformance;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = B9788A1C27B3CDA900EDF754 /* Project object */;
 }

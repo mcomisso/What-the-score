@@ -41,41 +41,23 @@ struct TapButton: View {
         ZStack {
             GeometryReader { geometryProxy in
                 VStack {
+                    let fontSize = min(geometryProxy.size.width, geometryProxy.size.height) / 3.5
                     Text("\(count)")
-                        .font(.system(size: min(geometryProxy.size.width, geometryProxy.size.height) / 3.5))
+                        .font(.system(size: fontSize, design: .rounded))
                         .frame(maxWidth: .infinity,
                                maxHeight: .infinity)
                     Text(name)
                         .bold()
-                        .font(.headline)
+                        .font(.system(.headline, design: .default))
                         .padding(.bottom)
                 }
-                .foregroundColor(color)
+                .foregroundStyle(color)
                 .colorInvert()
                 .frame(maxWidth: .infinity,
                        maxHeight: .infinity)
                 .contentShape(Rectangle())
-                .onTapGesture {
-                    if isEnabled {
-                        justAdded = true
-                        count += 1
-                        feedbackGenerator.prepare()
-                        feedbackGenerator.impactOccurred()
-                        self.lastTapped = name
-                        self.lastTimeTapped = Date()
-                    }
-                }
-                .gesture(DragGesture()
-                            .onEnded { valuee in
-                    if count > 0 {
-                        count -= 1
-                        feedbackGenerator.prepare()
-                        feedbackGenerator.impactOccurred()
-                        self.lastTimeTapped = Date()
-                    } else {
-                        warningGenerator.notificationOccurred(.warning)
-                    }
-                })
+                .onTapGesture(perform: didTapOnButton)
+                .gesture(DragGesture().onEnded(onGestureEnd))
 
                 if justAdded {
                     Text("+1")
@@ -84,6 +66,28 @@ struct TapButton: View {
                         .opacity(animationAlpha)
                 }
             }
+        }
+    }
+
+    private func onGestureEnd(_ value: DragGesture.Value) {
+        if count > 0 {
+            count -= 1
+            feedbackGenerator.prepare()
+            feedbackGenerator.impactOccurred()
+            self.lastTimeTapped = Date()
+        } else {
+            warningGenerator.notificationOccurred(.warning)
+        }
+    }
+
+    private func didTapOnButton() {
+        if isEnabled {
+            justAdded = true
+            count += 1
+            feedbackGenerator.prepare()
+            feedbackGenerator.impactOccurred()
+            self.lastTapped = name
+            self.lastTimeTapped = Date()
         }
     }
 }
