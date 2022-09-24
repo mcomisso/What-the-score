@@ -19,7 +19,7 @@ class ViewModel: ObservableObject, Equatable {
 
     init() {
         teamsViewModels = ["Team A", "Team B"]
-            .compactMap(TeamsData.init(_:))
+            .compactMap { TeamsData($0) }
     }
 
     func addInterval() {

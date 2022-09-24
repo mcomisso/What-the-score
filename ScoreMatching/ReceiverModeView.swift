@@ -3,6 +3,7 @@ import SwiftUI
 
 struct ReceiverModeView: View {
     @Binding var isReceiverMode: Bool
+
     var body: some View {
         ZStack(alignment: .bottom) {
             ConnectivityView()
