@@ -51,7 +51,9 @@ struct SettingsView: View {
                         }.alert("Are you sure?", isPresented: $showResetAlert) {
                             Button("Yes, reset scores", role: .destructive) {
                                 let privateTeams = teams
-                                privateTeams.forEach { $0.count = 0 }
+                                privateTeams.forEach {
+                                    $0.score.removeAll()
+                                }
                                 self.teams = privateTeams
                             }
                         } message: {

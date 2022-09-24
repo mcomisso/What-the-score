@@ -3,7 +3,7 @@ import SwiftUI
 
 struct TapButton: View {
 
-    @Binding var count: Int
+    @Binding var score: [Score]
     @Binding var color: Color
     @Binding var name: String
     @Binding var lastTapped: String?
@@ -42,7 +42,7 @@ struct TapButton: View {
             GeometryReader { geometryProxy in
                 VStack {
                     let fontSize = min(geometryProxy.size.width, geometryProxy.size.height) / 3.5
-                    Text("\(count)")
+                    Text("\(score.count)")
                         .font(.system(size: fontSize, design: .rounded))
                         .frame(maxWidth: .infinity,
                                maxHeight: .infinity)
@@ -70,8 +70,8 @@ struct TapButton: View {
     }
 
     private func onGestureEnd(_ value: DragGesture.Value) {
-        if count > 0 {
-            count -= 1
+        if !score.isEmpty {
+            score.removeLast()
             feedbackGenerator.prepare()
             feedbackGenerator.impactOccurred()
             self.lastTimeTapped = Date()
@@ -83,7 +83,7 @@ struct TapButton: View {
     private func didTapOnButton() {
         if isEnabled {
             justAdded = true
-            count += 1
+            score.append(.init(time: .init()))
             feedbackGenerator.prepare()
             feedbackGenerator.impactOccurred()
             self.lastTapped = name
@@ -92,9 +92,15 @@ struct TapButton: View {
     }
 }
 struct Previews_TapButton_Previews: PreviewProvider {
-    @State static var count: Int = 0
+    @State static var score: [Score] = [Date()].map { Score.init(time: $0) }
     static var previews: some View {
-        TapButton(count: $count, color: .constant(.primary), name: .constant("Team Name"), lastTapped: .constant(""), lastTimeTapped: .constant(Date()))
-            .background(.gray)
+        TapButton(
+            score: $score,
+            color: .constant(.primary),
+            name: .constant("Team Name"),
+            lastTapped: .constant(""),
+            lastTimeTapped: .constant(Date())
+        )
+        .background(.gray)
     }
 }
