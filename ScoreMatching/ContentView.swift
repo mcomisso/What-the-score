@@ -129,7 +129,8 @@ struct ContentView: View {
                     .foregroundStyle(.primary)
                     .imageScale(.large)
                     .padding()
-                    .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 16))
+                    .background(.regularMaterial,
+                                in: RoundedRectangle(cornerRadius: 16))
                     .shadow(radius: 8)
             }
         }.symbolRenderingMode(.hierarchical)
@@ -137,10 +138,15 @@ struct ContentView: View {
     @State var shadowRadius: Double = 10
     var buttons: some View {
         ForEach($viewModel.teamsViewModels) { team in
-            TapButton(count: team.count, color: team.color, name: team.name,
-                      lastTapped: $lastTapped, lastTimeTapped: $lastTimeTapped)
-                .background(team.color.wrappedValue)
-                .id(team.name.wrappedValue)
+            TapButton(
+                score: team.score,
+                color: team.color,
+                name: team.name,
+                lastTapped: $lastTapped,
+                lastTimeTapped: $lastTimeTapped
+            )
+            .background(team.color.wrappedValue)
+            .id(team.name.wrappedValue)
         }
     }
 

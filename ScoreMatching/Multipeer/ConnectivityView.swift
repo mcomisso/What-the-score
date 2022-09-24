@@ -12,7 +12,7 @@ struct ConnectivityView: View {
         if verticalSizeClass == .regular {
             VStack(spacing: 0) {
                 ForEach(connectivity.readOnlyData) { element in
-                    TapButton(count:.constant(element.count),
+                    TapButton(score:.constant(element.score),
                               color: .constant(element.color),
                               name: .constant(element.name),
                               lastTapped: .constant(nil),
@@ -25,7 +25,7 @@ struct ConnectivityView: View {
         } else {
             HStack(spacing: 0) {
                 ForEach(connectivity.readOnlyData) { element in
-                    TapButton(count:.constant(element.count),
+                    TapButton(score:.constant(element.score),
                               color: .constant(element.color),
                               name: .constant(element.name),
                               lastTapped: .constant(nil),
