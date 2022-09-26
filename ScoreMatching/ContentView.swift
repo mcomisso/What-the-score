@@ -4,12 +4,17 @@ struct ContentView: View {
     @Environment(\.verticalSizeClass) var verticalSizeClass
     @EnvironmentObject var connectivity: Connectivity
 
-    @StateObject var viewModel = ViewModel()
-    @State var lastTapped: String?
-    @State var lastTimeTapped: Date = Date()
+    @AppStorage("encodedTeamData", store: UserDefaults(suiteName: "group.mcomisso.whatTheScore"))
+    var encodedTeamsData: Data = Data()
 
-    @State var isVisualisingSettings: Bool = false
-    @State var isShowingIntervals: Bool = false
+    @StateObject var viewModel = ViewModel()
+    @State private var lastTapped: String?
+    @State private var lastTimeTapped: Date = Date()
+
+    @State private var isVisualisingSettings: Bool = false
+    @State private var isShowingIntervals: Bool = false
+
+    @State private var shadowRadius: Double = 10
 
     var body: some View {
         ZStack(alignment: .bottomTrailing) {
@@ -29,11 +34,12 @@ struct ContentView: View {
 
             let data = self.viewModel.teamsViewModels.map { $0.toCodable() }
 
-            let encoder = JSONEncoder()
-            if let encodedData = try? encoder.encode(data) {
-                connectivity.send(data: encodedData)
-                UserDefaults.standard.set(encodedData, forKey: "encodedTeamData")
+            guard let encodedData = try? JSONEncoder().encode(data) else {
+                return
             }
+            print(encodedData.description)
+            connectivity.send(data: encodedData)
+            encodedTeamsData = encodedData
         })
         .sheet(isPresented: $isVisualisingSettings, onDismiss: nil, content: {
             SettingsView(teams: $viewModel.teamsViewModels)
@@ -84,7 +90,6 @@ struct ContentView: View {
         }.symbolRenderingMode(.hierarchical)
     }
 
-    @State var shadowRadius: Double = 10
     var buttons: some View {
         ForEach($viewModel.teamsViewModels) { team in
             TapButton(

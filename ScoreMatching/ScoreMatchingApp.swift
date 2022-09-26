@@ -1,5 +1,6 @@
 import SwiftUI
 import StoreKit
+import WidgetKit
 
 @main
 struct ScoreMatchingApp: App {
@@ -20,7 +21,14 @@ struct ScoreMatchingApp: App {
                 }
                 .onChange(of: scenePhase) { phase in
                     onSceneActive(phase)
+                    onSceneBackground(phase)
                 }
+        }
+    }
+
+    private func onSceneBackground(_ phase: ScenePhase) {
+        if phase == .background {
+            WidgetCenter.shared.reloadAllTimelines()
         }
     }
 
