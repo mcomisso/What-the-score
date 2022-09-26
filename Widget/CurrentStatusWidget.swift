@@ -2,7 +2,7 @@ import WidgetKit
 import SwiftUI
 
 struct Provider: TimelineProvider {
-    @AppStorage("encodedTeamData")
+    @AppStorage("encodedTeamData", store: UserDefaults(suiteName: "group.mcomisso.whatTheScore"))
     var encodedTeamsData: Data = Data()
 
     func placeholder(in context: Context) -> SimpleEntry {
@@ -21,21 +21,31 @@ struct Provider: TimelineProvider {
             let entry = SimpleEntry(date: Date(), teams: teamsDecodedData.map { $0.toTeamData() })
 
             completion(entry)
-        } catch {
-            completion(.init(date: Date(), teams: []))
-        }
 
+        } catch {
+            let teamA = TeamsData("Team A")
+            let teamB = TeamsData("Team B")
+            completion(.init(date: Date(), teams: [teamA, teamB]))
+        }
     }
 
     func getTimeline(in context: Context, completion: @escaping (Timeline<Entry>) -> ()) {
+
+        let teamsDecodedData = try? JSONDecoder()
+            .decode([CodableTeamData].self, from: encodedTeamsData)
+
         var entries: [SimpleEntry] = []
 
-        // Generate a timeline consisting of five entries an hour apart, starting from the current date.
-        let currentDate = Date()
-        for hourOffset in 0 ..< 5 {
-            let entryDate = Calendar.current.date(byAdding: .hour, value: hourOffset, to: currentDate)!
-            let entry = SimpleEntry(date: entryDate, teams: [])
-            entries.append(entry)
+        if let decodedTeams = teamsDecodedData {
+            let teamsEntries = SimpleEntry(
+                date: Date(),
+                teams: decodedTeams.map { $0.toTeamData() }
+            )
+            entries.append(teamsEntries)
+        } else {
+            let teamA = TeamsData("Team A")
+            let teamB = TeamsData("Team B")
+            entries.append(.init(date: Date(), teams: [teamA, teamB]))
         }
 
         let timeline = Timeline(entries: entries, policy: .atEnd)
@@ -82,6 +92,7 @@ struct CurrentStatusWidget: Widget {
         StaticConfiguration(kind: kind, provider: Provider()) { entry in
             WidgetEntryView(entry: entry)
         }
+        .supportedFamilies([.systemSmall])
         .configurationDisplayName("Current game")
         .description("Displays the current score for all teams.")
     }
