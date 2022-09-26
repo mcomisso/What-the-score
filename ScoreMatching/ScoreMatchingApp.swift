@@ -1,5 +1,6 @@
 import SwiftUI
 import StoreKit
+import WidgetKit
 
 @main
 struct ScoreMatchingApp: App {
@@ -20,7 +21,14 @@ struct ScoreMatchingApp: App {
                 }
                 .onChange(of: scenePhase) { phase in
                     onSceneActive(phase)
+                    onSceneBackground(phase)
                 }
+        }
+    }
+
+    private func onSceneBackground(_ phase: ScenePhase) {
+        if phase == .background {
+            WidgetCenter.shared.reloadAllTimelines()
         }
     }
 
@@ -37,12 +45,3 @@ struct ScoreMatchingApp: App {
         }
     }
 }
-
-extension Color {
-    static var random: Color {
-        Color(hue: Double.random(in: (0...1)),
-              saturation: Double.random(in: (0.6...0.8)),
-              brightness: 0.8)
-    }
-}
-
