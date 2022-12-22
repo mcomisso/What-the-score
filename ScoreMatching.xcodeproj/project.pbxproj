@@ -26,11 +26,6 @@
 		B9788A2C27B3CDA900EDF754 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B9788A2B27B3CDA900EDF754 /* Assets.xcassets */; };
 		B9788A2F27B3CDA900EDF754 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B9788A2E27B3CDA900EDF754 /* Preview Assets.xcassets */; };
 		B97E44FE28DE8418001C9EF1 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = B97E44FD28DE8418001C9EF1 /* GoogleService-Info.plist */; };
-		B97E450128DE8499001C9EF1 /* FirebaseAnalyticsWithoutAdIdSupport in Frameworks */ = {isa = PBXBuildFile; productRef = B97E450028DE8499001C9EF1 /* FirebaseAnalyticsWithoutAdIdSupport */; };
-		B97E450328DE8499001C9EF1 /* FirebaseAppCheck in Frameworks */ = {isa = PBXBuildFile; productRef = B97E450228DE8499001C9EF1 /* FirebaseAppCheck */; };
-		B97E450528DE8499001C9EF1 /* FirebaseCrashlytics in Frameworks */ = {isa = PBXBuildFile; productRef = B97E450428DE8499001C9EF1 /* FirebaseCrashlytics */; };
-		B97E450728DE8499001C9EF1 /* FirebaseInstallations in Frameworks */ = {isa = PBXBuildFile; productRef = B97E450628DE8499001C9EF1 /* FirebaseInstallations */; };
-		B97E450928DE8499001C9EF1 /* FirebasePerformance in Frameworks */ = {isa = PBXBuildFile; productRef = B97E450828DE8499001C9EF1 /* FirebasePerformance */; };
 		B97E450B28DE84EE001C9EF1 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B97E450A28DE84EE001C9EF1 /* AppDelegate.swift */; };
 		B97E450D28DE8507001C9EF1 /* MainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B97E450C28DE8507001C9EF1 /* MainView.swift */; };
 		B97E451028DE871B001C9EF1 /* CodableTeamData.swift in Sources */ = {isa = PBXBuildFile; fileRef = B97E450F28DE871B001C9EF1 /* CodableTeamData.swift */; };
@@ -41,6 +36,7 @@
 		B97E451828DFC89C001C9EF1 /* Color+random.swift in Sources */ = {isa = PBXBuildFile; fileRef = B97E451628DFC895001C9EF1 /* Color+random.swift */; };
 		B97E451A28DFCBAF001C9EF1 /* FloaterText.swift in Sources */ = {isa = PBXBuildFile; fileRef = B97E451928DFCBAF001C9EF1 /* FloaterText.swift */; };
 		B97E451C28DFCBCB001C9EF1 /* FeatureFlag.swift in Sources */ = {isa = PBXBuildFile; fileRef = B97E451B28DFCBCB001C9EF1 /* FeatureFlag.swift */; };
+		B98539CF2954E4020084DCEC /* TelemetryClient in Frameworks */ = {isa = PBXBuildFile; productRef = B98539CE2954E4020084DCEC /* TelemetryClient */; };
 		B9861D5727CC5D0100053D00 /* EditTeamName.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9861D5627CC5D0100053D00 /* EditTeamName.swift */; };
 		B9861D5F27CD485A00053D00 /* ScoreMatchingScreenshots.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9861D5E27CD485A00053D00 /* ScoreMatchingScreenshots.swift */; };
 		B9861D6827CD487800053D00 /* SnapshotHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9861D6727CD487800053D00 /* SnapshotHelper.swift */; };
@@ -132,11 +128,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				B97E450528DE8499001C9EF1 /* FirebaseCrashlytics in Frameworks */,
-				B97E450328DE8499001C9EF1 /* FirebaseAppCheck in Frameworks */,
-				B97E450928DE8499001C9EF1 /* FirebasePerformance in Frameworks */,
-				B97E450128DE8499001C9EF1 /* FirebaseAnalyticsWithoutAdIdSupport in Frameworks */,
-				B97E450728DE8499001C9EF1 /* FirebaseInstallations in Frameworks */,
+				B98539CF2954E4020084DCEC /* TelemetryClient in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -332,11 +324,7 @@
 			);
 			name = "What the score";
 			packageProductDependencies = (
-				B97E450028DE8499001C9EF1 /* FirebaseAnalyticsWithoutAdIdSupport */,
-				B97E450228DE8499001C9EF1 /* FirebaseAppCheck */,
-				B97E450428DE8499001C9EF1 /* FirebaseCrashlytics */,
-				B97E450628DE8499001C9EF1 /* FirebaseInstallations */,
-				B97E450828DE8499001C9EF1 /* FirebasePerformance */,
+				B98539CE2954E4020084DCEC /* TelemetryClient */,
 			);
 			productName = ScoreMatching;
 			productReference = B9788A2427B3CDA900EDF754 /* What the score.app */;
@@ -392,7 +380,7 @@
 			);
 			mainGroup = B9788A1B27B3CDA900EDF754;
 			packageReferences = (
-				B97E44FF28DE8499001C9EF1 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+				B98539CD2954E4020084DCEC /* XCRemoteSwiftPackageReference "SwiftClient" */,
 			);
 			productRefGroup = B9788A2527B3CDA900EDF754 /* Products */;
 			projectDirPath = "";
@@ -820,41 +808,21 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		B97E44FF28DE8499001C9EF1 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
+		B98539CD2954E4020084DCEC /* XCRemoteSwiftPackageReference "SwiftClient" */ = {
 			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
+			repositoryURL = "https://github.com/TelemetryDeck/SwiftClient";
 			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 9.0.0;
+				branch = main;
+				kind = branch;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		B97E450028DE8499001C9EF1 /* FirebaseAnalyticsWithoutAdIdSupport */ = {
+		B98539CE2954E4020084DCEC /* TelemetryClient */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = B97E44FF28DE8499001C9EF1 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
-			productName = FirebaseAnalyticsWithoutAdIdSupport;
-		};
-		B97E450228DE8499001C9EF1 /* FirebaseAppCheck */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = B97E44FF28DE8499001C9EF1 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
-			productName = FirebaseAppCheck;
-		};
-		B97E450428DE8499001C9EF1 /* FirebaseCrashlytics */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = B97E44FF28DE8499001C9EF1 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
-			productName = FirebaseCrashlytics;
-		};
-		B97E450628DE8499001C9EF1 /* FirebaseInstallations */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = B97E44FF28DE8499001C9EF1 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
-			productName = FirebaseInstallations;
-		};
-		B97E450828DE8499001C9EF1 /* FirebasePerformance */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = B97E44FF28DE8499001C9EF1 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
-			productName = FirebasePerformance;
+			package = B98539CD2954E4020084DCEC /* XCRemoteSwiftPackageReference "SwiftClient" */;
+			productName = TelemetryClient;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

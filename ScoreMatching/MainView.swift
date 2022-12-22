@@ -8,6 +8,9 @@ struct MainView: View {
     var body: some View {
         if isReceiverMode {
             ReceiverModeView(isReceiverMode: $isReceiverMode)
+                .onAppear {
+                    Analytics.log("receiverModeLaunch")
+                }
         } else {
             ContentView()
         }
