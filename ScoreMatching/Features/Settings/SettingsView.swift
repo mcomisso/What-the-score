@@ -5,6 +5,7 @@ import PDFKit
 struct SettingsView: View {
 
     @Environment(\.dismiss) var dimiss
+    @Environment(\.openURL) var openURL
 
     @Binding var teams: [TeamsData]
 
@@ -61,6 +62,19 @@ struct SettingsView: View {
                         }
                     }
 
+                    Section("About") {
+                        TwitterButton(username: "comismatt")
+
+                        Button {
+                            openURL(mailURL)
+                        } label: {
+                            HStack {
+                                Image(systemName: "envelope")
+                                Text("Submit feedback or feature request")
+                            }
+                        }
+                    }.buttonStyle(.plain)
+
                     #if DEBUG
                     Section("Export") {
                         Button("Generate PDF of scoreboard") { }
@@ -84,6 +98,28 @@ struct SettingsView: View {
 
     func remove(_ indexSet: IndexSet) {
         teams.remove(atOffsets: indexSet)
+    }
+
+    var mailURL: URL {
+        let subject = "What the score (\(Bundle.main.buildNumber)) support request"
+        let body = """
+
+
+----- Please reply above this line -----
+Build number: \(Bundle.main.buildNumber)
+Version: \(Bundle.main.versionNumber)
+Locale: \(Locale.current.description)
+"""
+        let mailURL: URL = URL(string: "mailto:whatthescore@mcomisso.me")!
+        var components = URLComponents(url: mailURL, resolvingAgainstBaseURL: false)
+        let items = [
+            URLQueryItem(name: "body", value: body),
+            URLQueryItem(name: "subject", value: subject)
+        ]
+
+        components?.queryItems = items
+
+        return components!.url!
     }
 }
 
