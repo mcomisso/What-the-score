@@ -1,6 +1,7 @@
 import Foundation
 import TelemetryClient
 import UIKit
+import FirebaseCore
 
 private extension Bundle {
     var analyticsID: String {
@@ -15,7 +16,7 @@ class AppDelegate: NSObject, UIApplicationDelegate {
 
         let configuration = TelemetryManagerConfiguration(appID: Bundle.main.analyticsID)
         TelemetryManager.initialize(with: configuration)
-
+        FirebaseApp.configure()
         return true
     }
 }

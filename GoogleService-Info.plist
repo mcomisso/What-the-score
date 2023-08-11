@@ -3,21 +3,21 @@
 <plist version="1.0">
 <dict>
 	<key>CLIENT_ID</key>
-	<string>1021900716346-0q5dr7q9dhqkcudg4m8tq1cqia8mkkqi.apps.googleusercontent.com</string>
+	<string>402489678918-924s549n9gskn9k8dlepr2sedhcsot5s.apps.googleusercontent.com</string>
 	<key>REVERSED_CLIENT_ID</key>
-	<string>com.googleusercontent.apps.1021900716346-0q5dr7q9dhqkcudg4m8tq1cqia8mkkqi</string>
+	<string>com.googleusercontent.apps.402489678918-924s549n9gskn9k8dlepr2sedhcsot5s</string>
 	<key>API_KEY</key>
-	<string>AIzaSyBkArCYtLa_hghMZb5PONJAmjdLIRU3zj8</string>
+	<string>AIzaSyBrqfI2RWn0oacXemfZ3gEv6Fy6NO17bmQ</string>
 	<key>GCM_SENDER_ID</key>
-	<string>1021900716346</string>
+	<string>402489678918</string>
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
 	<string>com.mcomisso.ScoreMatching</string>
 	<key>PROJECT_ID</key>
-	<string>what-the-score</string>
+	<string>test-interaction-fdd61</string>
 	<key>STORAGE_BUCKET</key>
-	<string>what-the-score.appspot.com</string>
+	<string>test-interaction-fdd61.appspot.com</string>
 	<key>IS_ADS_ENABLED</key>
 	<false></false>
 	<key>IS_ANALYTICS_ENABLED</key>
@@ -29,6 +29,8 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:1021900716346:ios:e2401ee913d8678859f803</string>
+	<string>1:402489678918:ios:6a72d99623f909421afe47</string>
+	<key>DATABASE_URL</key>
+	<string>https://test-interaction-fdd61.firebaseio.com</string>
 </dict>
 </plist>
