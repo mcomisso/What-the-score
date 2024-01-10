@@ -1,10 +1,14 @@
 import SwiftUI
 import StoreKit
 import WidgetKit
+import SwiftData
 
 @main
 struct ScoreMatchingApp: App {
     private let connectivity = Connectivity()
+
+    @AppStorage("encodedTeamData", store: UserDefaults(suiteName: "group.mcomisso.whatTheScore"))
+    var encodedTeamsData: Data = Data()
 
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
 
@@ -16,30 +20,31 @@ struct ScoreMatchingApp: App {
         WindowGroup {
             MainView()
                 .environmentObject(connectivity)
-                .task {
-                    await requestReviewIfNeeded()
+                .onAppear {
+                    requestReviewIfNeeded()
                 }
                 .onChange(of: scenePhase) { phase in
                     onSceneActive(phase)
                     onSceneBackground(phase)
                 }
-        }
+        }.modelContainer(for: [Team.self])
     }
 
     private func onSceneBackground(_ phase: ScenePhase) {
-        if phase == .background {
-            WidgetCenter.shared.reloadAllTimelines()
+        guard phase == .background else {
+            return
         }
+        WidgetCenter.shared.reloadAllTimelines()
     }
 
     private func onSceneActive(_ phase: ScenePhase) {
-        if phase == .active {
-            totalLaunches += 1
+        guard phase == .active else {
+            return
         }
+        totalLaunches += 1
     }
 
-    @MainActor
-    private func requestReviewIfNeeded() async {
+    private func requestReviewIfNeeded() {
         if totalLaunches % 3 == 0 {
             requestReview()
         }
