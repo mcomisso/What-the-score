@@ -63,7 +63,17 @@ struct SettingsView: View {
                     }
 
                     Section("About") {
-                        TwitterButton(username: "comismatt")
+                        SocialButton(
+                            username: "Matteo on Mastodon",
+                            url: URL(string: "https://mastodon.social/@teomatteo89")!,
+                            icon: Image(.mastodon)
+                        )
+
+                        SocialButton(
+                            username: "Matteo on Threads",
+                            url: URL(string: "https://www.threads.net/@matteo_comisso")!,
+                            icon: Image(.threads)
+                        )
 
                         Button {
                             openURL(mailURL)

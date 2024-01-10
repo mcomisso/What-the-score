@@ -8,14 +8,15 @@
 import Foundation
 import SwiftUI
 
-class ViewModel: ObservableObject, Equatable {
+@Observable
+class ViewModel: Equatable {
     static func == (lhs: ViewModel, rhs: ViewModel) -> Bool {
         lhs.teamsViewModels == rhs.teamsViewModels
     }
 
-    @Published var teamsViewModels: [TeamsData] = []
+    var teamsViewModels: [TeamsData] = []
 
-    @Published var intervals: [Interval] = []
+    var intervals: [Interval] = []
 
     init() {
         teamsViewModels = ["Team A", "Team B"]

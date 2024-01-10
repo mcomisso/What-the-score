@@ -1,4 +1,5 @@
 import SwiftUI
+import SwiftData
 
 struct ContentView: View {
     @Environment(\.verticalSizeClass) var verticalSizeClass
@@ -7,7 +8,9 @@ struct ContentView: View {
     @AppStorage("encodedTeamData", store: UserDefaults(suiteName: "group.mcomisso.whatTheScore"))
     var encodedTeamsData: Data = Data()
 
-    @StateObject var viewModel = ViewModel()
+    @Query(sort: \Team.name) var teams: [Team]
+
+    @State private var viewModel = ViewModel()
     @State private var lastTapped: String?
     @State private var lastTimeTapped: Date = Date()
 

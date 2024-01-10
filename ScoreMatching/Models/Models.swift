@@ -1,5 +1,6 @@
 import Foundation
 import SwiftUI
+import Observation
 
 struct Score: Codable {
     var time: Date
@@ -10,12 +11,13 @@ struct Interval {
     var points: [TeamsData]
 }
 
-class TeamsData: ObservableObject, Identifiable {
+@Observable
+class TeamsData: Identifiable, Codable {
     let id: UUID = UUID()
     var score: [Score] = []
 
-    @Published var name: String
-    @Published var color: Color = .random
+    var name: String
+    var color: Color = .random
 
     init(_ name: String, score: [Score] = [], color: Color = .random) {
         self.name = name

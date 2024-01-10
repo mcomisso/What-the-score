@@ -1,5 +1,6 @@
 import Foundation
 import SwiftUI
+import Pow
 
 struct TapButton: View {
 
@@ -11,31 +12,14 @@ struct TapButton: View {
 
     var isEnabled: Bool = true
 
-    private let feedbackGenerator = UIImpactFeedbackGenerator()
     private let warningGenerator = UINotificationFeedbackGenerator()
 
     @State var shadowRadius: Double = 10
 
-    @State var isEditing: Bool = false
-    @State var animationOffset: CGFloat = 0
-    @State var animationAlpha: Double = 0
-    @State var justAdded: Bool = false {
-        didSet {
-            if justAdded {
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.7) {
-                    justAdded = false
-                }
-                animationAlpha = 1
-                withAnimation(Animation.easeOut(duration: 0.7)) {
-                    animationOffset = -150
-                    animationAlpha = 0
-                }
-            } else {
-                animationOffset = 0
-            }
+    @State var increased: Int = 0
+    @State var decreased: Int = 0
 
-        }
-    }
+    @State var justAdded: Bool = false
 
     var body: some View {
         ZStack {
@@ -58,13 +42,15 @@ struct TapButton: View {
                 .contentShape(Rectangle())
                 .onTapGesture(perform: didTapOnButton)
                 .gesture(DragGesture().onEnded(onGestureEnd))
-
-                if justAdded {
-                    Text("+1")
-                        .font(.largeTitle)
-                        .offset(x: 100, y: animationOffset)
-                        .opacity(animationAlpha)
-                }
+                .sensoryFeedback(.increase, trigger: increased)
+                .sensoryFeedback(.decrease, trigger: decreased)
+                .changeEffect(
+                    .rise(origin: UnitPoint(x: 0.75, y: 0.35)) {
+                        Text("+1")
+                            .foregroundStyle(color)
+                            .scaleEffect(x: 2, y: 2, anchor: .center)
+                            .colorInvert()
+                    }, value: justAdded)
             }
         }
     }
@@ -72,9 +58,8 @@ struct TapButton: View {
     private func onGestureEnd(_ value: DragGesture.Value) {
         if !score.isEmpty {
             score.removeLast()
-            feedbackGenerator.prepare()
-            feedbackGenerator.impactOccurred()
             self.lastTimeTapped = Date()
+            decreased += 1
         } else {
             warningGenerator.notificationOccurred(.warning)
         }
@@ -82,25 +67,24 @@ struct TapButton: View {
 
     private func didTapOnButton() {
         if isEnabled {
-            justAdded = true
+
+            justAdded.toggle()
             score.append(.init(time: .init()))
-            feedbackGenerator.prepare()
-            feedbackGenerator.impactOccurred()
+            increased += 1
             self.lastTapped = name
             self.lastTimeTapped = Date()
+
         }
     }
 }
-struct Previews_TapButton_Previews: PreviewProvider {
-    @State static var score: [Score] = [Date()].map { Score.init(time: $0) }
-    static var previews: some View {
-        TapButton(
-            score: $score,
-            color: .constant(.primary),
-            name: .constant("Team Name"),
-            lastTapped: .constant(""),
-            lastTimeTapped: .constant(Date())
-        )
-        .background(.gray)
-    }
+
+#Preview("Tap button") {
+    TapButton(
+        score: .constant([Date()].map { Score(time: $0) }),
+        color: .constant(.primary),
+        name: .constant("Team Name"),
+        lastTapped: .constant(""),
+        lastTimeTapped: .constant(Date())
+    )
+    .background(.gray)
 }
