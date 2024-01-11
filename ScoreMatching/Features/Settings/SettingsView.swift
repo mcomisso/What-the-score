@@ -1,42 +1,53 @@
 import Foundation
 import SwiftUI
 import PDFKit
+import SwiftData
 
 struct SettingsView: View {
 
     @Environment(\.dismiss) var dimiss
     @Environment(\.openURL) var openURL
 
-    @Binding var teams: [TeamsData]
+    @Query(sort: \Team.creationDate) var teams: [Team]
+    @Environment(\.modelContext) var modelContext
 
     @State private var isShowingNameChangeAlert: Bool = false
-    @State private var selection: TeamsData.ID?
+    //    @State private var selection: Team.ID?
     @State private var isEditing: Bool = false
     @State private var showResetAlert: Bool = false
 
+    @State var colorSelection: Color = .random
     @SceneStorage("isReceiverMode") var isReceiverMode: Bool = false
+
+    var teamsSection: some View {
+        ForEach(teams) { team in
+            @Bindable var team = team
+            ColorPicker(selection: $team.resolvedColor,
+                        supportsOpacity: false) {
+                NavigationLink(destination: EditView(team: team)) {
+                    Text(team.name)
+                }
+            }
+        }
+        .onDelete(perform: remove(_:))
+    }
 
     var body: some View {
         NavigationView {
 
             VStack {
-                List(selection: $selection) {
+                List/*(selection: $selection)*/ {
                     Section("Teams") {
-                        ForEach($teams) { team in
-                            ColorPicker(selection: team.color,
-                                        supportsOpacity: false) {
-                                NavigationLink(destination: EditView(team: team)) {
-                                    Text(team.name.wrappedValue)
-                                }
-                            }
-                        }.onDelete(perform: remove(_:))
+
+                        teamsSection
 
                         Button("Add team") {
-                            teams.append(TeamsData("Team \(teams.count + 1)"))
+                            let team = Team(name: "Team \(teams.count + 1)")
+                            modelContext.insert(team)
                         }.buttonStyle(.borderless)
                     }
 
-                    Section("Utils") {
+                    Section("Connectivity") {
                         NavigationLink(destination: ConnectivityView()) {
                             Text("Broadcast to other devices")
                         }
@@ -51,11 +62,7 @@ struct SettingsView: View {
                             showResetAlert.toggle()
                         }.alert("Are you sure?", isPresented: $showResetAlert) {
                             Button("Yes, reset scores", role: .destructive) {
-                                let privateTeams = teams
-                                privateTeams.forEach {
-                                    $0.score.removeAll()
-                                }
-                                self.teams = privateTeams
+                                self.teams.forEach { modelContext.delete($0) }
                             }
                         } message: {
                             Text("The score will be set to 0.")
@@ -85,29 +92,39 @@ struct SettingsView: View {
                         }
                     }.buttonStyle(.plain)
 
-                    #if DEBUG
+#if DEBUG
                     Section("Export") {
                         Button("Generate PDF of scoreboard") { }
                     }
-                    #endif
+#endif
                 }
-
-                Button {
-                    dimiss()
-                } label: {
-                    Text("Dismiss")
-                        .frame(minWidth: 280, minHeight: 32)
-                }
-                .buttonStyle(.borderedProminent)
-                .padding()
-                
-            }.navigationTitle("Settings")
-                .background(Color(uiColor: UIColor.systemGroupedBackground))
+            }
+            .navigationTitle("Settings")
+            .background(Color(uiColor: UIColor.systemGroupedBackground))
+            .safeAreaInset(edge: .bottom) {
+                    RoundedRectangle(cornerRadius: 16)
+                        .fill(Material.regular)
+                        .overlay {
+                            Button {
+                                dimiss()
+                            } label: {
+                                Text("Dismiss")
+                                    .frame(minWidth: 280, minHeight: 32)
+                            }
+                            .buttonStyle(.borderedProminent)
+                            .padding()
+                        }
+                        .frame(height: 64)
+                        .ignoresSafeArea()
+            }
         }
     }
 
     func remove(_ indexSet: IndexSet) {
-        teams.remove(atOffsets: indexSet)
+        for idx in indexSet {
+            let team = teams[idx]
+            modelContext.delete(team)
+        }
     }
 
     var mailURL: URL {
@@ -130,16 +147,5 @@ Locale: \(Locale.current.description)
         components?.queryItems = items
 
         return components!.url!
-    }
-}
-
-
-struct Previews_SettingsView_Previews: PreviewProvider {
-    @State static var color1: Color = .accentColor
-    @State static var color2: Color = .accentColor
-
-    static var previews: some View {
-        SettingsView(teams: .constant([TeamsData("Team A"),
-                                       TeamsData("Team B")]))
     }
 }

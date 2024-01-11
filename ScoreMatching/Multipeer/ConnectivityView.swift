@@ -4,16 +4,17 @@ import MultipeerConnectivity
 
 struct ConnectivityView: View {
 
-    @EnvironmentObject var connectivity: Connectivity
+    @Environment(Connectivity.self) var connectivity
     @Environment(\.verticalSizeClass) var verticalSizeClass
 
+    @MainActor
     @ViewBuilder
     var connectedView: some View {
         if verticalSizeClass == .regular {
             VStack(spacing: 0) {
                 ForEach(connectivity.readOnlyData) { element in
                     TapButton(score:.constant(element.score),
-                              color: .constant(element.color),
+                              colorHex: .constant(element.color.toHex()),
                               name: .constant(element.name),
                               lastTapped: .constant(nil),
                               lastTimeTapped: .constant(Date()))
@@ -26,7 +27,7 @@ struct ConnectivityView: View {
             HStack(spacing: 0) {
                 ForEach(connectivity.readOnlyData) { element in
                     TapButton(score:.constant(element.score),
-                              color: .constant(element.color),
+                              colorHex: .constant(element.color.toHex()),
                               name: .constant(element.name),
                               lastTapped: .constant(nil),
                               lastTimeTapped: .constant(Date()))

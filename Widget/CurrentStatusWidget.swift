@@ -1,53 +1,33 @@
 import WidgetKit
 import SwiftUI
+import SwiftData
 
 struct Provider: TimelineProvider {
-    @AppStorage("encodedTeamData", store: UserDefaults(suiteName: "group.mcomisso.whatTheScore"))
-    var encodedTeamsData: Data = Data()
+    @Query(sort: \Team.creationDate) var teams: [Team]
+    @Environment(\.modelContext) var modelContext
 
     func placeholder(in context: Context) -> SimpleEntry {
-        let teamA = TeamsData("Team A")
-        let teamB = TeamsData("Team B")
-
-        return SimpleEntry(date: Date(), teams: [teamA, teamB])
+        if teams.isEmpty {
+            let teamA = Team(name: "Team A")
+            let teamB = Team(name: "Team B")
+            return SimpleEntry(date: Date(), teams: [teamA, teamB])
+        }
+        return SimpleEntry(date: Date(), teams: teams)
     }
 
     func getSnapshot(in context: Context, completion: @escaping (SimpleEntry) -> ()) {
-
-        do {
-            let teamsDecodedData = try JSONDecoder()
-                .decode([CodableTeamData].self, from: encodedTeamsData)
-
-            let entry = SimpleEntry(date: Date(), teams: teamsDecodedData.map { $0.toTeamData() })
-
-            completion(entry)
-
-        } catch {
-            let teamA = TeamsData("Team A")
-            let teamB = TeamsData("Team B")
-            completion(.init(date: Date(), teams: [teamA, teamB]))
-        }
+        let entry = SimpleEntry(date: Date(), teams: teams)
+        completion(entry)
     }
 
     func getTimeline(in context: Context, completion: @escaping (Timeline<Entry>) -> ()) {
-
-        let teamsDecodedData = try? JSONDecoder()
-            .decode([CodableTeamData].self, from: encodedTeamsData)
-
         var entries: [SimpleEntry] = []
-
-        if let decodedTeams = teamsDecodedData {
-            let teamsEntries = SimpleEntry(
-                date: Date(),
-                teams: decodedTeams.map { $0.toTeamData() }
-            )
-            entries.append(teamsEntries)
-        } else {
-            let teamA = TeamsData("Team A")
-            let teamB = TeamsData("Team B")
-            entries.append(.init(date: Date(), teams: [teamA, teamB]))
-        }
-
+        let teamsEntries = SimpleEntry(
+            date: Date(),
+            teams: teams
+        )
+        entries.append(teamsEntries)
+        
         let timeline = Timeline(entries: entries, policy: .atEnd)
         completion(timeline)
     }
@@ -55,17 +35,17 @@ struct Provider: TimelineProvider {
 
 struct SimpleEntry: TimelineEntry {
     let date: Date
-
-    let teams: [TeamsData]
+    let teams: [Team]
 }
 
 struct WidgetEntryView : View {
+    @Query var teams: [Team]
     var entry: Provider.Entry
 
     var body: some View {
         VStack(spacing: 0) {
-            ForEach(entry.teams) { team in
-                team.color
+            ForEach(teams) { team in
+                team.resolvedColor
                     .overlay {
                         VStack{
                             Text(team.name)
@@ -75,7 +55,7 @@ struct WidgetEntryView : View {
                                     .system(.title, design: .rounded)
                                 )
                         }
-                        .foregroundColor(team.color)
+                        .foregroundColor(team.resolvedColor)
                         .colorInvert()
                     }
             }
@@ -91,16 +71,15 @@ struct CurrentStatusWidget: Widget {
     var body: some WidgetConfiguration {
         StaticConfiguration(kind: kind, provider: Provider()) { entry in
             WidgetEntryView(entry: entry)
+                .modelContainer(for: [Team.self])
         }
-        .supportedFamilies([.systemSmall])
+        .contentMarginsDisabled()
+        .supportedFamilies([.systemSmall, .systemMedium])
         .configurationDisplayName("Current game")
         .description("Displays the current score for all teams.")
     }
 }
 
-struct Widget_Previews: PreviewProvider {
-    static var previews: some View {
-        WidgetEntryView(entry: SimpleEntry(date: Date(), teams: [.init("Team A"), .init("Team B")]))
-            .previewContext(WidgetPreviewContext(family: .systemSmall))
-    }
+#Preview {
+    WidgetEntryView(entry: .init(date: .now, teams: []))
 }

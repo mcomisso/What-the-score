@@ -5,7 +5,7 @@ import Pow
 struct TapButton: View {
 
     @Binding var score: [Score]
-    @Binding var color: Color
+    @Binding var colorHex: String
     @Binding var name: String
     @Binding var lastTapped: String?
     @Binding var lastTimeTapped: Date
@@ -35,7 +35,7 @@ struct TapButton: View {
                         .font(.system(.headline, design: .default))
                         .padding(.bottom)
                 }
-                .foregroundStyle(color)
+                .foregroundStyle(Color(hex: colorHex))
                 .colorInvert()
                 .frame(maxWidth: .infinity,
                        maxHeight: .infinity)
@@ -47,7 +47,7 @@ struct TapButton: View {
                 .changeEffect(
                     .rise(origin: UnitPoint(x: 0.75, y: 0.35)) {
                         Text("+1")
-                            .foregroundStyle(color)
+                            .foregroundStyle(Color(hex: colorHex))
                             .scaleEffect(x: 2, y: 2, anchor: .center)
                             .colorInvert()
                     }, value: justAdded)
@@ -81,7 +81,7 @@ struct TapButton: View {
 #Preview("Tap button") {
     TapButton(
         score: .constant([Date()].map { Score(time: $0) }),
-        color: .constant(.primary),
+        colorHex: .constant(Color.primary.toHex()),
         name: .constant("Team Name"),
         lastTapped: .constant(""),
         lastTimeTapped: .constant(Date())
