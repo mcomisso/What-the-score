@@ -45,9 +45,9 @@ struct ContentView: View {
 //        .sheet(isPresented: $isShowingIntervals, onDismiss: nil, content: {
 //            IntervalsList(viewModel: self.viewModel)
 //        })
-        .overlay(alignment: .top) {
-            FloaterText(text: $lastTapped)
-        }
+//        .overlay(alignment: .top) {
+//            FloaterText(text: $lastTapped)
+//        }
         .onAppear {
             if teams.isEmpty {
                 Team.createBaseData(modelContext: modelContext)
@@ -112,6 +112,15 @@ struct ContentView: View {
                 lastTimeTapped: $lastTimeTapped
             )
             .background(Color(hex: team.color))
+            .overlay(alignment: .leading) {
+                if lastTapped == team.name {
+                    Image(systemName: "arrowtriangle.right.fill")
+                        .resizable()
+                        .foregroundStyle(team.resolvedColor)
+                        .frame(width: 32, height: 32)
+                        .colorInvert()
+                }
+            }
         }
     }
 
