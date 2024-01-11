@@ -5,10 +5,7 @@ import SwiftData
 
 @main
 struct ScoreMatchingApp: App {
-    private let connectivity = Connectivity()
-
-    @AppStorage("encodedTeamData", store: UserDefaults(suiteName: "group.mcomisso.whatTheScore"))
-    var encodedTeamsData: Data = Data()
+    @State private var connectivity = Connectivity()
 
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
 
@@ -19,11 +16,11 @@ struct ScoreMatchingApp: App {
     var body: some Scene {
         WindowGroup {
             MainView()
-                .environmentObject(connectivity)
+                .environment(connectivity)
                 .onAppear {
                     requestReviewIfNeeded()
                 }
-                .onChange(of: scenePhase) { phase in
+                .onChange(of: scenePhase) { phase, _ in
                     onSceneActive(phase)
                     onSceneBackground(phase)
                 }

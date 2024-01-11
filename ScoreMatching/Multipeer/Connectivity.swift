@@ -1,7 +1,8 @@
 import Foundation
 import MultipeerConnectivity
 
-final class Connectivity: NSObject, ObservableObject {
+@Observable
+final class Connectivity: NSObject {
 
     private let devicePeerID = MCPeerID(displayName: UIDevice.current.name)
     private let serviceType = "com-scorekpr"
@@ -10,11 +11,11 @@ final class Connectivity: NSObject, ObservableObject {
     private var serviceBrowser: MCNearbyServiceBrowser
     private var serviceAdvertiser: MCNearbyServiceAdvertiser
 
-    @Published var peers: Set<MCPeerID> = []
-    @Published var connectedPeers: [MCPeerID] = []
+    var peers: Set<MCPeerID> = []
+    var connectedPeers: [MCPeerID] = []
 
     @MainActor
-    @Published var readOnlyData: [CodableTeamData] = []
+    var readOnlyData: [CodableTeamData] = []
 
     override init() {
 

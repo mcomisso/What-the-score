@@ -12,7 +12,7 @@ extension CodableTeamData: Identifiable {
 }
 
 extension CodableTeamData {
-    func toTeamData() -> TeamsData {
-        TeamsData(name, score: score, color: color)
+    func toTeam() -> Team {
+        Team(score: score, name: name, color: color.toHex())
     }
 }

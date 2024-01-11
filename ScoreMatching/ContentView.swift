@@ -3,14 +3,11 @@ import SwiftData
 
 struct ContentView: View {
     @Environment(\.verticalSizeClass) var verticalSizeClass
-    @EnvironmentObject var connectivity: Connectivity
+    @Environment(Connectivity.self) var connectivity
 
-    @AppStorage("encodedTeamData", store: UserDefaults(suiteName: "group.mcomisso.whatTheScore"))
-    var encodedTeamsData: Data = Data()
+    @Query(sort: \Team.creationDate) var teams: [Team]
+    @Environment(\.modelContext) var modelContext
 
-    @Query(sort: \Team.name) var teams: [Team]
-
-    @State private var viewModel = ViewModel()
     @State private var lastTapped: String?
     @State private var lastTimeTapped: Date = Date()
 
@@ -33,25 +30,28 @@ struct ContentView: View {
                 .padding()
 
         }
-        .onChange(of: lastTimeTapped, perform: { _ in
-
-            let data = self.viewModel.teamsViewModels.map { $0.toCodable() }
+        .onChange(of: lastTimeTapped, { _, _ in
+            let data = teams.map { $0.toCodable() }
 
             guard let encodedData = try? JSONEncoder().encode(data) else {
                 return
             }
             print(encodedData.description)
             connectivity.send(data: encodedData)
-            encodedTeamsData = encodedData
         })
         .sheet(isPresented: $isVisualisingSettings, onDismiss: nil, content: {
-            SettingsView(teams: $viewModel.teamsViewModels)
+            SettingsView()
         })
-        .sheet(isPresented: $isShowingIntervals, onDismiss: nil, content: {
-            IntervalsList(viewModel: self.viewModel)
-        })
+//        .sheet(isPresented: $isShowingIntervals, onDismiss: nil, content: {
+//            IntervalsList(viewModel: self.viewModel)
+//        })
         .overlay(alignment: .top) {
             FloaterText(text: $lastTapped)
+        }
+        .onAppear {
+            if teams.isEmpty {
+                Team.createBaseData(modelContext: modelContext)
+            }
         }
     }
 
@@ -69,12 +69,12 @@ struct ContentView: View {
                     .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 16))
                     .shadow(radius: 8)
             }
-            .contextMenu {
-                Text("Current interval: \(viewModel.intervals.count)")
-                Button("Start new") {
-                    viewModel.addInterval()
-                }
-            }
+//            .contextMenu {
+//                Text("Current interval: \(viewModel.intervals.count)")
+//                Button("Start new") {
+//                    viewModel.addInterval()
+//                }
+//            }
             .featureFlag(.intervalsFeature)
 
             Spacer()
@@ -90,20 +90,28 @@ struct ContentView: View {
                                 in: RoundedRectangle(cornerRadius: 16))
                     .shadow(radius: 8)
             }
+            .contextMenu(menuItems: {
+                Button(role: .destructive) {
+                    teams.forEach { modelContext.delete($0) }
+                    Team.createBaseData(modelContext: modelContext)
+                } label: {
+                    Label("Reset", systemImage: "trash")
+                }
+            })
         }.symbolRenderingMode(.hierarchical)
     }
 
     var buttons: some View {
-        ForEach($viewModel.teamsViewModels) { team in
+        ForEach(teams) { team in
+            @Bindable var bindingTeam = team
             TapButton(
-                score: team.score,
-                color: team.color,
-                name: team.name,
+                score: $bindingTeam.score,
+                colorHex: $bindingTeam.color,
+                name: $bindingTeam.name,
                 lastTapped: $lastTapped,
                 lastTimeTapped: $lastTimeTapped
             )
-            .background(team.color.wrappedValue)
-            .id(team.name.wrappedValue)
+            .background(Color(hex: team.color))
         }
     }
 
