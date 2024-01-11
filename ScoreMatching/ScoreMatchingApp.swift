@@ -1,42 +1,49 @@
 import SwiftUI
-
-struct MainView: View {
-    @SceneStorage("isReceiverMode") var isReceiverMode: Bool = false
-
-    var body: some View {
-        if isReceiverMode {
-            ZStack(alignment: .bottom) {
-                ConnectivityView()
-
-                Button {
-                    isReceiverMode = false
-                } label: {
-                    Text("Exit receiver mode")
-                        .font(.callout)
-                        .padding()
-                        .background(.thickMaterial, in: RoundedRectangle(cornerRadius: 8))
-                        .padding()
-                }
-            }
-        } else {
-            ContentView()
-        }
-    }
-}
+import StoreKit
+import WidgetKit
+import SwiftData
 
 @main
 struct ScoreMatchingApp: App {
-    private let connectivity = Connectivity()
+    @State private var connectivity = Connectivity()
+
+    @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
+
+    @AppStorage("totalLaunches") var totalLaunches: Int = 1
+    @Environment(\.requestReview) var requestReview
+    @Environment(\.scenePhase) var scenePhase
+
     var body: some Scene {
         WindowGroup {
             MainView()
-                .environmentObject(connectivity)
-        }
+                .environment(connectivity)
+                .onAppear {
+                    requestReviewIfNeeded()
+                }
+                .onChange(of: scenePhase) { phase, _ in
+                    onSceneActive(phase)
+                    onSceneBackground(phase)
+                }
+        }.modelContainer(for: [Team.self])
     }
-}
 
-extension Color {
-    static var random: Color {
-        Color(hue: Double.random(in: (0...1)), saturation: Double.random(in: (0.8...1.0)), brightness: 1)
+    private func onSceneBackground(_ phase: ScenePhase) {
+        guard phase == .background else {
+            return
+        }
+        WidgetCenter.shared.reloadAllTimelines()
+    }
+
+    private func onSceneActive(_ phase: ScenePhase) {
+        guard phase == .active else {
+            return
+        }
+        totalLaunches += 1
+    }
+
+    private func requestReviewIfNeeded() {
+        if totalLaunches % 3 == 0 {
+            requestReview()
+        }
     }
 }

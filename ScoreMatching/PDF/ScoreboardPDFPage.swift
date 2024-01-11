@@ -21,7 +21,7 @@ import PDFKit
  */
 class ScoreboardPage: PDFPage {
 
-    var quarters: [TeamsData] = []
+    var teams: [Team] = []
 
     // 3. Override PDFPage custom draw
     /// - Tag: OverrideDraw

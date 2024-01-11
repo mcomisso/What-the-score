@@ -1,92 +1,151 @@
 import Foundation
 import SwiftUI
 import PDFKit
-
-struct EditView: View {
-
-    @Binding var team: TeamsData
-
-    var body: some View {
-        TextField(team.name, text: $team.name)
-            .textFieldStyle(.roundedBorder)
-            .padding()
-    }
-}
+import SwiftData
 
 struct SettingsView: View {
 
     @Environment(\.dismiss) var dimiss
+    @Environment(\.openURL) var openURL
 
-    @Binding var teams: [TeamsData]
+    @Query(sort: \Team.creationDate) var teams: [Team]
+    @Environment(\.modelContext) var modelContext
 
-    @State var isShowingNameChangeAlert: Bool = false
-    @State var selection: TeamsData.ID?
+    @State private var isShowingNameChangeAlert: Bool = false
+    //    @State private var selection: Team.ID?
+    @State private var isEditing: Bool = false
+    @State private var showResetAlert: Bool = false
 
-    @State var isEditing: Bool = false
-
+    @State var colorSelection: Color = .random
     @SceneStorage("isReceiverMode") var isReceiverMode: Bool = false
+
+    var teamsSection: some View {
+        ForEach(teams) { team in
+            @Bindable var team = team
+            ColorPicker(selection: $team.resolvedColor,
+                        supportsOpacity: false) {
+                NavigationLink(destination: EditView(team: team)) {
+                    Text(team.name)
+                }
+            }
+        }
+        .onDelete(perform: remove(_:))
+    }
 
     var body: some View {
         NavigationView {
 
-            ZStack(alignment: .bottom) {
-                List(selection: $selection) {
-                    ForEach($teams) { team in
-                        ColorPicker(selection: team.color,
-                                    supportsOpacity: false) {
-                            NavigationLink(destination: EditView(team: team)) {
-                                Text(team.name.wrappedValue)
-                            }
-                        }
-                    }.onDelete(perform: remove(_:))
+            VStack {
+                List/*(selection: $selection)*/ {
+                    Section("Teams") {
 
-                    Button("Add team") {
-                        teams.append(TeamsData("Team \(teams.count + 1)"))
+                        teamsSection
+
+                        Button("Add team") {
+                            let team = Team(name: "Team \(teams.count + 1)")
+                            modelContext.insert(team)
+                        }.buttonStyle(.borderless)
                     }
 
-                    Section("Utils") {
-                        Button("Reset scores") {
-                            teams.forEach { team in
-                                team.count = 0
-                            }
-                        }
+                    Section("Connectivity") {
                         NavigationLink(destination: ConnectivityView()) {
-                            Text("Sync and view on network")
+                            Text("Broadcast to other devices")
                         }
 
-                        Button("Open receiver mode") {
+                        Button("Receive scores from other devices") {
                             isReceiverMode = true
                         }
                     }
 
-                    Section("Export") {
-                        Button("Generate PDF of scoreboard") { }.disabled(true)
+                    Section("Danger zone") {
+                        Button("Reset scores", role: .destructive) {
+                            showResetAlert.toggle()
+                        }.alert("Are you sure?", isPresented: $showResetAlert) {
+                            Button("Yes, reset scores", role: .destructive) {
+                                self.teams.forEach { modelContext.delete($0) }
+                            }
+                        } message: {
+                            Text("The score will be set to 0.")
+                        }
                     }
-                }
 
-                Button("Dismiss") {
-                    dimiss()
-                }.buttonStyle(.borderedProminent)
-            }.navigationTitle("Settings")
+                    Section("About") {
+                        SocialButton(
+                            username: "Matteo on Mastodon",
+                            url: URL(string: "https://mastodon.social/@teomatteo89")!,
+                            icon: Image(.mastodon)
+                        )
+
+                        SocialButton(
+                            username: "Matteo on Threads",
+                            url: URL(string: "https://www.threads.net/@matteo_comisso")!,
+                            icon: Image(.threads)
+                        )
+
+                        Button {
+                            openURL(mailURL)
+                        } label: {
+                            HStack {
+                                Image(systemName: "envelope")
+                                Text("Submit feedback or feature request")
+                            }
+                        }
+                    }.buttonStyle(.plain)
+
+#if DEBUG
+                    Section("Export") {
+                        Button("Generate PDF of scoreboard") { }
+                    }
+#endif
+                }
+            }
+            .navigationTitle("Settings")
+            .background(Color(uiColor: UIColor.systemGroupedBackground))
+            .safeAreaInset(edge: .bottom) {
+                    RoundedRectangle(cornerRadius: 16)
+                        .fill(Material.regular)
+                        .overlay {
+                            Button {
+                                dimiss()
+                            } label: {
+                                Text("Dismiss")
+                                    .frame(minWidth: 280, minHeight: 32)
+                            }
+                            .buttonStyle(.borderedProminent)
+                            .padding()
+                        }
+                        .frame(height: 64)
+                        .ignoresSafeArea()
+            }
         }
     }
 
     func remove(_ indexSet: IndexSet) {
-        teams.remove(atOffsets: indexSet)
+        for idx in indexSet {
+            let team = teams[idx]
+            modelContext.delete(team)
+        }
     }
-}
+
+    var mailURL: URL {
+        let subject = "What the score (\(Bundle.main.buildNumber)) support request"
+        let body = """
 
 
-struct Previews_SettingsView_Previews: PreviewProvider {
-    @State static var color1: Color = .accentColor
-    @State static var color2: Color = .accentColor
+----- Please reply above this line -----
+Build number: \(Bundle.main.buildNumber)
+Version: \(Bundle.main.versionNumber)
+Locale: \(Locale.current.description)
+"""
+        let mailURL: URL = URL(string: "mailto:whatthescore@mcomisso.me")!
+        var components = URLComponents(url: mailURL, resolvingAgainstBaseURL: false)
+        let items = [
+            URLQueryItem(name: "body", value: body),
+            URLQueryItem(name: "subject", value: subject)
+        ]
 
-    static var previews: some View {
-        SettingsView(teams: .constant([TeamsData("Team A"),
-                                       TeamsData("Team B")]))
+        components?.queryItems = items
 
-        SettingsView(teams: .constant([TeamsData("Team A"),
-                                       TeamsData("Team B")]))
-            .previewInterfaceOrientation(.landscapeLeft)
+        return components!.url!
     }
 }

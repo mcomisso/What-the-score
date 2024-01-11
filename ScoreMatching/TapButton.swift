@@ -1,93 +1,90 @@
 import Foundation
 import SwiftUI
+import Pow
 
 struct TapButton: View {
-    @State var isEditing: Bool = false
 
-    @Binding var count: Int
-    @Binding var color: Color
+    @Binding var score: [Score]
+    @Binding var colorHex: String
     @Binding var name: String
     @Binding var lastTapped: String?
     @Binding var lastTimeTapped: Date
 
-    private let feedbackGenerator = UIImpactFeedbackGenerator()
+    var isEnabled: Bool = true
+
     private let warningGenerator = UINotificationFeedbackGenerator()
 
-    @State var animationOffset: CGFloat = 0
-    @State var animationAlpha: Double = 0
-    @State var justAdded: Bool = false {
-        didSet {
-            if justAdded {
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.7) {
-                    justAdded = false
-                }
-                animationAlpha = 1
-                withAnimation(Animation.easeOut(duration: 0.7)) {
-                    animationOffset = -150
-                    animationAlpha = 0
-                }
-            } else {
-                animationOffset = 0
-            }
+    @State var shadowRadius: Double = 10
 
-        }
-    }
+    @State var increased: Int = 0
+    @State var decreased: Int = 0
+
+    @State var justAdded: Bool = false
 
     var body: some View {
         ZStack {
             GeometryReader { geometryProxy in
                 VStack {
-                    Text("\(count)")
-                        .font(.system(size: min(geometryProxy.size.width, geometryProxy.size.height) / 3.5))
+                    let fontSize = min(geometryProxy.size.width, geometryProxy.size.height) / 3.5
+                    Text("\(score.count)")
+                        .font(.system(size: fontSize, design: .rounded))
                         .frame(maxWidth: .infinity,
                                maxHeight: .infinity)
                     Text(name)
                         .bold()
-                        .font(.headline)
+                        .font(.system(.headline, design: .default))
                         .padding(.bottom)
                 }
-                .foregroundColor(color)
+                .foregroundStyle(Color(hex: colorHex))
                 .colorInvert()
                 .frame(maxWidth: .infinity,
                        maxHeight: .infinity)
                 .contentShape(Rectangle())
-                .onTapGesture {
-                    justAdded = true
-                    count += 1
-                    feedbackGenerator.prepare()
-                    feedbackGenerator.impactOccurred()
-                    self.lastTapped = name
-                    self.lastTimeTapped = Date()
-
-                }
-                .gesture(DragGesture()
-                            .onEnded { valuee in
-                    if count > 0 {
-                        count -= 1
-                        feedbackGenerator.prepare()
-                        feedbackGenerator.impactOccurred()
-                        self.lastTimeTapped = Date()
-                    } else {
-                        warningGenerator.notificationOccurred(.warning)
-                    }
-                })
-
-                if justAdded {
-                    Text("+1")
-                        .font(.largeTitle)
-                        .offset(x: 100, y: animationOffset)
-                        .opacity(animationAlpha)
-                }
-
+                .onTapGesture(perform: didTapOnButton)
+                .gesture(DragGesture().onEnded(onGestureEnd))
+                .sensoryFeedback(.increase, trigger: increased)
+                .sensoryFeedback(.decrease, trigger: decreased)
+                .changeEffect(
+                    .rise(origin: UnitPoint(x: 0.75, y: 0.35)) {
+                        Text("+1")
+                            .foregroundStyle(Color(hex: colorHex))
+                            .scaleEffect(x: 2, y: 2, anchor: .center)
+                            .colorInvert()
+                    }, value: justAdded)
             }
+        }
+    }
+
+    private func onGestureEnd(_ value: DragGesture.Value) {
+        if !score.isEmpty {
+            score.removeLast()
+            self.lastTimeTapped = Date()
+            decreased += 1
+        } else {
+            warningGenerator.notificationOccurred(.warning)
+        }
+    }
+
+    private func didTapOnButton() {
+        if isEnabled {
+
+            justAdded.toggle()
+            score.append(.init(time: .init()))
+            increased += 1
+            self.lastTapped = name
+            self.lastTimeTapped = Date()
 
         }
     }
 }
-struct Previews_TapButton_Previews: PreviewProvider {
-    @State static var count: Int = 0
-    static var previews: some View {
-        TapButton(count: $count, color: .constant(.primary), name: .constant("Team Name"), lastTapped: .constant(""), lastTimeTapped: .constant(Date()))
-            .background(.gray)
-    }
+
+#Preview("Tap button") {
+    TapButton(
+        score: .constant([Date()].map { Score(time: $0) }),
+        colorHex: .constant(Color.primary.toHex()),
+        name: .constant("Team Name"),
+        lastTapped: .constant(""),
+        lastTimeTapped: .constant(Date())
+    )
+    .background(.gray)
 }

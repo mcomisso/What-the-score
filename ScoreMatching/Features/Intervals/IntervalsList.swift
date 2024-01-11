@@ -1,48 +1,38 @@
-//
-//  IntervalsList.swift
-//  ScoreMatching
-//
-//  Created by Matteo Comisso on 26/02/22.
-//
-
 import Foundation
 import SwiftUI
+import SwiftData
 
 struct IntervalsList: View {
+    
+    @Query var intervals: [Interval]
+    @Environment(\.modelContext) var modelContext
 
-    var viewModel: ViewModel
+    @Query var teams: [Team]
 
     var body: some View {
         List {
-            ForEach(viewModel.intervals.indices, id: \.self) { intervalIdx in
+            ForEach(intervals) { interval in
                 VStack(alignment: .center) {
-                    Text("Interval \(intervalIdx)")
-                        HStack {
-                            ForEach(viewModel.intervals[intervalIdx].points.map { $0.count }, id: \.self) { points in
-                                Text("\(points)")
-                                    .font(.title)
-                                    .foregroundColor(.secondary)
-                            }
-                    }
+                    Text("Interval \(intervals.count)")
+//                        HStack {
+//                            ForEach(intervals[interval].points.map { $0.count }, id: \.self) { points in
+//                                Text("\(points)")
+//                                    .font(.title)
+//                                    .foregroundStyle(.secondary)
+//                            }
+//                    }
                 }
-            }.onDelete { indexSet in
-                viewModel.removeInterval(indexSet.first!)
             }
+//            .onDelete { indexSet in
+//                indexSet.forEach { modelContext.delete($0) }
+//            }
 
             Section {
                 Button("New interval") {
-                    viewModel.addInterval()
+                    let interval = Interval(teams: teams, duration: 10)
+                    modelContext.insert(interval)
                 }
             }
         }
-    }
-
-}
-
-struct Previews_IntervalsList_Previews: PreviewProvider {
-    static var previews: some View {
-        let vm = ViewModel.init()
-        vm.intervals = [.init(id: 0, points: [.init("A"), .init("B")])]
-        return IntervalsList(viewModel: vm)
     }
 }

@@ -1,36 +1,26 @@
 import SwiftUI
-
-struct FloaterText: View {
-
-    @Binding var text: String?
-
-    var body: some View {
-        VStack {
-            Text(text ?? "Info box")
-                .font(.subheadline)
-        }.padding()
-            .background(.thickMaterial, in: RoundedRectangle(cornerRadius: 16))
-            .padding()
-            .shadow(radius: 16)
-    }
-}
+import SwiftData
 
 struct ContentView: View {
     @Environment(\.verticalSizeClass) var verticalSizeClass
-    @EnvironmentObject var connectivity: Connectivity
+    @Environment(Connectivity.self) var connectivity
 
-    @StateObject var viewModel = ViewModel()
-    @State var lastTapped: String?
-    @State var lastTimeTapped: Date = Date()
+    @Query(sort: \Team.creationDate) var teams: [Team]
+    @Environment(\.modelContext) var modelContext
 
-    @State var isVisualisingSettings: Bool = false
-    @State var isShowingIntervals: Bool = false
+    @State private var lastTapped: String?
+    @State private var lastTimeTapped: Date = Date()
+
+    @State private var isVisualisingSettings: Bool = false
+    @State private var isShowingIntervals: Bool = false
+
+    @State private var shadowRadius: Double = 10
 
     var body: some View {
         ZStack(alignment: .bottomTrailing) {
-
             if verticalSizeClass == .regular {
                 portraitButtons
+
             } else if verticalSizeClass == .compact {
                 landscapeButtons
             }
@@ -40,23 +30,28 @@ struct ContentView: View {
                 .padding()
 
         }
-        .onChange(of: lastTimeTapped, perform: { _ in
+        .onChange(of: lastTimeTapped, { _, _ in
+            let data = teams.map { $0.toCodable() }
 
-            let data = self.viewModel.teamsViewModels.map { $0.toCodable() }
-
-            let encoder = JSONEncoder()
-            if let encodedData = try? encoder.encode(data) {
-                connectivity.send(data: encodedData)
+            guard let encodedData = try? JSONEncoder().encode(data) else {
+                return
             }
+            print(encodedData.description)
+            connectivity.send(data: encodedData)
         })
         .sheet(isPresented: $isVisualisingSettings, onDismiss: nil, content: {
-            SettingsView(teams: $viewModel.teamsViewModels)
+            SettingsView()
         })
-        .sheet(isPresented: $isShowingIntervals, onDismiss: nil, content: {
-            IntervalsList(viewModel: self.viewModel)
-        })
-        .overlay(alignment: .top) {
-            FloaterText(text: $lastTapped)
+//        .sheet(isPresented: $isShowingIntervals, onDismiss: nil, content: {
+//            IntervalsList(viewModel: self.viewModel)
+//        })
+//        .overlay(alignment: .top) {
+//            FloaterText(text: $lastTapped)
+//        }
+        .onAppear {
+            if teams.isEmpty {
+                Team.createBaseData(modelContext: modelContext)
+            }
         }
     }
 
@@ -68,19 +63,19 @@ struct ContentView: View {
                 }
             } label: {
                 Image(systemName: "timer")
-                    .foregroundColor(.primary)
+                    .foregroundStyle(.primary)
                     .imageScale(.large)
                     .padding()
                     .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 16))
                     .shadow(radius: 8)
             }
-            .contextMenu {
-                Text("Current interval: \(viewModel.intervals.count)")
-                Button("Start new") {
-                    viewModel.addInterval()
-                }
-            }
-
+//            .contextMenu {
+//                Text("Current interval: \(viewModel.intervals.count)")
+//                Button("Start new") {
+//                    viewModel.addInterval()
+//                }
+//            }
+            .featureFlag(.intervalsFeature)
 
             Spacer()
 
@@ -88,21 +83,44 @@ struct ContentView: View {
                 isVisualisingSettings.toggle()
             } label: {
                 Image(systemName: "gear")
-                    .foregroundColor(.primary)
+                    .foregroundStyle(.primary)
                     .imageScale(.large)
                     .padding()
-                    .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 16))
+                    .background(.regularMaterial,
+                                in: RoundedRectangle(cornerRadius: 16))
                     .shadow(radius: 8)
             }
+            .contextMenu(menuItems: {
+                Button(role: .destructive) {
+                    teams.forEach { modelContext.delete($0) }
+                    Team.createBaseData(modelContext: modelContext)
+                } label: {
+                    Label("Reset", systemImage: "trash")
+                }
+            })
         }.symbolRenderingMode(.hierarchical)
     }
 
     var buttons: some View {
-        ForEach($viewModel.teamsViewModels) { team in
-            TapButton(count: team.count, color: team.color, name: team.name,
-                      lastTapped: $lastTapped, lastTimeTapped: $lastTimeTapped)
-                .background(team.color.wrappedValue)
-                .id(team.name.wrappedValue)
+        ForEach(teams) { team in
+            @Bindable var bindingTeam = team
+            TapButton(
+                score: $bindingTeam.score,
+                colorHex: $bindingTeam.color,
+                name: $bindingTeam.name,
+                lastTapped: $lastTapped,
+                lastTimeTapped: $lastTimeTapped
+            )
+            .background(Color(hex: team.color))
+            .overlay(alignment: .leading) {
+                if lastTapped == team.name {
+                    Image(systemName: "arrowtriangle.right.fill")
+                        .resizable()
+                        .foregroundStyle(team.resolvedColor)
+                        .frame(width: 32, height: 32)
+                        .colorInvert()
+                }
+            }
         }
     }
 
@@ -122,10 +140,6 @@ struct ContentView: View {
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
-        Group {
-            ContentView()
-            ContentView()
-                .previewInterfaceOrientation(.landscapeLeft)
-        }
+        ContentView()
     }
 }

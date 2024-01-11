@@ -1,30 +1,25 @@
-//
-//  File.swift
-//  ScoreMatching
-//
-//  Created by Matteo Comisso on 09/02/22.
-//
-
 import Foundation
 import MultipeerConnectivity
 
-class Connectivity: NSObject, ObservableObject {
+@Observable
+final class Connectivity: NSObject {
 
-    let devicePeerID = MCPeerID(displayName: UIDevice.current.name)
+    private let devicePeerID = MCPeerID(displayName: UIDevice.current.name)
     private let serviceType = "com-scorekpr"
 
     private var session: MCSession
     private var serviceBrowser: MCNearbyServiceBrowser
     private var serviceAdvertiser: MCNearbyServiceAdvertiser
 
-    @Published var peers: Set<MCPeerID> = []
-    @Published var connectedPeers: [MCPeerID] = []
+    var peers: Set<MCPeerID> = []
+    var connectedPeers: [MCPeerID] = []
 
     @MainActor
-    @Published var readOnlyData: [CodableTeamData] = []
+    var readOnlyData: [CodableTeamData] = []
 
     override init() {
-        self.session = MCSession(peer: devicePeerID, securityIdentity: nil, encryptionPreference: .none)
+
+        self.session = MCSession(peer: devicePeerID, securityIdentity: nil, encryptionPreference: .required)
         self.serviceBrowser = MCNearbyServiceBrowser(peer: devicePeerID, serviceType: serviceType)
         self.serviceAdvertiser = MCNearbyServiceAdvertiser.init(peer: devicePeerID, discoveryInfo: nil, serviceType: serviceType)
         super.init()
