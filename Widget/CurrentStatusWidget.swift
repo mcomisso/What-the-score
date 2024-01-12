@@ -1,6 +1,7 @@
-import WidgetKit
 import SwiftUI
 import SwiftData
+#if canImport(WidgetKit)
+import WidgetKit
 
 struct Provider: TimelineProvider {
     @Query(sort: \Team.creationDate) var teams: [Team]
@@ -83,3 +84,4 @@ struct CurrentStatusWidget: Widget {
 #Preview {
     WidgetEntryView(entry: .init(date: .now, teams: []))
 }
+#endif

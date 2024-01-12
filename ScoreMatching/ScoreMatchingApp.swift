@@ -1,6 +1,8 @@
 import SwiftUI
 import StoreKit
+#if canImport(WidgetKit)
 import WidgetKit
+#endif
 import SwiftData
 
 @main
@@ -31,7 +33,9 @@ struct ScoreMatchingApp: App {
         guard phase == .background else {
             return
         }
+        #if canImport(WidgetKit)
         WidgetCenter.shared.reloadAllTimelines()
+        #endif
     }
 
     private func onSceneActive(_ phase: ScenePhase) {

@@ -11,8 +11,9 @@ struct TapButton: View {
     @Binding var lastTimeTapped: Date
 
     var isEnabled: Bool = true
-
+    #if os(iOS)
     private let warningGenerator = UINotificationFeedbackGenerator()
+    #endif
 
     @State var shadowRadius: Double = 10
 
@@ -42,8 +43,10 @@ struct TapButton: View {
                 .contentShape(Rectangle())
                 .onTapGesture(perform: didTapOnButton)
                 .gesture(DragGesture().onEnded(onGestureEnd))
+                #if os(iOS)
                 .sensoryFeedback(.increase, trigger: increased)
                 .sensoryFeedback(.decrease, trigger: decreased)
+                #endif
                 .changeEffect(
                     .rise(origin: UnitPoint(x: 0.75, y: 0.35)) {
                         Text("+1")
@@ -61,7 +64,9 @@ struct TapButton: View {
             self.lastTimeTapped = Date()
             decreased += 1
         } else {
+            #if os(iOS)
             warningGenerator.notificationOccurred(.warning)
+            #endif
         }
     }
 
