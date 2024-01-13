@@ -3,7 +3,7 @@ import SwiftData
 
 struct ContentView: View {
     @Environment(\.verticalSizeClass) var verticalSizeClass
-    @Environment(Connectivity.self) var connectivity
+//    @Environment(Connectivity.self) var connectivity
 
     @Query(sort: \Team.creationDate) var teams: [Team]
     @Environment(\.modelContext) var modelContext
@@ -30,15 +30,15 @@ struct ContentView: View {
                 .padding()
 
         }
-        .onChange(of: lastTimeTapped, { _, _ in
-            let data = teams.map { $0.toCodable() }
-
-            guard let encodedData = try? JSONEncoder().encode(data) else {
-                return
-            }
-            print(encodedData.description)
-            connectivity.send(data: encodedData)
-        })
+//        .onChange(of: lastTimeTapped, { _, _ in
+//            let data = teams.map { $0.toCodable() }
+//
+//            guard let encodedData = try? JSONEncoder().encode(data) else {
+//                return
+//            }
+//            print(encodedData.description)
+//            connectivity.send(data: encodedData)
+//        })
         .sheet(isPresented: $isVisualisingSettings, onDismiss: nil, content: {
             SettingsView()
         })

@@ -6,13 +6,13 @@ struct MainView: View {
     var isReceiverMode: Bool = false
 
     var body: some View {
-        if isReceiverMode {
-            ReceiverModeView(isReceiverMode: $isReceiverMode)
-                .onAppear {
-                    Analytics.log("receiverModeLaunch")
-                }
-        } else {
+//        if isReceiverMode {
+//            ReceiverModeView(isReceiverMode: $isReceiverMode)
+//                .onAppear {
+//                    Analytics.log("receiverModeLaunch")
+//                }
+//        } else {
             ContentView()
-        }
+//        }
     }
 }

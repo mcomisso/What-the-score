@@ -16,6 +16,9 @@ struct SettingsView: View {
     @State private var isEditing: Bool = false
     @State private var showResetAlert: Bool = false
 
+    @AppStorage("shouldKeepScreenAwake") 
+    var shouldKeepScreenAwake: Bool = false
+
     @State var colorSelection: Color = .random
     @SceneStorage("isReceiverMode") var isReceiverMode: Bool = false
 
@@ -47,17 +50,7 @@ struct SettingsView: View {
                         }.buttonStyle(.borderless)
                     }
 
-                    Section("Connectivity") {
-                        NavigationLink(destination: ConnectivityView()) {
-                            Text("Broadcast to other devices")
-                        }
-
-                        Button("Receive scores from other devices") {
-                            isReceiverMode = true
-                        }
-                    }
-
-                    Section("Danger zone") {
+                    Section {
                         Button("Reset scores", role: .destructive) {
                             showResetAlert.toggle()
                         }.alert("Are you sure?", isPresented: $showResetAlert) {
@@ -68,6 +61,20 @@ struct SettingsView: View {
                             Text("The score will be set to 0.")
                         }
                     }
+
+                    Section("Preferences") {
+                        Toggle("Keep screen awake", isOn: $shouldKeepScreenAwake)
+                    }
+
+//                    Section("Connectivity") {
+//                        NavigationLink(destination: ConnectivityView()) {
+//                            Text("Broadcast to other devices")
+//                        }
+//
+//                        Button("Receive scores from other devices") {
+//                            isReceiverMode = true
+//                        }
+//                    }
 
                     Section("About") {
                         SocialButton(
@@ -120,6 +127,10 @@ struct SettingsView: View {
         }
     }
 
+    func onToggleChanged() {
+
+    }
+
     func remove(_ indexSet: IndexSet) {
         for idx in indexSet {
             let team = teams[idx]
@@ -148,4 +159,8 @@ Locale: \(Locale.current.description)
 
         return components!.url!
     }
+}
+
+#Preview {
+    SettingsView()
 }
