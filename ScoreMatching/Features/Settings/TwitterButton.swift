@@ -7,18 +7,20 @@ struct SocialButton: View {
     let icon: Image
 
     var body: some View {
-        HStack {
-            icon
-                .resizable()
-                .renderingMode(.template)
-                .aspectRatio(contentMode: .fit)
-                .frame(width: 20, height: 20)
-                .foregroundColor(.primary)
-            Link(
+        Label.init(
+            title: { Link(
                 "Follow \(username)",
                 destination: url
-            )
-        }
+            ) },
+            icon: { 
+                icon
+//                .resizable()
+//                .renderingMode(.template)
+//                .aspectRatio(contentMode: .fit)
+//                .frame(width: 20, height: 20)
+//                .foregroundColor(.primary)
+            }
+        )
     }
 }
 
