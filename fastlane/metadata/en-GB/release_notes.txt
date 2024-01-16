@@ -1,0 +1,1 @@
+• Added a toggle to prevent the display going to sleep (Thanks for the suggestion Sery!)
