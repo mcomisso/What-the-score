@@ -4,6 +4,12 @@ import PDFKit
 import SwiftData
 import StoreKit
 
+enum AppStorageValues {
+    static let shouldKeepScreenAwake = "shouldKeepScreenAwake"
+    static let shouldAllowNegativePoints = "shouldAllowNegativePoints"
+    static let hasEnabledIntervals = "hasEnabledIntervals"
+}
+
 struct SettingsView: View {
 
     @Environment(\.dismiss) var dimiss
@@ -19,11 +25,16 @@ struct SettingsView: View {
     @State private var showResetAlert: Bool = false
     @State private var showZeroScoreAlert: Bool = false
 
-    @AppStorage("shouldKeepScreenAwake") 
+    @AppStorage(AppStorageValues.shouldKeepScreenAwake)
     var shouldKeepScreenAwake: Bool = false
+    
+    @AppStorage(AppStorageValues.shouldAllowNegativePoints)
+    var shouldAllowNegativePoints: Bool = false
+    
+    @AppStorage(AppStorageValues.hasEnabledIntervals)
+    var hasEnabledIntervals: Bool = false
 
     @State var colorSelection: Color = .random
-    @SceneStorage("isReceiverMode") var isReceiverMode: Bool = false
 
     var teamsSection: some View {
         ForEach(teams) { team in
@@ -38,11 +49,41 @@ struct SettingsView: View {
         .onDelete(perform: remove(_:))
     }
 
+    var reinitialiseAppButton: some View {
+        Button("Reinitialize app", role: .destructive) {
+            showResetAlert.toggle()
+        }
+        .alert("Are you sure?", isPresented: $showResetAlert) {
+            Button("Yes, reset scores", role: .destructive) {
+                self.teams.forEach { modelContext.delete($0) }
+            }
+        } message: {
+            Text("The app will delete teams and scores, and start with \"Team A\" and \"Team B\".")
+        }
+    }
+
+    var setZeroScoreButton: some View {
+        Button("Set scores to 0") {
+            showZeroScoreAlert.toggle()
+        }
+        .alert("Are you sure?", isPresented: $showZeroScoreAlert) {
+            Button("Yes, reset scores", role: .destructive) {
+                self.teams.forEach {
+                    $0.score = []
+                }
+            }
+        } message: {
+            Text("Each team score will be set to 0.")
+        }
+    }
+
     var body: some View {
         NavigationView {
 
             VStack {
                 List {
+                    // MARK: - Teams
+
                     Section("Teams") {
 
                         teamsSection
@@ -54,44 +95,39 @@ struct SettingsView: View {
                     }
 
                     Section {
-                        Button("Set scores to 0") {
-                            showZeroScoreAlert.toggle()
-                        }
-                        .alert("Are you sure?", isPresented: $showZeroScoreAlert) {
-                            Button("Yes, reset scores", role: .destructive) {
-                                self.teams.forEach {
-                                    $0.score = []
-                                }
-                            }
-                        } message: {
-                            Text("Each team score will be set to 0.")
-                        }
-                        
-                        Button("Reinitialize app", role: .destructive) {
-                            showResetAlert.toggle()
-                        }
-                        .alert("Are you sure?", isPresented: $showResetAlert) {
-                            Button("Yes, reset scores", role: .destructive) {
-                                self.teams.forEach { modelContext.delete($0) }
-                            }
-                        } message: {
-                            Text("The app will delete teams and scores, and start with \"Team A\" and \"Team B\".")
-                        }
+                        setZeroScoreButton
+
+                        reinitialiseAppButton
+                    }
+                    
+                    // MARK: - Preferences
+
+                    let preferencesHeader = Text("Preferences")
+                    let preferencesFooter = Text("This will prevent your device from dimming the screen and going to sleep.")
+                    Section(
+                        header: preferencesHeader,
+                        footer: preferencesFooter
+                    ) {
+                        Toggle(
+                            "Keep screen awake",
+                            isOn: $shouldKeepScreenAwake
+                        )
                     }
 
-                    Section(header: Text("Preferences"), footer: Text("This will prevent your device from dimming the screen and going to sleep.")) {
-                        Toggle("Keep screen awake", isOn: $shouldKeepScreenAwake)
+
+
+                    Section {
+                        Toggle(
+                            "Use intervals",
+                            isOn: $hasEnabledIntervals
+                        )
+                        Toggle(
+                            "Allow negative points",
+                            isOn: $shouldAllowNegativePoints
+                        )
                     }
 
-//                    Section("Connectivity") {
-//                        NavigationLink(destination: ConnectivityView()) {
-//                            Text("Broadcast to other devices")
-//                        }
-//
-//                        Button("Receive scores from other devices") {
-//                            isReceiverMode = true
-//                        }
-//                    }
+                    // MARK: - About
 
                     let aboutHeader = Text("About")
                     let aboutFooter = Text("Feel free to get in touch via any of the above socials for feedback or feature requests.")
@@ -120,12 +156,6 @@ struct SettingsView: View {
                             url: URL(string: "https://www.threads.net/@matteo_comisso")!,
                             icon: Image(.threads)
                         )
-//                        
-//                        Button {
-//                            openURL(mailURL)
-//                        } label: {
-//                            Label("Submit feedback / feature request", systemImage: "envelope")
-//                        }
                     }
 #if DEBUG
                     Section("Export") {
@@ -135,22 +165,14 @@ struct SettingsView: View {
                 }
             }
             .navigationTitle("Settings")
+            .navigationBarTitleDisplayMode(.inline)
             .background(Color(uiColor: UIColor.systemGroupedBackground))
-            .safeAreaInset(edge: .bottom) {
-                    RoundedRectangle(cornerRadius: 16)
-                        .fill(Material.regular)
-                        .overlay {
-                            Button {
-                                dimiss()
-                            } label: {
-                                Text("Dismiss")
-                                    .frame(minWidth: 280, minHeight: 32)
-                            }
-                            .buttonStyle(.borderedProminent)
-                            .padding()
-                        }
-                        .frame(height: 64)
-                        .ignoresSafeArea()
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Dismiss") {
+                        dimiss()
+                    }
+                }
             }
         }
     }
@@ -161,28 +183,6 @@ struct SettingsView: View {
             modelContext.delete(team)
         }
     }
-//
-//    var mailURL: URL {
-//        let subject = "What the score (\(Bundle.main.buildNumber)) support request"
-//        let body = """
-//
-//
-//----- Please reply above this line -----
-//Build number: \(Bundle.main.buildNumber)
-//Version: \(Bundle.main.versionNumber)
-//Locale: \(Locale.current.description)
-//"""
-//        let mailURL: URL = URL(string: "mailto:whatthescore@mcomisso.me")!
-//        var components = URLComponents(url: mailURL, resolvingAgainstBaseURL: false)
-//        let items = [
-//            URLQueryItem(name: "body", value: body),
-//            URLQueryItem(name: "subject", value: subject)
-//        ]
-//
-//        components?.queryItems = items
-//
-//        return components!.url!
-//    }
 }
 
 #Preview {

@@ -3,10 +3,12 @@ import SwiftData
 
 struct ContentView: View {
     @Environment(\.verticalSizeClass) var verticalSizeClass
-//    @Environment(Connectivity.self) var connectivity
+    @Environment(\.modelContext) var modelContext
+
+    @AppStorage(AppStorageValues.hasEnabledIntervals)
+    var hasEnabledIntervals: Bool = false
 
     @Query(sort: \Team.creationDate) var teams: [Team]
-    @Environment(\.modelContext) var modelContext
 
     @State private var lastTapped: String?
     @State private var lastTimeTapped: Date = Date()
@@ -20,7 +22,6 @@ struct ContentView: View {
         ZStack(alignment: .bottomTrailing) {
             if verticalSizeClass == .regular {
                 portraitButtons
-
             } else if verticalSizeClass == .compact {
                 landscapeButtons
             }
@@ -28,26 +29,14 @@ struct ContentView: View {
             bottomToolbar
                 .ignoresSafeArea(.all, edges: .all)
                 .padding()
-
         }
-//        .onChange(of: lastTimeTapped, { _, _ in
-//            let data = teams.map { $0.toCodable() }
-//
-//            guard let encodedData = try? JSONEncoder().encode(data) else {
-//                return
-//            }
-//            print(encodedData.description)
-//            connectivity.send(data: encodedData)
-//        })
+        .sheet(isPresented: $isShowingIntervals) {
+            IntervalsList()
+                .presentationDetents([.medium])
+        }
         .sheet(isPresented: $isVisualisingSettings, onDismiss: nil, content: {
             SettingsView()
         })
-//        .sheet(isPresented: $isShowingIntervals, onDismiss: nil, content: {
-//            IntervalsList(viewModel: self.viewModel)
-//        })
-//        .overlay(alignment: .top) {
-//            FloaterText(text: $lastTapped)
-//        }
         .onAppear {
             if teams.isEmpty {
                 Team.createBaseData(modelContext: modelContext)
@@ -57,25 +46,20 @@ struct ContentView: View {
 
     var bottomToolbar: some View {
         HStack {
-            Button {
-                withAnimation(Animation.interactiveSpring()) {
-                    isShowingIntervals.toggle()
+            if hasEnabledIntervals {
+                Button {
+                    withAnimation(Animation.interactiveSpring()) {
+                        isShowingIntervals.toggle()
+                    }
+                } label: {
+                    Image(systemName: "timer")
+                        .foregroundStyle(.primary)
+                        .imageScale(.large)
+                        .padding()
+                        .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 16))
+                        .shadow(radius: 8)
                 }
-            } label: {
-                Image(systemName: "timer")
-                    .foregroundStyle(.primary)
-                    .imageScale(.large)
-                    .padding()
-                    .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 16))
-                    .shadow(radius: 8)
             }
-//            .contextMenu {
-//                Text("Current interval: \(viewModel.intervals.count)")
-//                Button("Start new") {
-//                    viewModel.addInterval()
-//                }
-//            }
-            .featureFlag(.intervalsFeature)
 
             Spacer()
 
@@ -91,11 +75,19 @@ struct ContentView: View {
                     .shadow(radius: 8)
             }
             .contextMenu(menuItems: {
+                Button {
+                    teams.forEach { $0.score = [] }
+                } label: {
+                    Label("Set scores to 0", systemImage: "arrow.counterclockwise")
+                }
+                
+                Divider()
+
                 Button(role: .destructive) {
                     teams.forEach { modelContext.delete($0) }
                     Team.createBaseData(modelContext: modelContext)
                 } label: {
-                    Label("Reset", systemImage: "trash")
+                    Label("Reset all", systemImage: "trash")
                 }
             })
         }.symbolRenderingMode(.hierarchical)
@@ -138,8 +130,11 @@ struct ContentView: View {
 
 }
 
-struct ContentView_Previews: PreviewProvider {
-    static var previews: some View {
+
+#Preview {
+    ModelContainerPreview {
         ContentView()
+    } modelContainer: {
+        try makeModelContainer()
     }
 }

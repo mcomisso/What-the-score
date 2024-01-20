@@ -3,7 +3,9 @@ import SwiftUI
 import Pow
 
 struct TapButton: View {
-
+    @AppStorage(AppStorageValues.shouldAllowNegativePoints)
+    var shouldAllowNegativePoints: Bool = false
+    
     @Binding var score: [Score]
     @Binding var colorHex: String
     @Binding var name: String
@@ -27,7 +29,7 @@ struct TapButton: View {
             GeometryReader { geometryProxy in
                 VStack {
                     let fontSize = min(geometryProxy.size.width, geometryProxy.size.height) / 3.5
-                    Text("\(score.count)")
+                    Text("\(score.totalScore)")
                         .font(.system(size: fontSize, design: .rounded))
                         .frame(maxWidth: .infinity,
                                maxHeight: .infinity)
@@ -59,26 +61,31 @@ struct TapButton: View {
     }
 
     private func onGestureEnd(_ value: DragGesture.Value) {
-        if !score.isEmpty {
-            score.removeLast()
-            self.lastTimeTapped = Date()
+        if shouldAllowNegativePoints {
+            score.append(Score(time: .now, value: -1))
             decreased += 1
         } else {
-            #if os(iOS)
-            warningGenerator.notificationOccurred(.warning)
-            #endif
+            if !score.isEmpty {
+                score.removeLast()
+                self.lastTimeTapped = Date()
+                decreased += 1
+            } else {
+#if os(iOS)
+                warningGenerator.notificationOccurred(.warning)
+#endif
+            }
         }
     }
 
     private func didTapOnButton() {
         if isEnabled {
-
             justAdded.toggle()
-            score.append(.init(time: .init()))
+            
+            score.append(Score(time: .now))
             increased += 1
+            
             self.lastTapped = name
             self.lastTimeTapped = Date()
-
         }
     }
 }

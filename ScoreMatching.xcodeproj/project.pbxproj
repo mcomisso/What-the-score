@@ -33,13 +33,13 @@
 		B97E451728DFC895001C9EF1 /* Color+random.swift in Sources */ = {isa = PBXBuildFile; fileRef = B97E451628DFC895001C9EF1 /* Color+random.swift */; };
 		B97E451828DFC89C001C9EF1 /* Color+random.swift in Sources */ = {isa = PBXBuildFile; fileRef = B97E451628DFC895001C9EF1 /* Color+random.swift */; };
 		B97E451A28DFCBAF001C9EF1 /* FloaterText.swift in Sources */ = {isa = PBXBuildFile; fileRef = B97E451928DFCBAF001C9EF1 /* FloaterText.swift */; };
-		B97E451C28DFCBCB001C9EF1 /* FeatureFlag.swift in Sources */ = {isa = PBXBuildFile; fileRef = B97E451B28DFCBCB001C9EF1 /* FeatureFlag.swift */; };
 		B98539CF2954E4020084DCEC /* TelemetryClient in Frameworks */ = {isa = PBXBuildFile; productRef = B98539CE2954E4020084DCEC /* TelemetryClient */; };
-		B98539D22954EA010084DCEC /* TwitterButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = B98539D12954EA010084DCEC /* TwitterButton.swift */; };
+		B98539D22954EA010084DCEC /* SocialButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = B98539D12954EA010084DCEC /* SocialButton.swift */; };
 		B98539D42954EABC0084DCEC /* Bundle+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = B98539D32954EABC0084DCEC /* Bundle+Extensions.swift */; };
 		B9861D5727CC5D0100053D00 /* EditTeamName.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9861D5627CC5D0100053D00 /* EditTeamName.swift */; };
 		B9861D5F27CD485A00053D00 /* ScoreMatchingScreenshots.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9861D5E27CD485A00053D00 /* ScoreMatchingScreenshots.swift */; };
 		B9861D6827CD487800053D00 /* SnapshotHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9861D6727CD487800053D00 /* SnapshotHelper.swift */; };
+		B99194312B574A5100E5EF87 /* ModelContainerPreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = B99194302B574A5100E5EF87 /* ModelContainerPreview.swift */; };
 		B9949AD42B4F8E1600BE4D7F /* SwiftDataModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9538C582B4F4E7A0052F8C0 /* SwiftDataModel.swift */; };
 		B9A8A7662A86373900139043 /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = B9A8A7652A86373900139043 /* FirebaseAnalytics */; };
 		B9A8A7682A86373900139043 /* FirebaseAnalyticsWithoutAdIdSupport in Frameworks */ = {isa = PBXBuildFile; productRef = B9A8A7672A86373900139043 /* FirebaseAnalyticsWithoutAdIdSupport */; };
@@ -110,14 +110,14 @@
 		B97E451528DF8271001C9EF1 /* WidgetExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = WidgetExtension.entitlements; sourceTree = "<group>"; };
 		B97E451628DFC895001C9EF1 /* Color+random.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+random.swift"; sourceTree = "<group>"; };
 		B97E451928DFCBAF001C9EF1 /* FloaterText.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FloaterText.swift; sourceTree = "<group>"; };
-		B97E451B28DFCBCB001C9EF1 /* FeatureFlag.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeatureFlag.swift; sourceTree = "<group>"; };
 		B98539D02954E8930084DCEC /* Config.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Config.xcconfig; sourceTree = "<group>"; };
-		B98539D12954EA010084DCEC /* TwitterButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TwitterButton.swift; sourceTree = "<group>"; };
+		B98539D12954EA010084DCEC /* SocialButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SocialButton.swift; sourceTree = "<group>"; };
 		B98539D32954EABC0084DCEC /* Bundle+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Bundle+Extensions.swift"; sourceTree = "<group>"; };
 		B9861D5627CC5D0100053D00 /* EditTeamName.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditTeamName.swift; sourceTree = "<group>"; };
 		B9861D5C27CD485A00053D00 /* ScoreMatchingScreenshots.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ScoreMatchingScreenshots.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		B9861D5E27CD485A00053D00 /* ScoreMatchingScreenshots.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScoreMatchingScreenshots.swift; sourceTree = "<group>"; };
 		B9861D6727CD487800053D00 /* SnapshotHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SnapshotHelper.swift; path = fastlane/SnapshotHelper.swift; sourceTree = SOURCE_ROOT; };
+		B99194302B574A5100E5EF87 /* ModelContainerPreview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelContainerPreview.swift; sourceTree = "<group>"; };
 		B9A8A76F2A8637FC00139043 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		B9F9A8C927B3DAD900B4C805 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		B9F9A8CB27B3DBCF00B4C805 /* TapButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TapButton.swift; sourceTree = "<group>"; };
@@ -170,7 +170,7 @@
 			isa = PBXGroup;
 			children = (
 				B9F9A8C927B3DAD900B4C805 /* SettingsView.swift */,
-				B98539D12954EA010084DCEC /* TwitterButton.swift */,
+				B98539D12954EA010084DCEC /* SocialButton.swift */,
 				B9861D5627CC5D0100053D00 /* EditTeamName.swift */,
 			);
 			path = Settings;
@@ -256,7 +256,7 @@
 				B919B9C827CC591300014942 /* ReceiverModeView.swift */,
 				B9788A2927B3CDA900EDF754 /* ContentView.swift */,
 				B98539D32954EABC0084DCEC /* Bundle+Extensions.swift */,
-				B97E451D28DFCBD4001C9EF1 /* FeatureFlagSystem */,
+				B99194302B574A5100E5EF87 /* ModelContainerPreview.swift */,
 				B97E451928DFCBAF001C9EF1 /* FloaterText.swift */,
 				B97E450E28DE8712001C9EF1 /* Models */,
 				B919B9C127CAA69B00014942 /* Features */,
@@ -286,14 +286,6 @@
 				B97E450F28DE871B001C9EF1 /* CodableTeamData.swift */,
 			);
 			path = Models;
-			sourceTree = "<group>";
-		};
-		B97E451D28DFCBD4001C9EF1 /* FeatureFlagSystem */ = {
-			isa = PBXGroup;
-			children = (
-				B97E451B28DFCBCB001C9EF1 /* FeatureFlag.swift */,
-			);
-			path = FeatureFlagSystem;
 			sourceTree = "<group>";
 		};
 		B9861D5D27CD485A00053D00 /* ScoreMatchingScreenshots */ = {
@@ -471,6 +463,7 @@
 				B97E451A28DFCBAF001C9EF1 /* FloaterText.swift in Sources */,
 				B95C37EF27B474EA009A2C5F /* Connectivity.swift in Sources */,
 				B97E451728DFC895001C9EF1 /* Color+random.swift in Sources */,
+				B99194312B574A5100E5EF87 /* ModelContainerPreview.swift in Sources */,
 				B95C37F227B49369009A2C5F /* ConnectivityView.swift in Sources */,
 				B919B9C927CC591300014942 /* ReceiverModeView.swift in Sources */,
 				B97E450D28DE8507001C9EF1 /* MainView.swift in Sources */,
@@ -478,11 +471,10 @@
 				B9538C592B4F4E7A0052F8C0 /* SwiftDataModel.swift in Sources */,
 				B919B9C027CAA67A00014942 /* IntervalsList.swift in Sources */,
 				B95C37EB27B4748A009A2C5F /* PDFGenerator.swift in Sources */,
-				B98539D22954EA010084DCEC /* TwitterButton.swift in Sources */,
+				B98539D22954EA010084DCEC /* SocialButton.swift in Sources */,
 				B9788A2827B3CDA900EDF754 /* ScoreMatchingApp.swift in Sources */,
 				B9F9A8CC27B3DBCF00B4C805 /* TapButton.swift in Sources */,
 				B95C37E927B473D7009A2C5F /* ScoreboardPDFPage.swift in Sources */,
-				B97E451C28DFCBCB001C9EF1 /* FeatureFlag.swift in Sources */,
 				B95C37F427B4A9C2009A2C5F /* Color+Decodable.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

@@ -2,6 +2,9 @@ import Foundation
 import TelemetryClient
 import UIKit
 import FirebaseCore
+#if canImport(WidgetKit)
+import WidgetKit
+#endif
 
 private extension Bundle {
     var analyticsID: String {
@@ -18,6 +21,12 @@ class AppDelegate: NSObject, UIApplicationDelegate {
         TelemetryManager.initialize(with: configuration)
         FirebaseApp.configure()
         return true
+    }
+
+    func applicationWillResignActive(_ application: UIApplication) {
+#if canImport(WidgetKit)
+        WidgetCenter.shared.reloadAllTimelines()
+#endif
     }
 }
 
