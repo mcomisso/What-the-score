@@ -40,7 +40,7 @@ extension Array where Element == Score {
 
     // Returns total score, ensuring it never goes below zero
     var safeTotalScore: Int {
-        max(0, totalScore)
+        Swift.max(0, totalScore)
     }
 
     // Removes all negative score entries
