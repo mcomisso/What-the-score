@@ -16,8 +16,6 @@
 		B95C37EF27B474EA009A2C5F /* Connectivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = B95C37EE27B474EA009A2C5F /* Connectivity.swift */; };
 		B95C37F227B49369009A2C5F /* ConnectivityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B95C37F127B49369009A2C5F /* ConnectivityView.swift */; };
 		B95C37F427B4A9C2009A2C5F /* Color+Decodable.swift in Sources */ = {isa = PBXBuildFile; fileRef = B95C37F327B4A9C2009A2C5F /* Color+Decodable.swift */; };
-		B9620DAE2EBCC4AD0014F7B0 /* RippleEffect.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9620DAC2EBCC4AD0014F7B0 /* RippleEffect.swift */; };
-		B9620DAF2EBCC4AD0014F7B0 /* RippleShader.metal in Sources */ = {isa = PBXBuildFile; fileRef = B9620DAD2EBCC4AD0014F7B0 /* RippleShader.metal */; };
 		B96F151B28DE670E00349258 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B96F151A28DE670E00349258 /* WidgetKit.framework */; };
 		B96F151D28DE670E00349258 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B96F151C28DE670E00349258 /* SwiftUI.framework */; };
 		B96F152028DE670E00349258 /* CurrentStatusWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = B96F151F28DE670E00349258 /* CurrentStatusWidget.swift */; };
@@ -91,8 +89,6 @@
 		B95C37F027B49144009A2C5F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		B95C37F127B49369009A2C5F /* ConnectivityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectivityView.swift; sourceTree = "<group>"; };
 		B95C37F327B4A9C2009A2C5F /* Color+Decodable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+Decodable.swift"; sourceTree = "<group>"; };
-		B9620DAC2EBCC4AD0014F7B0 /* RippleEffect.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RippleEffect.swift; sourceTree = "<group>"; };
-		B9620DAD2EBCC4AD0014F7B0 /* RippleShader.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = RippleShader.metal; sourceTree = "<group>"; };
 		B96F151828DE670E00349258 /* WidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = WidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		B96F151A28DE670E00349258 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
 		B96F151C28DE670E00349258 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
@@ -253,8 +249,6 @@
 				B919B9C827CC591300014942 /* ReceiverModeView.swift */,
 				B9788A2927B3CDA900EDF754 /* ContentView.swift */,
 				B98539D32954EABC0084DCEC /* Bundle+Extensions.swift */,
-				B9620DAC2EBCC4AD0014F7B0 /* RippleEffect.swift */,
-				B9620DAD2EBCC4AD0014F7B0 /* RippleShader.metal */,
 				B99194302B574A5100E5EF87 /* ModelContainerPreview.swift */,
 				B97E450E28DE8712001C9EF1 /* Models */,
 				B919B9C127CAA69B00014942 /* Features */,
@@ -452,8 +446,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				B9620DAE2EBCC4AD0014F7B0 /* RippleEffect.swift in Sources */,
-				B9620DAF2EBCC4AD0014F7B0 /* RippleShader.metal in Sources */,
 				B9861D5727CC5D0100053D00 /* EditTeamName.swift in Sources */,
 				B97E450B28DE84EE001C9EF1 /* AppDelegate.swift in Sources */,
 				B9F9A8CA27B3DAD900B4C805 /* SettingsView.swift in Sources */,

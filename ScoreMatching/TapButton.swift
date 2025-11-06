@@ -6,9 +6,6 @@ struct TapButton: View {
     @AppStorage(AppStorageValues.shouldAllowNegativePoints)
     var shouldAllowNegativePoints: Bool = false
 
-    @AppStorage(AppStorageValues.isFancyModeEnabled)
-    var isFancyModeEnabled: Bool = true
-
     @Binding var score: [Score]
     @Binding var colorHex: String
     @Binding var name: String
@@ -23,9 +20,6 @@ struct TapButton: View {
     @State var decreased: Int = 0
 
     @State var justAdded: Bool = false
-    @State var rippleTrigger: Int = 0
-    @State var tapLocation: CGPoint = .zero
-    @State var viewSize: CGSize = .zero
 
     var body: some View {
         ZStack {
@@ -47,31 +41,10 @@ struct TapButton: View {
                 .frame(maxWidth: .infinity,
                        maxHeight: .infinity)
                 .contentShape(Rectangle())
-                .simultaneousGesture(
-                    SpatialTapGesture()
-                        .onEnded { value in
-                            tapLocation = value.location
-                            didTapOnButton()
-                        }
-                )
+                .onTapGesture {
+                    didTapOnButton()
+                }
                 .gesture(DragGesture().onEnded(onGestureEnd))
-                .background(
-                    GeometryReader { geo in
-                        Color.clear
-                            .onAppear {
-                                viewSize = geo.size
-                            }
-                            .onChange(of: geo.size) { _, newSize in
-                                viewSize = newSize
-                            }
-                    }
-                )
-                .modifier(ConditionalRippleEffect(
-                    isEnabled: isFancyModeEnabled,
-                    trigger: rippleTrigger,
-                    tapLocation: tapLocation,
-                    bounds: viewSize
-                ))
                 #if os(iOS)
                 .sensoryFeedback(.increase, trigger: increased)
                 .sensoryFeedback(.decrease, trigger: decreased)
@@ -109,7 +82,6 @@ struct TapButton: View {
 
             score.append(Score(time: .now))
             increased += 1
-            rippleTrigger += 1
 
             self.lastTapped = name
         }

@@ -8,7 +8,6 @@ enum AppStorageValues {
     static let shouldKeepScreenAwake = "shouldKeepScreenAwake"
     static let shouldAllowNegativePoints = "shouldAllowNegativePoints"
     static let hasEnabledIntervals = "hasEnabledIntervals"
-    static let isFancyModeEnabled = "isFancyModeEnabled"
 }
 
 private enum SocialLinks {
@@ -45,9 +44,6 @@ struct SettingsView: View {
 
     @AppStorage(AppStorageValues.hasEnabledIntervals)
     var hasEnabledIntervals: Bool = false
-
-    @AppStorage(AppStorageValues.isFancyModeEnabled)
-    var isFancyModeEnabled: Bool = true
 
     @State var colorSelection: Color = .random
 
@@ -116,6 +112,14 @@ struct SettingsView: View {
 
                         reinitialiseAppButton
                     }
+
+                    Section("Export") {
+                        Button {
+                            generatePDF()
+                        } label: {
+                            Label("Export Scoreboard as PDF", systemImage: "doc.text")
+                        }
+                    }
                     
                     // MARK: - Preferences
 
@@ -133,7 +137,7 @@ struct SettingsView: View {
 
 
 
-                    Section(footer: Text("Enable intervals to track scores by quarters, halves, or periods. Fancy mode adds a cool Metal-powered ripple effect when tapping score buttons.")) {
+                    Section(footer: Text("Enable intervals to track scores by quarters, halves, or periods.")) {
                         Toggle(
                             "Use intervals",
                             isOn: $hasEnabledIntervals
@@ -141,10 +145,6 @@ struct SettingsView: View {
                         Toggle(
                             "Allow negative points",
                             isOn: $shouldAllowNegativePoints
-                        )
-                        Toggle(
-                            "Fancy mode",
-                            isOn: $isFancyModeEnabled
                         )
                     }
 
@@ -200,14 +200,6 @@ struct SettingsView: View {
                                     Text("My Vinyl+")
                                 }
                             }
-                        }
-                    }
-
-                    Section("Export") {
-                        Button {
-                            generatePDF()
-                        } label: {
-                            Label("Export Scoreboard as PDF", systemImage: "doc.text")
                         }
                     }
                 }
