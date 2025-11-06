@@ -5,7 +5,7 @@ import Pow
 struct TapButton: View {
     @AppStorage(AppStorageValues.shouldAllowNegativePoints)
     var shouldAllowNegativePoints: Bool = false
-    
+
     @Binding var score: [Score]
     @Binding var colorHex: String
     @Binding var name: String
@@ -41,7 +41,9 @@ struct TapButton: View {
                 .frame(maxWidth: .infinity,
                        maxHeight: .infinity)
                 .contentShape(Rectangle())
-                .onTapGesture(perform: didTapOnButton)
+                .onTapGesture {
+                    didTapOnButton()
+                }
                 .gesture(DragGesture().onEnded(onGestureEnd))
                 #if os(iOS)
                 .sensoryFeedback(.increase, trigger: increased)
@@ -95,3 +97,4 @@ struct TapButton: View {
     )
     .background(.gray)
 }
+

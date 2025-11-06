@@ -15,6 +15,10 @@ private enum SocialLinks {
     static let threads = URL(string: "https://www.threads.net/@matteo_comisso")
 }
 
+private enum AppLinks {
+    static let myVinylPlus = URL(string: "https://apple.co/41yJhHM")
+}
+
 struct SettingsView: View {
 
     @Environment(\.dismiss) var dimiss
@@ -34,10 +38,10 @@ struct SettingsView: View {
 
     @AppStorage(AppStorageValues.shouldKeepScreenAwake)
     var shouldKeepScreenAwake: Bool = false
-    
+
     @AppStorage(AppStorageValues.shouldAllowNegativePoints)
     var shouldAllowNegativePoints: Bool = false
-    
+
     @AppStorage(AppStorageValues.hasEnabledIntervals)
     var hasEnabledIntervals: Bool = false
 
@@ -63,9 +67,11 @@ struct SettingsView: View {
         .alert("Are you sure?", isPresented: $showResetAlert) {
             Button("Yes, reset scores", role: .destructive) {
                 self.teams.forEach { modelContext.delete($0) }
+                self.intervals.forEach { modelContext.delete($0) }
+                Team.createBaseData(modelContext: modelContext)
             }
         } message: {
-            Text("The app will delete teams and scores, and start with \"Team A\" and \"Team B\".")
+            Text("The app will delete teams, scores, and intervals, and start with \"Team A\" and \"Team B\".")
         }
     }
 
@@ -106,6 +112,14 @@ struct SettingsView: View {
 
                         reinitialiseAppButton
                     }
+
+                    Section("Export") {
+                        Button {
+                            generatePDF()
+                        } label: {
+                            Label("Export Scoreboard as PDF", systemImage: "doc.text")
+                        }
+                    }
                     
                     // MARK: - Preferences
 
@@ -123,7 +137,7 @@ struct SettingsView: View {
 
 
 
-                    Section(footer: Text("Enable intervals to track scores by quarters, halves, or periods (useful for basketball, netball, etc).")) {
+                    Section(footer: Text("Enable intervals to track scores by quarters, halves, or periods.")) {
                         Toggle(
                             "Use intervals",
                             isOn: $hasEnabledIntervals
@@ -168,11 +182,24 @@ struct SettingsView: View {
                             )
                         }
                     }
-                    Section("Export") {
-                        Button {
-                            generatePDF()
-                        } label: {
-                            Label("Export Scoreboard as PDF", systemImage: "doc.text")
+
+                    // MARK: - Other Apps
+
+                    Section(
+                        header: Text("Other Apps"),
+                        footer: Text("Check out my other apps on the App Store.")
+                    ) {
+                        if let myVinylPlusURL = AppLinks.myVinylPlus {
+                            Link(destination: myVinylPlusURL) {
+                                HStack {
+                                    Image("MyVinylPlus")
+                                        .resizable()
+                                        .aspectRatio(contentMode: .fit)
+                                        .frame(width: 32, height: 32)
+                                        .cornerRadius(8)
+                                    Text("My Vinyl+")
+                                }
+                            }
                         }
                     }
                 }
