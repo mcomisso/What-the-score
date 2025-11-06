@@ -26,7 +26,8 @@ struct TapButton: View {
             GeometryReader { geometryProxy in
                 VStack {
                     let fontSize = min(geometryProxy.size.width, geometryProxy.size.height) / 3.5
-                    Text("\(score.totalScore)")
+                    let displayScore = shouldAllowNegativePoints ? score.totalScore : score.safeTotalScore
+                    Text("\(displayScore)")
                         .font(.system(size: fontSize, design: .rounded))
                         .frame(maxWidth: .infinity,
                                maxHeight: .infinity)

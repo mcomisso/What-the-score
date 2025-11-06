@@ -22,12 +22,15 @@ struct SettingsView: View {
     @Environment(\.requestReview) var requestReview
 
     @Query(sort: \Team.creationDate) var teams: [Team]
+    @Query(sort: \Interval.date) var intervals: [Interval]
     @Environment(\.modelContext) var modelContext
 
     @State private var isShowingNameChangeAlert: Bool = false
     @State private var isEditing: Bool = false
     @State private var showResetAlert: Bool = false
     @State private var showZeroScoreAlert: Bool = false
+    @State private var pdfURL: URL?
+    @State private var showShareSheet: Bool = false
 
     @AppStorage(AppStorageValues.shouldKeepScreenAwake)
     var shouldKeepScreenAwake: Bool = false
@@ -120,7 +123,7 @@ struct SettingsView: View {
 
 
 
-                    Section {
+                    Section(footer: Text("Enable intervals to track scores by quarters, halves, or periods (useful for basketball, netball, etc).")) {
                         Toggle(
                             "Use intervals",
                             isOn: $hasEnabledIntervals
@@ -165,11 +168,13 @@ struct SettingsView: View {
                             )
                         }
                     }
-#if DEBUG
                     Section("Export") {
-                        Button("Generate PDF of scoreboard") { }
+                        Button {
+                            generatePDF()
+                        } label: {
+                            Label("Export Scoreboard as PDF", systemImage: "doc.text")
+                        }
                     }
-#endif
                 }
             }
             .navigationTitle("Settings")
@@ -182,7 +187,25 @@ struct SettingsView: View {
                     }
                 }
             }
+            .sheet(isPresented: $showShareSheet) {
+                if let pdfURL = pdfURL {
+                    ShareSheet(items: [pdfURL])
+                }
+            }
         }
+    }
+
+    private func generatePDF() {
+        guard let document = PDFCreator.generateScoreboardPDF(teams: teams, intervals: intervals) else {
+            return
+        }
+
+        guard let url = PDFCreator.savePDFToTemporaryFile(document: document) else {
+            return
+        }
+
+        pdfURL = url
+        showShareSheet = true
     }
 
     func remove(_ indexSet: IndexSet) {
@@ -196,6 +219,18 @@ struct SettingsView: View {
             modelContext.delete(team)
         }
     }
+}
+
+// Share Sheet for iOS
+struct ShareSheet: UIViewControllerRepresentable {
+    let items: [Any]
+
+    func makeUIViewController(context: Context) -> UIActivityViewController {
+        let controller = UIActivityViewController(activityItems: items, applicationActivities: nil)
+        return controller
+    }
+
+    func updateUIViewController(_ uiViewController: UIActivityViewController, context: Context) {}
 }
 
 #Preview {

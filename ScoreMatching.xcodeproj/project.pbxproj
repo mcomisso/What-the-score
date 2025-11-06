@@ -40,7 +40,6 @@
 		B99194312B574A5100E5EF87 /* ModelContainerPreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = B99194302B574A5100E5EF87 /* ModelContainerPreview.swift */; };
 		B9949AD42B4F8E1600BE4D7F /* SwiftDataModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9538C582B4F4E7A0052F8C0 /* SwiftDataModel.swift */; };
 		B9A8A7662A86373900139043 /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = B9A8A7652A86373900139043 /* FirebaseAnalytics */; };
-		B9A8A7682A86373900139043 /* FirebaseAnalyticsWithoutAdIdSupport in Frameworks */ = {isa = PBXBuildFile; productRef = B9A8A7672A86373900139043 /* FirebaseAnalyticsWithoutAdIdSupport */; };
 		B9A8A76A2A86373900139043 /* FirebaseCrashlytics in Frameworks */ = {isa = PBXBuildFile; productRef = B9A8A7692A86373900139043 /* FirebaseCrashlytics */; };
 		B9A8A76C2A86373900139043 /* FirebaseInstallations in Frameworks */ = {isa = PBXBuildFile; productRef = B9A8A76B2A86373900139043 /* FirebaseInstallations */; };
 		B9A8A76E2A86373900139043 /* FirebasePerformance in Frameworks */ = {isa = PBXBuildFile; productRef = B9A8A76D2A86373900139043 /* FirebasePerformance */; };
@@ -137,7 +136,6 @@
 				B93805A22B4F486A00E57CC9 /* Pow in Frameworks */,
 				B9A8A76A2A86373900139043 /* FirebaseCrashlytics in Frameworks */,
 				B9A8A76E2A86373900139043 /* FirebasePerformance in Frameworks */,
-				B9A8A7682A86373900139043 /* FirebaseAnalyticsWithoutAdIdSupport in Frameworks */,
 				B98539CF2954E4020084DCEC /* TelemetryClient in Frameworks */,
 				B9A8A76C2A86373900139043 /* FirebaseInstallations in Frameworks */,
 			);
@@ -329,7 +327,6 @@
 			packageProductDependencies = (
 				B98539CE2954E4020084DCEC /* TelemetryClient */,
 				B9A8A7652A86373900139043 /* FirebaseAnalytics */,
-				B9A8A7672A86373900139043 /* FirebaseAnalyticsWithoutAdIdSupport */,
 				B9A8A7692A86373900139043 /* FirebaseCrashlytics */,
 				B9A8A76B2A86373900139043 /* FirebaseInstallations */,
 				B9A8A76D2A86373900139043 /* FirebasePerformance */,
@@ -518,7 +515,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.mcomisso.ScoreMatching.Widget;
+				PRODUCT_BUNDLE_IDENTIFIER = com.mcomisso.ScoreMatching.MCWidget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -551,7 +548,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.mcomisso.ScoreMatching.Widget;
+				PRODUCT_BUNDLE_IDENTIFIER = com.mcomisso.ScoreMatching.MCWidget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -862,7 +859,7 @@
 			repositoryURL = "https://github.com/firebase/firebase-ios-sdk.git";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 10.0.0;
+				minimumVersion = 12.0.0;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
@@ -882,11 +879,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = B9A8A7642A86373900139043 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseAnalytics;
-		};
-		B9A8A7672A86373900139043 /* FirebaseAnalyticsWithoutAdIdSupport */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = B9A8A7642A86373900139043 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
-			productName = FirebaseAnalyticsWithoutAdIdSupport;
 		};
 		B9A8A7692A86373900139043 /* FirebaseCrashlytics */ = {
 			isa = XCSwiftPackageProductDependency;

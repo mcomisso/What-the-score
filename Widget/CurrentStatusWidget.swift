@@ -67,7 +67,7 @@ struct WidgetEntryView : View {
                         VStack{
                             Text(team.name)
                                 .font(.subheadline)
-                            Text("\(team.score.count)")
+                            Text("\(team.score.safeTotalScore)")
                                 .font(
                                     .system(.title, design: .rounded)
                                 )

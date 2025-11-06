@@ -8,12 +8,18 @@ struct ContentView: View {
     @AppStorage(AppStorageValues.hasEnabledIntervals)
     var hasEnabledIntervals: Bool = false
 
+    @AppStorage(AppStorageValues.shouldAllowNegativePoints)
+    var shouldAllowNegativePoints: Bool = false
+
     @Query(sort: \Team.creationDate) var teams: [Team]
+    @Query(sort: \Interval.date) var intervals: [Interval]
 
     @State private var lastTapped: String?
 
     @State private var isVisualisingSettings: Bool = false
     @State private var isShowingIntervals: Bool = false
+    @State private var showingQuickIntervalPrompt: Bool = false
+    @State private var quickIntervalName: String = ""
 
     var body: some View {
         ZStack(alignment: .bottomTrailing) {
@@ -34,11 +40,38 @@ struct ContentView: View {
         .sheet(isPresented: $isVisualisingSettings, onDismiss: nil, content: {
             SettingsView()
         })
+        .alert("Name this interval", isPresented: $showingQuickIntervalPrompt) {
+            TextField("e.g., Q1, Half 1", text: $quickIntervalName)
+            Button("Cancel", role: .cancel) {
+                quickIntervalName = ""
+            }
+            Button("Create") {
+                createQuickInterval(name: quickIntervalName.isEmpty ? "Interval \(intervals.count + 1)" : quickIntervalName)
+                quickIntervalName = ""
+            }
+        }
+        .onChange(of: shouldAllowNegativePoints) { oldValue, newValue in
+            // When negative points is disabled, remove all negative scores
+            if !newValue {
+                cleanupNegativeScores()
+            }
+        }
         .onAppear {
             if teams.isEmpty {
                 Team.createBaseData(modelContext: modelContext)
             }
         }
+    }
+
+    private func cleanupNegativeScores() {
+        for team in teams {
+            team.score.removeNegativeScores()
+        }
+    }
+
+    private func createQuickInterval(name: String) {
+        let interval = Interval.create(name: name, from: teams)
+        modelContext.insert(interval)
     }
 
     var bottomToolbar: some View {
@@ -55,6 +88,19 @@ struct ContentView: View {
                         .padding()
                         .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 16))
                         .shadow(radius: 8)
+                }
+                .contextMenu {
+                    Button {
+                        showingQuickIntervalPrompt = true
+                    } label: {
+                        Label("Quick Add Interval", systemImage: "plus.circle")
+                    }
+
+                    Button {
+                        createQuickInterval(name: "Q\(intervals.count + 1)")
+                    } label: {
+                        Label("Add Q\(intervals.count + 1)", systemImage: "clock")
+                    }
                 }
             }
 

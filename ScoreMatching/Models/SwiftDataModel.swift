@@ -37,28 +37,77 @@ extension Array where Element == Score {
     var totalScore: Int {
         map(\.value).reduce(0, +)
     }
+
+    // Returns total score, ensuring it never goes below zero
+    var safeTotalScore: Int {
+        max(0, totalScore)
+    }
+
+    // Removes all negative score entries
+    mutating func removeNegativeScores() {
+        self.removeAll { $0.value < 0 }
+    }
+}
+
+// Snapshot of a team's score at a specific point in time
+struct IntervalTeamSnapshot: Codable {
+    var teamName: String
+    var teamColor: String
+    var totalScore: Int
 }
 
 @Model
 public class Interval {
-    @Relationship(deleteRule: .nullify) var teams: [Team]
-    var duration: Double
+    var name: String // e.g., "Q1", "Q2", "Half 1", etc.
+    var teamSnapshots: [IntervalTeamSnapshot]
     var date: Date
 
-    init(teams: [Team], duration: Double, date: Date = .now) {
-        self.teams = teams
-        self.duration = duration
+    init(name: String, teamSnapshots: [IntervalTeamSnapshot], date: Date = .now) {
+        self.name = name
+        self.teamSnapshots = teamSnapshots
         self.date = date
+    }
+
+    // Helper to create interval from current teams
+    static func create(name: String, from teams: [Team]) -> Interval {
+        let snapshots = teams.map { team in
+            IntervalTeamSnapshot(
+                teamName: team.name,
+                teamColor: team.color,
+                totalScore: team.score.totalScore
+            )
+        }
+        return Interval(name: name, teamSnapshots: snapshots)
     }
 }
 
 extension Interval {
     static func generateData(modelContext: ModelContext) {
-        let interval1 = Interval(teams: [], duration: 10)
-        let interval2 = Interval(teams: [], duration: 10)
+        let snapshot1 = IntervalTeamSnapshot(teamName: "Team A", teamColor: "FF0000", totalScore: 10)
+        let snapshot2 = IntervalTeamSnapshot(teamName: "Team B", teamColor: "0000FF", totalScore: 8)
+
+        let interval1 = Interval(name: "Q1", teamSnapshots: [snapshot1, snapshot2])
+        let interval2 = Interval(name: "Q2", teamSnapshots: [snapshot1, snapshot2])
 
         modelContext.insert(interval1)
         modelContext.insert(interval2)
+    }
+
+    // Calculate score gained in this interval compared to previous
+    func scoreGained(previousInterval: Interval?) -> [String: Int] {
+        var gains: [String: Int] = [:]
+
+        for snapshot in teamSnapshots {
+            if let previousInterval = previousInterval,
+               let previousSnapshot = previousInterval.teamSnapshots.first(where: { $0.teamName == snapshot.teamName }) {
+                gains[snapshot.teamName] = snapshot.totalScore - previousSnapshot.totalScore
+            } else {
+                // First interval - the gain is the total score
+                gains[snapshot.teamName] = snapshot.totalScore
+            }
+        }
+
+        return gains
     }
 }
 

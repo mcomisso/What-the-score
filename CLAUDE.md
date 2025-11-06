@@ -37,24 +37,27 @@ No need to run package installation commands; Xcode handles this automatically.
 All models are in `Models/SwiftDataModel.swift`:
 - **`Team`** - Represents a team with scores array, name, and color. Includes undo functionality.
 - **`Score`** - Individual score entry with timestamp and value (supports negative points)
-- **`Interval`** - Time-based game intervals (in development)
-- **`Game`** - Groups teams and intervals together
+- **`Interval`** - Snapshots team scores at specific points in time (quarters, halves, periods)
+  - Contains `IntervalTeamSnapshot` array storing team name, color, and total score
+  - Can calculate score gained per interval using `scoreGained(previousInterval:)`
+  - Created using `Interval.create(name:from:)` helper
+- **`Game`** - Groups teams and intervals together (optional, for future use)
 
 **Key persistence patterns:**
 - SwiftData with `@Model` macro for automatic persistence
 - `@Query` property wrapper for reactive data fetching
 - App Groups (`group.mcomisso.whatTheScore`) for sharing data with Widget extension
 - In-memory containers used in previews via `ModelContainerPreview`
+- `@Relationship` attributes with proper delete rules for data integrity
 
 ### App Structure
 
 ```
 ScoreMatchingApp.swift (@main)
-└── MainView (wrapper)
-    └── ContentView (main UI)
-        ├── TapButton (core interaction)
-        ├── SettingsView (team config, preferences)
-        └── IntervalsListView (time tracking)
+└── ContentView (main UI)
+    ├── TapButton (core interaction)
+    ├── SettingsView (team config, preferences)
+    └── IntervalsList (period/quarter tracking)
 ```
 
 **Entry point:** `ScoreMatchingApp.swift` uses modern SwiftUI lifecycle with `@UIApplicationDelegateAdaptor` for Firebase/analytics initialization in `AppDelegate.swift`.
@@ -75,9 +78,13 @@ ScoreMatchingApp.swift (@main)
 - App reset functionality
 - App Store review prompts
 
-**Intervals** (`Features/Intervals/`) - IN DEVELOPMENT
-- Time-based interval tracking for games
-- Currently basic implementation; integration incomplete
+**Intervals** (`Features/Intervals/`)
+- Period/quarter/half tracking for sports like basketball, netball
+- `IntervalsList` view displays all intervals with score breakdowns
+- Shows cumulative scores and points gained per interval
+- Can be toggled on/off in Settings
+- Quick creation via context menu on timer button in main view
+- Intervals snapshot team scores at specific moments for historical tracking
 
 **Multipeer** (`Multipeer/`)
 - Peer-to-peer score sharing using MultipeerConnectivity
@@ -85,9 +92,15 @@ ScoreMatchingApp.swift (@main)
 - Uses `CodableTeamData` for JSON serialization
 
 **PDF** (`PDF/`)
-- PDF export of scoreboards
-- Custom rendering via `ScoreboardPDFPage`
-- Debug mode feature
+- PDF export of scoreboards with full game summary
+- `ScoreboardPDFPage` renders custom PDF with:
+  - Final scores for all teams
+  - Interval breakdown (if intervals enabled)
+  - Points gained per interval
+  - Color-coded team indicators
+- `PDFCreator` utility with `generateScoreboardPDF()` and `savePDFToTemporaryFile()`
+- Available in Settings → Export → "Export Scoreboard as PDF"
+- Uses native iOS share sheet for saving/sharing PDFs
 
 **Widget** (`Widget/`)
 - WidgetKit extension for home screen
@@ -111,17 +124,18 @@ Colors are central to the UI design:
 - `Color+random.swift` generates random colors with controlled saturation/brightness
 - Supports both iOS and macOS color systems
 
-## Current Development
-
-**Active Branch:** `feature/intervals`
+## Recent Improvements
 
 **Recent Changes:**
-- Added support for negative points (configurable in Settings)
-- Started intervals feature (model exists, UI in progress)
-
-**Known Incomplete Work:**
-- Interval integration with main scoring flow is incomplete
-- Interval-based score grouping is planned but not implemented
+- ✅ Implemented complete intervals feature for tracking quarters/periods
+- ✅ Completed PDF export functionality with full scoreboard and intervals
+- ✅ Added support for negative points (configurable in Settings)
+- ✅ Fixed critical SwiftData model container issues
+- ✅ Removed force unwraps to prevent crashes
+- ✅ Replaced debug print statements with proper OSLog
+- ✅ Fixed Widget implementation
+- ✅ Added proper @Relationship attributes to models
+- ✅ Cleaned up dead code and unused views
 
 ## Analytics & Services
 
