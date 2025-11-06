@@ -8,11 +8,16 @@ enum AppStorageValues {
     static let shouldKeepScreenAwake = "shouldKeepScreenAwake"
     static let shouldAllowNegativePoints = "shouldAllowNegativePoints"
     static let hasEnabledIntervals = "hasEnabledIntervals"
+    static let isFancyModeEnabled = "isFancyModeEnabled"
 }
 
 private enum SocialLinks {
     static let mastodon = URL(string: "https://mastodon.social/@teomatteo89")
     static let threads = URL(string: "https://www.threads.net/@matteo_comisso")
+}
+
+private enum AppLinks {
+    static let myVinylPlus = URL(string: "https://apple.co/41yJhHM")
 }
 
 struct SettingsView: View {
@@ -34,12 +39,15 @@ struct SettingsView: View {
 
     @AppStorage(AppStorageValues.shouldKeepScreenAwake)
     var shouldKeepScreenAwake: Bool = false
-    
+
     @AppStorage(AppStorageValues.shouldAllowNegativePoints)
     var shouldAllowNegativePoints: Bool = false
-    
+
     @AppStorage(AppStorageValues.hasEnabledIntervals)
     var hasEnabledIntervals: Bool = false
+
+    @AppStorage(AppStorageValues.isFancyModeEnabled)
+    var isFancyModeEnabled: Bool = true
 
     @State var colorSelection: Color = .random
 
@@ -63,9 +71,11 @@ struct SettingsView: View {
         .alert("Are you sure?", isPresented: $showResetAlert) {
             Button("Yes, reset scores", role: .destructive) {
                 self.teams.forEach { modelContext.delete($0) }
+                self.intervals.forEach { modelContext.delete($0) }
+                Team.createBaseData(modelContext: modelContext)
             }
         } message: {
-            Text("The app will delete teams and scores, and start with \"Team A\" and \"Team B\".")
+            Text("The app will delete teams, scores, and intervals, and start with \"Team A\" and \"Team B\".")
         }
     }
 
@@ -123,7 +133,7 @@ struct SettingsView: View {
 
 
 
-                    Section(footer: Text("Enable intervals to track scores by quarters, halves, or periods (useful for basketball, netball, etc).")) {
+                    Section(footer: Text("Enable intervals to track scores by quarters, halves, or periods. Fancy mode adds a cool Metal-powered ripple effect when tapping score buttons.")) {
                         Toggle(
                             "Use intervals",
                             isOn: $hasEnabledIntervals
@@ -131,6 +141,10 @@ struct SettingsView: View {
                         Toggle(
                             "Allow negative points",
                             isOn: $shouldAllowNegativePoints
+                        )
+                        Toggle(
+                            "Fancy mode",
+                            isOn: $isFancyModeEnabled
                         )
                     }
 
@@ -168,6 +182,27 @@ struct SettingsView: View {
                             )
                         }
                     }
+
+                    // MARK: - Other Apps
+
+                    Section(
+                        header: Text("Other Apps"),
+                        footer: Text("Check out my other apps on the App Store.")
+                    ) {
+                        if let myVinylPlusURL = AppLinks.myVinylPlus {
+                            Link(destination: myVinylPlusURL) {
+                                HStack {
+                                    Image("MyVinylPlus")
+                                        .resizable()
+                                        .aspectRatio(contentMode: .fit)
+                                        .frame(width: 32, height: 32)
+                                        .cornerRadius(8)
+                                    Text("My Vinyl+")
+                                }
+                            }
+                        }
+                    }
+
                     Section("Export") {
                         Button {
                             generatePDF()
