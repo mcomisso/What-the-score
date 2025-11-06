@@ -4,6 +4,21 @@ import PDFKit
 import SwiftData
 import StoreKit
 
+enum AppStorageValues {
+    static let shouldKeepScreenAwake = "shouldKeepScreenAwake"
+    static let shouldAllowNegativePoints = "shouldAllowNegativePoints"
+    static let hasEnabledIntervals = "hasEnabledIntervals"
+}
+
+private enum SocialLinks {
+    static let mastodon = URL(string: "https://mastodon.social/@teomatteo89")
+    static let threads = URL(string: "https://www.threads.net/@matteo_comisso")
+}
+
+private enum AppLinks {
+    static let myVinylPlus = URL(string: "https://apple.co/41yJhHM")
+}
+
 struct SettingsView: View {
 
     @Environment(\.dismiss) var dimiss
@@ -11,19 +26,26 @@ struct SettingsView: View {
     @Environment(\.requestReview) var requestReview
 
     @Query(sort: \Team.creationDate) var teams: [Team]
+    @Query(sort: \Interval.date) var intervals: [Interval]
     @Environment(\.modelContext) var modelContext
 
     @State private var isShowingNameChangeAlert: Bool = false
-    //    @State private var selection: Team.ID?
     @State private var isEditing: Bool = false
     @State private var showResetAlert: Bool = false
     @State private var showZeroScoreAlert: Bool = false
+    @State private var pdfURL: URL?
+    @State private var showShareSheet: Bool = false
 
-    @AppStorage("shouldKeepScreenAwake") 
+    @AppStorage(AppStorageValues.shouldKeepScreenAwake)
     var shouldKeepScreenAwake: Bool = false
 
+    @AppStorage(AppStorageValues.shouldAllowNegativePoints)
+    var shouldAllowNegativePoints: Bool = false
+
+    @AppStorage(AppStorageValues.hasEnabledIntervals)
+    var hasEnabledIntervals: Bool = false
+
     @State var colorSelection: Color = .random
-    @SceneStorage("isReceiverMode") var isReceiverMode: Bool = false
 
     var teamsSection: some View {
         ForEach(teams) { team in
@@ -38,11 +60,43 @@ struct SettingsView: View {
         .onDelete(perform: remove(_:))
     }
 
+    var reinitialiseAppButton: some View {
+        Button("Reinitialize app", role: .destructive) {
+            showResetAlert.toggle()
+        }
+        .alert("Are you sure?", isPresented: $showResetAlert) {
+            Button("Yes, reset scores", role: .destructive) {
+                self.teams.forEach { modelContext.delete($0) }
+                self.intervals.forEach { modelContext.delete($0) }
+                Team.createBaseData(modelContext: modelContext)
+            }
+        } message: {
+            Text("The app will delete teams, scores, and intervals, and start with \"Team A\" and \"Team B\".")
+        }
+    }
+
+    var setZeroScoreButton: some View {
+        Button("Set scores to 0") {
+            showZeroScoreAlert.toggle()
+        }
+        .alert("Are you sure?", isPresented: $showZeroScoreAlert) {
+            Button("Yes, reset scores", role: .destructive) {
+                self.teams.forEach {
+                    $0.score = []
+                }
+            }
+        } message: {
+            Text("Each team score will be set to 0.")
+        }
+    }
+
     var body: some View {
         NavigationView {
 
             VStack {
                 List {
+                    // MARK: - Teams
+
                     Section("Teams") {
 
                         teamsSection
@@ -54,44 +108,47 @@ struct SettingsView: View {
                     }
 
                     Section {
-                        Button("Set scores to 0") {
-                            showZeroScoreAlert.toggle()
-                        }
-                        .alert("Are you sure?", isPresented: $showZeroScoreAlert) {
-                            Button("Yes, reset scores", role: .destructive) {
-                                self.teams.forEach {
-                                    $0.score = []
-                                }
-                            }
-                        } message: {
-                            Text("Each team score will be set to 0.")
-                        }
-                        
-                        Button("Reinitialize app", role: .destructive) {
-                            showResetAlert.toggle()
-                        }
-                        .alert("Are you sure?", isPresented: $showResetAlert) {
-                            Button("Yes, reset scores", role: .destructive) {
-                                self.teams.forEach { modelContext.delete($0) }
-                            }
-                        } message: {
-                            Text("The app will delete teams and scores, and start with \"Team A\" and \"Team B\".")
-                        }
+                        setZeroScoreButton
+
+                        reinitialiseAppButton
                     }
 
-                    Section(header: Text("Preferences"), footer: Text("This will prevent your device from dimming the screen and going to sleep.")) {
-                        Toggle("Keep screen awake", isOn: $shouldKeepScreenAwake)
+                    Section("Export") {
+                        Button {
+                            generatePDF()
+                        } label: {
+                            Label("Export Scoreboard as PDF", systemImage: "doc.text")
+                        }
+                    }
+                    
+                    // MARK: - Preferences
+
+                    let preferencesHeader = Text("Preferences")
+                    let preferencesFooter = Text("This will prevent your device from dimming the screen and going to sleep.")
+                    Section(
+                        header: preferencesHeader,
+                        footer: preferencesFooter
+                    ) {
+                        Toggle(
+                            "Keep screen awake",
+                            isOn: $shouldKeepScreenAwake
+                        )
                     }
 
-//                    Section("Connectivity") {
-//                        NavigationLink(destination: ConnectivityView()) {
-//                            Text("Broadcast to other devices")
-//                        }
-//
-//                        Button("Receive scores from other devices") {
-//                            isReceiverMode = true
-//                        }
-//                    }
+
+
+                    Section(footer: Text("Enable intervals to track scores by quarters, halves, or periods.")) {
+                        Toggle(
+                            "Use intervals",
+                            isOn: $hasEnabledIntervals
+                        )
+                        Toggle(
+                            "Allow negative points",
+                            isOn: $shouldAllowNegativePoints
+                        )
+                    }
+
+                    // MARK: - About
 
                     let aboutHeader = Text("About")
                     let aboutFooter = Text("Feel free to get in touch via any of the above socials for feedback or feature requests.")
@@ -109,80 +166,98 @@ struct SettingsView: View {
                                 .symbolVariant(.fill)
                         }
                         
-                        SocialButton(
-                            username: "Matteo on Mastodon",
-                            url: URL(string: "https://mastodon.social/@teomatteo89")!,
-                            icon: Image(.mastodon)
-                        )
-                        
-                        SocialButton(
-                            username: "Matteo on Threads",
-                            url: URL(string: "https://www.threads.net/@matteo_comisso")!,
-                            icon: Image(.threads)
-                        )
-//                        
-//                        Button {
-//                            openURL(mailURL)
-//                        } label: {
-//                            Label("Submit feedback / feature request", systemImage: "envelope")
-//                        }
+                        if let mastodonURL = SocialLinks.mastodon {
+                            SocialButton(
+                                username: "Matteo on Mastodon",
+                                url: mastodonURL,
+                                icon: Image(.mastodon)
+                            )
+                        }
+
+                        if let threadsURL = SocialLinks.threads {
+                            SocialButton(
+                                username: "Matteo on Threads",
+                                url: threadsURL,
+                                icon: Image(.threads)
+                            )
+                        }
                     }
-#if DEBUG
-                    Section("Export") {
-                        Button("Generate PDF of scoreboard") { }
+
+                    // MARK: - Other Apps
+
+                    Section(
+                        header: Text("Other Apps"),
+                        footer: Text("Check out my other apps on the App Store.")
+                    ) {
+                        if let myVinylPlusURL = AppLinks.myVinylPlus {
+                            Link(destination: myVinylPlusURL) {
+                                HStack {
+                                    Image("MyVinylPlus")
+                                        .resizable()
+                                        .aspectRatio(contentMode: .fit)
+                                        .frame(width: 32, height: 32)
+                                        .cornerRadius(8)
+                                    Text("My Vinyl+")
+                                }
+                            }
+                        }
                     }
-#endif
                 }
             }
             .navigationTitle("Settings")
+            .navigationBarTitleDisplayMode(.inline)
             .background(Color(uiColor: UIColor.systemGroupedBackground))
-            .safeAreaInset(edge: .bottom) {
-                    RoundedRectangle(cornerRadius: 16)
-                        .fill(Material.regular)
-                        .overlay {
-                            Button {
-                                dimiss()
-                            } label: {
-                                Text("Dismiss")
-                                    .frame(minWidth: 280, minHeight: 32)
-                            }
-                            .buttonStyle(.borderedProminent)
-                            .padding()
-                        }
-                        .frame(height: 64)
-                        .ignoresSafeArea()
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Dismiss") {
+                        dimiss()
+                    }
+                }
+            }
+            .sheet(isPresented: $showShareSheet) {
+                if let pdfURL = pdfURL {
+                    ShareSheet(items: [pdfURL])
+                }
             }
         }
     }
 
+    private func generatePDF() {
+        guard let document = PDFCreator.generateScoreboardPDF(teams: teams, intervals: intervals) else {
+            return
+        }
+
+        guard let url = PDFCreator.savePDFToTemporaryFile(document: document) else {
+            return
+        }
+
+        pdfURL = url
+        showShareSheet = true
+    }
+
     func remove(_ indexSet: IndexSet) {
+        // Ensure at least 2 teams remain
+        guard teams.count - indexSet.count >= 2 else {
+            return
+        }
+
         for idx in indexSet {
             let team = teams[idx]
             modelContext.delete(team)
         }
     }
-//
-//    var mailURL: URL {
-//        let subject = "What the score (\(Bundle.main.buildNumber)) support request"
-//        let body = """
-//
-//
-//----- Please reply above this line -----
-//Build number: \(Bundle.main.buildNumber)
-//Version: \(Bundle.main.versionNumber)
-//Locale: \(Locale.current.description)
-//"""
-//        let mailURL: URL = URL(string: "mailto:whatthescore@mcomisso.me")!
-//        var components = URLComponents(url: mailURL, resolvingAgainstBaseURL: false)
-//        let items = [
-//            URLQueryItem(name: "body", value: body),
-//            URLQueryItem(name: "subject", value: subject)
-//        ]
-//
-//        components?.queryItems = items
-//
-//        return components!.url!
-//    }
+}
+
+// Share Sheet for iOS
+struct ShareSheet: UIViewControllerRepresentable {
+    let items: [Any]
+
+    func makeUIViewController(context: Context) -> UIActivityViewController {
+        let controller = UIActivityViewController(activityItems: items, applicationActivities: nil)
+        return controller
+    }
+
+    func updateUIViewController(_ uiViewController: UIActivityViewController, context: Context) {}
 }
 
 #Preview {
