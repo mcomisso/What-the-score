@@ -10,6 +10,11 @@ enum AppStorageValues {
     static let hasEnabledIntervals = "hasEnabledIntervals"
 }
 
+private enum SocialLinks {
+    static let mastodon = URL(string: "https://mastodon.social/@teomatteo89")
+    static let threads = URL(string: "https://www.threads.net/@matteo_comisso")
+}
+
 struct SettingsView: View {
 
     @Environment(\.dismiss) var dimiss
@@ -20,7 +25,6 @@ struct SettingsView: View {
     @Environment(\.modelContext) var modelContext
 
     @State private var isShowingNameChangeAlert: Bool = false
-    //    @State private var selection: Team.ID?
     @State private var isEditing: Bool = false
     @State private var showResetAlert: Bool = false
     @State private var showZeroScoreAlert: Bool = false
@@ -145,17 +149,21 @@ struct SettingsView: View {
                                 .symbolVariant(.fill)
                         }
                         
-                        SocialButton(
-                            username: "Matteo on Mastodon",
-                            url: URL(string: "https://mastodon.social/@teomatteo89")!,
-                            icon: Image(.mastodon)
-                        )
-                        
-                        SocialButton(
-                            username: "Matteo on Threads",
-                            url: URL(string: "https://www.threads.net/@matteo_comisso")!,
-                            icon: Image(.threads)
-                        )
+                        if let mastodonURL = SocialLinks.mastodon {
+                            SocialButton(
+                                username: "Matteo on Mastodon",
+                                url: mastodonURL,
+                                icon: Image(.mastodon)
+                            )
+                        }
+
+                        if let threadsURL = SocialLinks.threads {
+                            SocialButton(
+                                username: "Matteo on Threads",
+                                url: threadsURL,
+                                icon: Image(.threads)
+                            )
+                        }
                     }
 #if DEBUG
                     Section("Export") {
@@ -178,6 +186,11 @@ struct SettingsView: View {
     }
 
     func remove(_ indexSet: IndexSet) {
+        // Ensure at least 2 teams remain
+        guard teams.count - indexSet.count >= 2 else {
+            return
+        }
+
         for idx in indexSet {
             let team = teams[idx]
             modelContext.delete(team)

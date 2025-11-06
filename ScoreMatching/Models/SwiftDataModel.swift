@@ -2,11 +2,13 @@ import Foundation
 import SwiftData
 import SwiftUI
 
+// TODO: Game model is defined but not yet used. Part of intervals feature implementation.
+// Once intervals feature is complete, this should group teams and intervals together for a full game session.
 @Model
 public class Game {
     var date: Date
-    var teams: [Team]
-    var intervals: [Interval]
+    @Relationship(deleteRule: .nullify) var teams: [Team]
+    @Relationship(deleteRule: .nullify) var intervals: [Interval]
 
     init(date: Date = .now, teams: [Team], intervals: [Interval]) {
         self.date = date
@@ -39,7 +41,7 @@ extension Array where Element == Score {
 
 @Model
 public class Interval {
-    var teams: [Team]
+    @Relationship(deleteRule: .nullify) var teams: [Team]
     var duration: Double
     var date: Date
 
@@ -83,7 +85,6 @@ public class Team {
         self.score = score
         self.name = name
         self.color = color
-        self.resolvedColor = Color(hex: color)
     }
 
     static func createBaseData(modelContext: ModelContext) {

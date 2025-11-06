@@ -20,7 +20,7 @@ struct ScoreMatchingApp: App {
 
     var body: some Scene {
         WindowGroup {
-            MainView()
+            ContentView()
                 .onAppear {
                     requestReviewIfNeeded()
                     setAwakeState()
@@ -31,7 +31,7 @@ struct ScoreMatchingApp: App {
                 .onChange(of: shouldKeepScreenAwake, initial: false) { _, newValue in
                     UIApplication.shared.isIdleTimerDisabled = newValue
                 }
-        }.modelContainer(for: [Team.self])
+        }.modelContainer(for: [Team.self, Interval.self, Game.self])
     }
 
     private func setAwakeState() {

@@ -4,32 +4,49 @@ import SwiftData
 import WidgetKit
 
 struct Provider: TimelineProvider {
-    @Query(sort: \Team.creationDate) var teams: [Team]
-    @Environment(\.modelContext) var modelContext
+    let modelContainer: ModelContainer
+
+    init() {
+        do {
+            let schema = Schema([Team.self, Interval.self, Game.self])
+            let modelConfiguration = ModelConfiguration(
+                schema: schema,
+                isStoredInMemoryOnly: false,
+                groupContainer: .identifier("group.mcomisso.whatTheScore")
+            )
+            self.modelContainer = try ModelContainer(for: schema, configurations: [modelConfiguration])
+        } catch {
+            fatalError("Could not create ModelContainer: \(error)")
+        }
+    }
+
+    private func fetchTeams() -> [Team] {
+        let context = ModelContext(modelContainer)
+        let descriptor = FetchDescriptor<Team>(sortBy: [SortDescriptor(\.creationDate)])
+        do {
+            return try context.fetch(descriptor)
+        } catch {
+            print("Failed to fetch teams: \(error)")
+            return []
+        }
+    }
 
     func placeholder(in context: Context) -> SimpleEntry {
-        if teams.isEmpty {
-            let teamA = Team(name: "Team A")
-            let teamB = Team(name: "Team B")
-            return SimpleEntry(date: Date(), teams: [teamA, teamB])
-        }
-        return SimpleEntry(date: Date(), teams: teams)
+        let teamA = Team(name: "Team A")
+        let teamB = Team(name: "Team B")
+        return SimpleEntry(date: Date(), teams: [teamA, teamB])
     }
 
     func getSnapshot(in context: Context, completion: @escaping (SimpleEntry) -> ()) {
+        let teams = fetchTeams()
         let entry = SimpleEntry(date: Date(), teams: teams)
         completion(entry)
     }
 
     func getTimeline(in context: Context, completion: @escaping (Timeline<Entry>) -> ()) {
-        var entries: [SimpleEntry] = []
-        let teamsEntries = SimpleEntry(
-            date: Date(),
-            teams: teams
-        )
-        entries.append(teamsEntries)
-        
-        let timeline = Timeline(entries: entries, policy: .atEnd)
+        let teams = fetchTeams()
+        let entry = SimpleEntry(date: Date(), teams: teams)
+        let timeline = Timeline(entries: [entry], policy: .atEnd)
         completion(timeline)
     }
 }
@@ -40,12 +57,11 @@ struct SimpleEntry: TimelineEntry {
 }
 
 struct WidgetEntryView : View {
-    @Query var teams: [Team]
     var entry: Provider.Entry
 
     var body: some View {
         VStack(spacing: 0) {
-            ForEach(teams) { team in
+            ForEach(entry.teams) { team in
                 team.resolvedColor
                     .overlay {
                         VStack{
@@ -72,7 +88,7 @@ struct CurrentStatusWidget: Widget {
     var body: some WidgetConfiguration {
         StaticConfiguration(kind: kind, provider: Provider()) { entry in
             WidgetEntryView(entry: entry)
-                .modelContainer(for: [Team.self])
+                .modelContainer(for: [Team.self, Interval.self, Game.self])
         }
         .contentMarginsDisabled()
         .supportedFamilies([.systemSmall, .systemMedium])

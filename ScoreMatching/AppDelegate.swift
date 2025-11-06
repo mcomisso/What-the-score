@@ -8,8 +8,11 @@ import WidgetKit
 
 private extension Bundle {
     var analyticsID: String {
-        let id = infoDictionary?["AnalyticsID"] as? String
-        return id!
+        guard let id = infoDictionary?["AnalyticsID"] as? String else {
+            assertionFailure("AnalyticsID not found in Info.plist")
+            return ""
+        }
+        return id
     }
 }
 

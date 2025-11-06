@@ -10,14 +10,11 @@ struct TapButton: View {
     @Binding var colorHex: String
     @Binding var name: String
     @Binding var lastTapped: String?
-    @Binding var lastTimeTapped: Date
 
     var isEnabled: Bool = true
     #if os(iOS)
     private let warningGenerator = UINotificationFeedbackGenerator()
     #endif
-
-    @State var shadowRadius: Double = 10
 
     @State var increased: Int = 0
     @State var decreased: Int = 0
@@ -67,7 +64,6 @@ struct TapButton: View {
         } else {
             if !score.isEmpty {
                 score.removeLast()
-                self.lastTimeTapped = Date()
                 decreased += 1
             } else {
 #if os(iOS)
@@ -80,12 +76,11 @@ struct TapButton: View {
     private func didTapOnButton() {
         if isEnabled {
             justAdded.toggle()
-            
+
             score.append(Score(time: .now))
             increased += 1
-            
+
             self.lastTapped = name
-            self.lastTimeTapped = Date()
         }
     }
 }
@@ -95,8 +90,7 @@ struct TapButton: View {
         score: .constant([Date()].map { Score(time: $0) }),
         colorHex: .constant(Color.primary.toHex()),
         name: .constant("Team Name"),
-        lastTapped: .constant(""),
-        lastTimeTapped: .constant(Date())
+        lastTapped: .constant("")
     )
     .background(.gray)
 }

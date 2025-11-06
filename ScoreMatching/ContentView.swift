@@ -11,12 +11,9 @@ struct ContentView: View {
     @Query(sort: \Team.creationDate) var teams: [Team]
 
     @State private var lastTapped: String?
-    @State private var lastTimeTapped: Date = Date()
 
     @State private var isVisualisingSettings: Bool = false
     @State private var isShowingIntervals: Bool = false
-
-    @State private var shadowRadius: Double = 10
 
     var body: some View {
         ZStack(alignment: .bottomTrailing) {
@@ -100,8 +97,7 @@ struct ContentView: View {
                 score: $bindingTeam.score,
                 colorHex: $bindingTeam.color,
                 name: $bindingTeam.name,
-                lastTapped: $lastTapped,
-                lastTimeTapped: $lastTimeTapped
+                lastTapped: $lastTapped
             )
             .background(Color(hex: team.color))
             .overlay(alignment: .leading) {

@@ -10,18 +10,12 @@ struct IntervalsList: View {
 
     var body: some View {
         List {
-            ForEach(intervals) { interval in
+            ForEach(Array(intervals.enumerated()), id: \.element.id) { index, interval in
                 VStack(alignment: .leading) {
                     Text(interval.date.formatted(date: .omitted, time: .shortened))
                         .foregroundStyle(.secondary)
-                    Text("Interval \(intervals.count)")
-//                        HStack {
-//                            ForEach(intervals[interval].points.map { $0.count }, id: \.self) { points in
-//                                Text("\(points)")
-//                                    .font(.title)
-//                                    .foregroundStyle(.secondary)
-//                            }
-//                    }
+                    Text("Interval \(index + 1)")
+                    // TODO: Display team scores for this interval once feature is complete
                 }
             }
             .onDelete { indexSet in
