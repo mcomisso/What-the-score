@@ -3,36 +3,115 @@ import SwiftUI
 import SwiftData
 
 struct IntervalsList: View {
-    
-    @Query var intervals: [Interval]
     @Environment(\.modelContext) var modelContext
+    @Query(sort: \Interval.date) var intervals: [Interval]
+    @Query(sort: \Team.creationDate) var teams: [Team]
 
-    @Query var teams: [Team]
+    @State private var showingNamePrompt = false
+    @State private var newIntervalName = ""
 
     var body: some View {
-        List {
-            ForEach(intervals) { interval in
-                VStack(alignment: .center) {
-                    Text("Interval \(intervals.count)")
-//                        HStack {
-//                            ForEach(intervals[interval].points.map { $0.count }, id: \.self) { points in
-//                                Text("\(points)")
-//                                    .font(.title)
-//                                    .foregroundStyle(.secondary)
-//                            }
-//                    }
+        NavigationView {
+            List {
+                if intervals.isEmpty {
+                    ContentUnavailableView(
+                        "No Intervals Yet",
+                        systemImage: "clock.badge.checkmark",
+                        description: Text("Tap 'New Interval' to mark the end of a quarter, half, or period")
+                    )
+                } else {
+                    ForEach(Array(intervals.enumerated()), id: \.element.id) { index, interval in
+                        IntervalRowView(
+                            interval: interval,
+                            previousInterval: index > 0 ? intervals[index - 1] : nil
+                        )
+                    }
+                    .onDelete { indexSet in
+                        indexSet.forEach {
+                            modelContext.delete(intervals[$0])
+                        }
+                    }
+                }
+
+                Section {
+                    Button {
+                        showingNamePrompt = true
+                    } label: {
+                        Label("New Interval", systemImage: "plus.circle.fill")
+                    }
                 }
             }
-//            .onDelete { indexSet in
-//                indexSet.forEach { modelContext.delete($0) }
-//            }
+            .navigationTitle("Intervals")
+            .navigationBarTitleDisplayMode(.inline)
+            .alert("Name this interval", isPresented: $showingNamePrompt) {
+                TextField("e.g., Q1, Half 1, Period 1", text: $newIntervalName)
+                Button("Cancel", role: .cancel) {
+                    newIntervalName = ""
+                }
+                Button("Create") {
+                    createInterval()
+                }
+            } message: {
+                Text("Give this interval a name to help identify it")
+            }
+        }
+    }
 
-            Section {
-                Button("New interval") {
-                    let interval = Interval(teams: teams, duration: 10)
-                    modelContext.insert(interval)
+    private func createInterval() {
+        let name = newIntervalName.isEmpty ? "Interval \(intervals.count + 1)" : newIntervalName
+        let interval = Interval.create(name: name, from: teams)
+        modelContext.insert(interval)
+        newIntervalName = ""
+    }
+}
+
+struct IntervalRowView: View {
+    let interval: Interval
+    let previousInterval: Interval?
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                Text(interval.name)
+                    .font(.headline)
+                Spacer()
+                Text(interval.date.formatted(date: .omitted, time: .shortened))
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+
+            // Show score breakdown
+            VStack(alignment: .leading, spacing: 4) {
+                ForEach(interval.teamSnapshots, id: \.teamName) { snapshot in
+                    HStack {
+                        Circle()
+                            .fill(Color(hex: snapshot.teamColor))
+                            .frame(width: 12, height: 12)
+                        Text(snapshot.teamName)
+                            .font(.subheadline)
+                        Spacer()
+                        Text("\(snapshot.totalScore)")
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+
+                        // Show score gained in this interval
+                        if let scoreGained = interval.scoreGained(previousInterval: previousInterval)[snapshot.teamName] {
+                            Text("(+\(scoreGained))")
+                                .font(.caption)
+                                .foregroundStyle(.green)
+                        }
+                    }
                 }
             }
         }
+        .padding(.vertical, 4)
+    }
+}
+
+#Preview {
+    ModelContainerPreview {
+        IntervalsList()
+    } modelContainer: {
+        try makeModelContainer()
     }
 }

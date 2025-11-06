@@ -1,0 +1,13 @@
+"Get 'What The Score' and transform your family and friends game nights! 
+This intuitive app is perfect for keeping track of scores in real-time for all your board games, sports, and family fun activities. 
+
+Effortless scoring, clear displays, and easy sharing options make it a must-have for every game enthusiast. Perfect for everything from casual play to competitive sports, 'What The Score' is your go-to app for staying on top of the game. 
+Score big at every gathering and never lose track of the action again!"
+
+How to use:
+- Tap on the area to increase the score 
+- Swipe anywhere to decrease
+- Tap Options to set names, number of teams and their colors
+
+And another extra feature: You can stream your score to another device under the same network!
+Simply grab an iPad or another iPhone, and connect it from the settings menu to the device you're currently tracking your match.

@@ -3,24 +3,28 @@ import SwiftData
 
 struct ContentView: View {
     @Environment(\.verticalSizeClass) var verticalSizeClass
-//    @Environment(Connectivity.self) var connectivity
-
-    @Query(sort: \Team.creationDate) var teams: [Team]
     @Environment(\.modelContext) var modelContext
 
+    @AppStorage(AppStorageValues.hasEnabledIntervals)
+    var hasEnabledIntervals: Bool = false
+
+    @AppStorage(AppStorageValues.shouldAllowNegativePoints)
+    var shouldAllowNegativePoints: Bool = false
+
+    @Query(sort: \Team.creationDate) var teams: [Team]
+    @Query(sort: \Interval.date) var intervals: [Interval]
+
     @State private var lastTapped: String?
-    @State private var lastTimeTapped: Date = Date()
 
     @State private var isVisualisingSettings: Bool = false
     @State private var isShowingIntervals: Bool = false
-
-    @State private var shadowRadius: Double = 10
+    @State private var showingQuickIntervalPrompt: Bool = false
+    @State private var quickIntervalName: String = ""
 
     var body: some View {
         ZStack(alignment: .bottomTrailing) {
             if verticalSizeClass == .regular {
                 portraitButtons
-
             } else if verticalSizeClass == .compact {
                 landscapeButtons
             }
@@ -28,26 +32,30 @@ struct ContentView: View {
             bottomToolbar
                 .ignoresSafeArea(.all, edges: .all)
                 .padding()
-
         }
-//        .onChange(of: lastTimeTapped, { _, _ in
-//            let data = teams.map { $0.toCodable() }
-//
-//            guard let encodedData = try? JSONEncoder().encode(data) else {
-//                return
-//            }
-//            print(encodedData.description)
-//            connectivity.send(data: encodedData)
-//        })
+        .sheet(isPresented: $isShowingIntervals) {
+            IntervalsList()
+                .presentationDetents([.medium])
+        }
         .sheet(isPresented: $isVisualisingSettings, onDismiss: nil, content: {
             SettingsView()
         })
-//        .sheet(isPresented: $isShowingIntervals, onDismiss: nil, content: {
-//            IntervalsList(viewModel: self.viewModel)
-//        })
-//        .overlay(alignment: .top) {
-//            FloaterText(text: $lastTapped)
-//        }
+        .alert("Name this interval", isPresented: $showingQuickIntervalPrompt) {
+            TextField("e.g., Q1, Half 1", text: $quickIntervalName)
+            Button("Cancel", role: .cancel) {
+                quickIntervalName = ""
+            }
+            Button("Create") {
+                createQuickInterval(name: quickIntervalName.isEmpty ? "Interval \(intervals.count + 1)" : quickIntervalName)
+                quickIntervalName = ""
+            }
+        }
+        .onChange(of: shouldAllowNegativePoints) { oldValue, newValue in
+            // When negative points is disabled, remove all negative scores
+            if !newValue {
+                cleanupNegativeScores()
+            }
+        }
         .onAppear {
             if teams.isEmpty {
                 Team.createBaseData(modelContext: modelContext)
@@ -55,27 +63,46 @@ struct ContentView: View {
         }
     }
 
+    private func cleanupNegativeScores() {
+        for team in teams {
+            team.score.removeNegativeScores()
+        }
+    }
+
+    private func createQuickInterval(name: String) {
+        let interval = Interval.create(name: name, from: teams)
+        modelContext.insert(interval)
+    }
+
     var bottomToolbar: some View {
         HStack {
-            Button {
-                withAnimation(Animation.interactiveSpring()) {
-                    isShowingIntervals.toggle()
+            if hasEnabledIntervals {
+                Button {
+                    withAnimation(Animation.interactiveSpring()) {
+                        isShowingIntervals.toggle()
+                    }
+                } label: {
+                    Image(systemName: "timer")
+                        .foregroundStyle(.primary)
+                        .imageScale(.large)
+                        .padding()
+                        .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 16))
+                        .shadow(radius: 8)
                 }
-            } label: {
-                Image(systemName: "timer")
-                    .foregroundStyle(.primary)
-                    .imageScale(.large)
-                    .padding()
-                    .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 16))
-                    .shadow(radius: 8)
+                .contextMenu {
+                    Button {
+                        showingQuickIntervalPrompt = true
+                    } label: {
+                        Label("Quick Add Interval", systemImage: "plus.circle")
+                    }
+
+                    Button {
+                        createQuickInterval(name: "Q\(intervals.count + 1)")
+                    } label: {
+                        Label("Add Q\(intervals.count + 1)", systemImage: "clock")
+                    }
+                }
             }
-//            .contextMenu {
-//                Text("Current interval: \(viewModel.intervals.count)")
-//                Button("Start new") {
-//                    viewModel.addInterval()
-//                }
-//            }
-            .featureFlag(.intervalsFeature)
 
             Spacer()
 
@@ -91,11 +118,19 @@ struct ContentView: View {
                     .shadow(radius: 8)
             }
             .contextMenu(menuItems: {
+                Button {
+                    teams.forEach { $0.score = [] }
+                } label: {
+                    Label("Set scores to 0", systemImage: "arrow.counterclockwise")
+                }
+                
+                Divider()
+
                 Button(role: .destructive) {
                     teams.forEach { modelContext.delete($0) }
                     Team.createBaseData(modelContext: modelContext)
                 } label: {
-                    Label("Reset", systemImage: "trash")
+                    Label("Reset all", systemImage: "trash")
                 }
             })
         }.symbolRenderingMode(.hierarchical)
@@ -108,8 +143,7 @@ struct ContentView: View {
                 score: $bindingTeam.score,
                 colorHex: $bindingTeam.color,
                 name: $bindingTeam.name,
-                lastTapped: $lastTapped,
-                lastTimeTapped: $lastTimeTapped
+                lastTapped: $lastTapped
             )
             .background(Color(hex: team.color))
             .overlay(alignment: .leading) {
@@ -138,8 +172,11 @@ struct ContentView: View {
 
 }
 
-struct ContentView_Previews: PreviewProvider {
-    static var previews: some View {
+
+#Preview {
+    ModelContainerPreview {
         ContentView()
+    } modelContainer: {
+        try makeModelContainer()
     }
 }

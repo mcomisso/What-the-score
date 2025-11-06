@@ -12,30 +12,26 @@ struct ConnectivityView: View {
     var connectedView: some View {
         if verticalSizeClass == .regular {
             VStack(spacing: 0) {
-                ForEach(connectivity.readOnlyData) { element in
-                    TapButton(score:.constant(element.score),
-                              colorHex: .constant(element.color.toHex()),
-                              name: .constant(element.name),
-                              lastTapped: .constant(nil),
-                              lastTimeTapped: .constant(Date()))
-                    .background(element.color)
-                    .colorInvert()
-                    .colorInvert()
-                }
+                teamButtons
             }.ignoresSafeArea()
         } else {
             HStack(spacing: 0) {
-                ForEach(connectivity.readOnlyData) { element in
-                    TapButton(score:.constant(element.score),
-                              colorHex: .constant(element.color.toHex()),
-                              name: .constant(element.name),
-                              lastTapped: .constant(nil),
-                              lastTimeTapped: .constant(Date()))
-                    .background(element.color)
-                    .colorInvert()
-                    .colorInvert()
-                }
+                teamButtons
             }.ignoresSafeArea()
+        }
+    }
+
+    @MainActor
+    @ViewBuilder
+    var teamButtons: some View {
+        ForEach(connectivity.readOnlyData) { element in
+            TapButton(
+                score: .constant(element.score),
+                colorHex: .constant(element.color.toHex()),
+                name: .constant(element.name),
+                lastTapped: .constant(nil)
+            )
+            .background(element.color)
         }
     }
 

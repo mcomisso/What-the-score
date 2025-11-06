@@ -1,5 +1,8 @@
 import Foundation
 import MultipeerConnectivity
+import OSLog
+
+private let logger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "com.mcomisso.ScoreMatching", category: "Connectivity")
 
 @Observable
 final class Connectivity: NSObject {
@@ -50,7 +53,7 @@ final class Connectivity: NSObject {
             do {
                 try session.send(data, toPeers: Array(peers), with: .reliable)
             } catch {
-                print(error.localizedDescription)
+                logger.error("Failed to send data: \(error.localizedDescription)")
             }
         }
     }
@@ -63,7 +66,7 @@ final class Connectivity: NSObject {
 extension Connectivity: MCNearbyServiceAdvertiserDelegate {
     func advertiser(_ advertiser: MCNearbyServiceAdvertiser, didReceiveInvitationFromPeer peerID: MCPeerID, withContext context: Data?, invitationHandler: @escaping (Bool, MCSession?) -> Void) {
 
-        print("Received Invitation from peer: \(peerID.displayName)")
+        logger.info("Received invitation from peer: \(peerID.displayName)")
 
         invitationHandler(true, session)
     }
@@ -71,12 +74,12 @@ extension Connectivity: MCNearbyServiceAdvertiserDelegate {
 
 extension Connectivity: MCNearbyServiceBrowserDelegate {
     func browser(_ browser: MCNearbyServiceBrowser, foundPeer peerID: MCPeerID, withDiscoveryInfo info: [String : String]?) {
-        print("Found Peer")
+        logger.info("Found peer: \(peerID.displayName)")
         self.peers.insert(peerID)
     }
 
     func browser(_ browser: MCNearbyServiceBrowser, lostPeer peerID: MCPeerID) {
-        print("Lost Peer")
+        logger.info("Lost peer: \(peerID.displayName)")
         if peers.contains(peerID) {
             peers.remove(peerID)
         }
@@ -97,7 +100,7 @@ extension Connectivity: MCSessionDelegate {
     }
 
     func session(_ session: MCSession, didReceive data: Data, fromPeer peerID: MCPeerID) {
-        print("Data received from peer: \(peerID)")
+        logger.info("Data received from peer: \(peerID.displayName)")
         let jsonDecoder = JSONDecoder()
         if let decodedData = try? jsonDecoder.decode([CodableTeamData].self, from: data) {
             DispatchQueue.main.async {
@@ -107,17 +110,17 @@ extension Connectivity: MCSessionDelegate {
     }
 
     func session(_ session: MCSession, peer peerID: MCPeerID, didChange state: MCSessionState) {
-        print("PeerID: \(peerID) changed state \(state)")
+        logger.info("Peer \(peerID.displayName) changed state to \(String(describing: state))")
 
         switch state {
             case .connected:
-                print("PeerID: \(peerID) connected")
+                logger.info("Peer \(peerID.displayName) connected")
             case .connecting:
-                print("PeerID: \(peerID) connecting")
+                logger.info("Peer \(peerID.displayName) connecting")
             case .notConnected:
-                print("PeerID: \(peerID) not connected")
-            default:
-                print("PeerID: \(peerID) Default?")
+                logger.info("Peer \(peerID.displayName) not connected")
+            @unknown default:
+                logger.warning("Peer \(peerID.displayName) entered unknown state")
         }
 
         DispatchQueue.main.async { [weak self] in

@@ -3,19 +3,18 @@ import SwiftUI
 import Pow
 
 struct TapButton: View {
-
+    @AppStorage(AppStorageValues.shouldAllowNegativePoints)
+    var shouldAllowNegativePoints: Bool = false
+    
     @Binding var score: [Score]
     @Binding var colorHex: String
     @Binding var name: String
     @Binding var lastTapped: String?
-    @Binding var lastTimeTapped: Date
 
     var isEnabled: Bool = true
     #if os(iOS)
     private let warningGenerator = UINotificationFeedbackGenerator()
     #endif
-
-    @State var shadowRadius: Double = 10
 
     @State var increased: Int = 0
     @State var decreased: Int = 0
@@ -27,7 +26,8 @@ struct TapButton: View {
             GeometryReader { geometryProxy in
                 VStack {
                     let fontSize = min(geometryProxy.size.width, geometryProxy.size.height) / 3.5
-                    Text("\(score.count)")
+                    let displayScore = shouldAllowNegativePoints ? score.totalScore : score.safeTotalScore
+                    Text("\(displayScore)")
                         .font(.system(size: fontSize, design: .rounded))
                         .frame(maxWidth: .infinity,
                                maxHeight: .infinity)
@@ -59,26 +59,29 @@ struct TapButton: View {
     }
 
     private func onGestureEnd(_ value: DragGesture.Value) {
-        if !score.isEmpty {
-            score.removeLast()
-            self.lastTimeTapped = Date()
+        if shouldAllowNegativePoints {
+            score.append(Score(time: .now, value: -1))
             decreased += 1
         } else {
-            #if os(iOS)
-            warningGenerator.notificationOccurred(.warning)
-            #endif
+            if !score.isEmpty {
+                score.removeLast()
+                decreased += 1
+            } else {
+#if os(iOS)
+                warningGenerator.notificationOccurred(.warning)
+#endif
+            }
         }
     }
 
     private func didTapOnButton() {
         if isEnabled {
-
             justAdded.toggle()
-            score.append(.init(time: .init()))
-            increased += 1
-            self.lastTapped = name
-            self.lastTimeTapped = Date()
 
+            score.append(Score(time: .now))
+            increased += 1
+
+            self.lastTapped = name
         }
     }
 }
@@ -88,8 +91,7 @@ struct TapButton: View {
         score: .constant([Date()].map { Score(time: $0) }),
         colorHex: .constant(Color.primary.toHex()),
         name: .constant("Team Name"),
-        lastTapped: .constant(""),
-        lastTimeTapped: .constant(Date())
+        lastTapped: .constant("")
     )
     .background(.gray)
 }

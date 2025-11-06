@@ -2,11 +2,17 @@ import Foundation
 import TelemetryClient
 import UIKit
 import FirebaseCore
+#if canImport(WidgetKit)
+import WidgetKit
+#endif
 
 private extension Bundle {
     var analyticsID: String {
-        let id = infoDictionary?["AnalyticsID"] as? String
-        return id!
+        guard let id = infoDictionary?["AnalyticsID"] as? String else {
+            assertionFailure("AnalyticsID not found in Info.plist")
+            return ""
+        }
+        return id
     }
 }
 
@@ -18,6 +24,12 @@ class AppDelegate: NSObject, UIApplicationDelegate {
         TelemetryManager.initialize(with: configuration)
         FirebaseApp.configure()
         return true
+    }
+
+    func applicationWillResignActive(_ application: UIApplication) {
+#if canImport(WidgetKit)
+        WidgetCenter.shared.reloadAllTimelines()
+#endif
     }
 }
 

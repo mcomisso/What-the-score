@@ -26,23 +26,20 @@
 		B9788A2C27B3CDA900EDF754 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B9788A2B27B3CDA900EDF754 /* Assets.xcassets */; };
 		B9788A2F27B3CDA900EDF754 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B9788A2E27B3CDA900EDF754 /* Preview Assets.xcassets */; };
 		B97E450B28DE84EE001C9EF1 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B97E450A28DE84EE001C9EF1 /* AppDelegate.swift */; };
-		B97E450D28DE8507001C9EF1 /* MainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B97E450C28DE8507001C9EF1 /* MainView.swift */; };
 		B97E451028DE871B001C9EF1 /* CodableTeamData.swift in Sources */ = {isa = PBXBuildFile; fileRef = B97E450F28DE871B001C9EF1 /* CodableTeamData.swift */; };
 		B97E451228DF820E001C9EF1 /* Color+Decodable.swift in Sources */ = {isa = PBXBuildFile; fileRef = B95C37F327B4A9C2009A2C5F /* Color+Decodable.swift */; };
 		B97E451328DF820E001C9EF1 /* CodableTeamData.swift in Sources */ = {isa = PBXBuildFile; fileRef = B97E450F28DE871B001C9EF1 /* CodableTeamData.swift */; };
 		B97E451728DFC895001C9EF1 /* Color+random.swift in Sources */ = {isa = PBXBuildFile; fileRef = B97E451628DFC895001C9EF1 /* Color+random.swift */; };
 		B97E451828DFC89C001C9EF1 /* Color+random.swift in Sources */ = {isa = PBXBuildFile; fileRef = B97E451628DFC895001C9EF1 /* Color+random.swift */; };
-		B97E451A28DFCBAF001C9EF1 /* FloaterText.swift in Sources */ = {isa = PBXBuildFile; fileRef = B97E451928DFCBAF001C9EF1 /* FloaterText.swift */; };
-		B97E451C28DFCBCB001C9EF1 /* FeatureFlag.swift in Sources */ = {isa = PBXBuildFile; fileRef = B97E451B28DFCBCB001C9EF1 /* FeatureFlag.swift */; };
 		B98539CF2954E4020084DCEC /* TelemetryClient in Frameworks */ = {isa = PBXBuildFile; productRef = B98539CE2954E4020084DCEC /* TelemetryClient */; };
-		B98539D22954EA010084DCEC /* TwitterButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = B98539D12954EA010084DCEC /* TwitterButton.swift */; };
+		B98539D22954EA010084DCEC /* SocialButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = B98539D12954EA010084DCEC /* SocialButton.swift */; };
 		B98539D42954EABC0084DCEC /* Bundle+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = B98539D32954EABC0084DCEC /* Bundle+Extensions.swift */; };
 		B9861D5727CC5D0100053D00 /* EditTeamName.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9861D5627CC5D0100053D00 /* EditTeamName.swift */; };
 		B9861D5F27CD485A00053D00 /* ScoreMatchingScreenshots.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9861D5E27CD485A00053D00 /* ScoreMatchingScreenshots.swift */; };
 		B9861D6827CD487800053D00 /* SnapshotHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9861D6727CD487800053D00 /* SnapshotHelper.swift */; };
+		B99194312B574A5100E5EF87 /* ModelContainerPreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = B99194302B574A5100E5EF87 /* ModelContainerPreview.swift */; };
 		B9949AD42B4F8E1600BE4D7F /* SwiftDataModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9538C582B4F4E7A0052F8C0 /* SwiftDataModel.swift */; };
 		B9A8A7662A86373900139043 /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = B9A8A7652A86373900139043 /* FirebaseAnalytics */; };
-		B9A8A7682A86373900139043 /* FirebaseAnalyticsWithoutAdIdSupport in Frameworks */ = {isa = PBXBuildFile; productRef = B9A8A7672A86373900139043 /* FirebaseAnalyticsWithoutAdIdSupport */; };
 		B9A8A76A2A86373900139043 /* FirebaseCrashlytics in Frameworks */ = {isa = PBXBuildFile; productRef = B9A8A7692A86373900139043 /* FirebaseCrashlytics */; };
 		B9A8A76C2A86373900139043 /* FirebaseInstallations in Frameworks */ = {isa = PBXBuildFile; productRef = B9A8A76B2A86373900139043 /* FirebaseInstallations */; };
 		B9A8A76E2A86373900139043 /* FirebasePerformance in Frameworks */ = {isa = PBXBuildFile; productRef = B9A8A76D2A86373900139043 /* FirebasePerformance */; };
@@ -104,20 +101,18 @@
 		B9788A2B27B3CDA900EDF754 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		B9788A2E27B3CDA900EDF754 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		B97E450A28DE84EE001C9EF1 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		B97E450C28DE8507001C9EF1 /* MainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainView.swift; sourceTree = "<group>"; };
 		B97E450F28DE871B001C9EF1 /* CodableTeamData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodableTeamData.swift; sourceTree = "<group>"; };
 		B97E451428DF8251001C9EF1 /* What the score.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "What the score.entitlements"; sourceTree = "<group>"; };
 		B97E451528DF8271001C9EF1 /* WidgetExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = WidgetExtension.entitlements; sourceTree = "<group>"; };
 		B97E451628DFC895001C9EF1 /* Color+random.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+random.swift"; sourceTree = "<group>"; };
-		B97E451928DFCBAF001C9EF1 /* FloaterText.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FloaterText.swift; sourceTree = "<group>"; };
-		B97E451B28DFCBCB001C9EF1 /* FeatureFlag.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeatureFlag.swift; sourceTree = "<group>"; };
 		B98539D02954E8930084DCEC /* Config.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Config.xcconfig; sourceTree = "<group>"; };
-		B98539D12954EA010084DCEC /* TwitterButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TwitterButton.swift; sourceTree = "<group>"; };
+		B98539D12954EA010084DCEC /* SocialButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SocialButton.swift; sourceTree = "<group>"; };
 		B98539D32954EABC0084DCEC /* Bundle+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Bundle+Extensions.swift"; sourceTree = "<group>"; };
 		B9861D5627CC5D0100053D00 /* EditTeamName.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditTeamName.swift; sourceTree = "<group>"; };
 		B9861D5C27CD485A00053D00 /* ScoreMatchingScreenshots.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ScoreMatchingScreenshots.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		B9861D5E27CD485A00053D00 /* ScoreMatchingScreenshots.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScoreMatchingScreenshots.swift; sourceTree = "<group>"; };
 		B9861D6727CD487800053D00 /* SnapshotHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SnapshotHelper.swift; path = fastlane/SnapshotHelper.swift; sourceTree = SOURCE_ROOT; };
+		B99194302B574A5100E5EF87 /* ModelContainerPreview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelContainerPreview.swift; sourceTree = "<group>"; };
 		B9A8A76F2A8637FC00139043 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		B9F9A8C927B3DAD900B4C805 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		B9F9A8CB27B3DBCF00B4C805 /* TapButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TapButton.swift; sourceTree = "<group>"; };
@@ -141,7 +136,6 @@
 				B93805A22B4F486A00E57CC9 /* Pow in Frameworks */,
 				B9A8A76A2A86373900139043 /* FirebaseCrashlytics in Frameworks */,
 				B9A8A76E2A86373900139043 /* FirebasePerformance in Frameworks */,
-				B9A8A7682A86373900139043 /* FirebaseAnalyticsWithoutAdIdSupport in Frameworks */,
 				B98539CF2954E4020084DCEC /* TelemetryClient in Frameworks */,
 				B9A8A76C2A86373900139043 /* FirebaseInstallations in Frameworks */,
 			);
@@ -170,7 +164,7 @@
 			isa = PBXGroup;
 			children = (
 				B9F9A8C927B3DAD900B4C805 /* SettingsView.swift */,
-				B98539D12954EA010084DCEC /* TwitterButton.swift */,
+				B98539D12954EA010084DCEC /* SocialButton.swift */,
 				B9861D5627CC5D0100053D00 /* EditTeamName.swift */,
 			);
 			path = Settings;
@@ -251,13 +245,11 @@
 			children = (
 				B95C37F027B49144009A2C5F /* Info.plist */,
 				B9788A2727B3CDA900EDF754 /* ScoreMatchingApp.swift */,
-				B97E450C28DE8507001C9EF1 /* MainView.swift */,
 				B97E450A28DE84EE001C9EF1 /* AppDelegate.swift */,
 				B919B9C827CC591300014942 /* ReceiverModeView.swift */,
 				B9788A2927B3CDA900EDF754 /* ContentView.swift */,
 				B98539D32954EABC0084DCEC /* Bundle+Extensions.swift */,
-				B97E451D28DFCBD4001C9EF1 /* FeatureFlagSystem */,
-				B97E451928DFCBAF001C9EF1 /* FloaterText.swift */,
+				B99194302B574A5100E5EF87 /* ModelContainerPreview.swift */,
 				B97E450E28DE8712001C9EF1 /* Models */,
 				B919B9C127CAA69B00014942 /* Features */,
 				B95C37ED27B474DF009A2C5F /* Multipeer */,
@@ -286,14 +278,6 @@
 				B97E450F28DE871B001C9EF1 /* CodableTeamData.swift */,
 			);
 			path = Models;
-			sourceTree = "<group>";
-		};
-		B97E451D28DFCBD4001C9EF1 /* FeatureFlagSystem */ = {
-			isa = PBXGroup;
-			children = (
-				B97E451B28DFCBCB001C9EF1 /* FeatureFlag.swift */,
-			);
-			path = FeatureFlagSystem;
 			sourceTree = "<group>";
 		};
 		B9861D5D27CD485A00053D00 /* ScoreMatchingScreenshots */ = {
@@ -343,7 +327,6 @@
 			packageProductDependencies = (
 				B98539CE2954E4020084DCEC /* TelemetryClient */,
 				B9A8A7652A86373900139043 /* FirebaseAnalytics */,
-				B9A8A7672A86373900139043 /* FirebaseAnalyticsWithoutAdIdSupport */,
 				B9A8A7692A86373900139043 /* FirebaseCrashlytics */,
 				B9A8A76B2A86373900139043 /* FirebaseInstallations */,
 				B9A8A76D2A86373900139043 /* FirebasePerformance */,
@@ -468,21 +451,19 @@
 				B9F9A8CA27B3DAD900B4C805 /* SettingsView.swift in Sources */,
 				B9788A2A27B3CDA900EDF754 /* ContentView.swift in Sources */,
 				B97E451028DE871B001C9EF1 /* CodableTeamData.swift in Sources */,
-				B97E451A28DFCBAF001C9EF1 /* FloaterText.swift in Sources */,
 				B95C37EF27B474EA009A2C5F /* Connectivity.swift in Sources */,
 				B97E451728DFC895001C9EF1 /* Color+random.swift in Sources */,
+				B99194312B574A5100E5EF87 /* ModelContainerPreview.swift in Sources */,
 				B95C37F227B49369009A2C5F /* ConnectivityView.swift in Sources */,
 				B919B9C927CC591300014942 /* ReceiverModeView.swift in Sources */,
-				B97E450D28DE8507001C9EF1 /* MainView.swift in Sources */,
 				B98539D42954EABC0084DCEC /* Bundle+Extensions.swift in Sources */,
 				B9538C592B4F4E7A0052F8C0 /* SwiftDataModel.swift in Sources */,
 				B919B9C027CAA67A00014942 /* IntervalsList.swift in Sources */,
 				B95C37EB27B4748A009A2C5F /* PDFGenerator.swift in Sources */,
-				B98539D22954EA010084DCEC /* TwitterButton.swift in Sources */,
+				B98539D22954EA010084DCEC /* SocialButton.swift in Sources */,
 				B9788A2827B3CDA900EDF754 /* ScoreMatchingApp.swift in Sources */,
 				B9F9A8CC27B3DBCF00B4C805 /* TapButton.swift in Sources */,
 				B95C37E927B473D7009A2C5F /* ScoreboardPDFPage.swift in Sources */,
-				B97E451C28DFCBCB001C9EF1 /* FeatureFlag.swift in Sources */,
 				B95C37F427B4A9C2009A2C5F /* Color+Decodable.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -523,7 +504,7 @@
 				CODE_SIGN_ENTITLEMENTS = WidgetExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = B82WJF6RBY;
+				DEVELOPMENT_TEAM = 382G4857JD;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Widget/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = Widget;
@@ -534,7 +515,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.mcomisso.ScoreMatching.Widget;
+				PRODUCT_BUNDLE_IDENTIFIER = com.mcomisso.ScoreMatching.MCWidget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -556,7 +537,7 @@
 				CODE_SIGN_ENTITLEMENTS = WidgetExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = B82WJF6RBY;
+				DEVELOPMENT_TEAM = 382G4857JD;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Widget/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = Widget;
@@ -567,7 +548,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.mcomisso.ScoreMatching.Widget;
+				PRODUCT_BUNDLE_IDENTIFIER = com.mcomisso.ScoreMatching.MCWidget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -714,7 +695,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"ScoreMatching/Preview Content\"";
-				DEVELOPMENT_TEAM = B82WJF6RBY;
+				DEVELOPMENT_TEAM = 382G4857JD;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = ScoreMatching/Info.plist;
@@ -752,7 +733,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"ScoreMatching/Preview Content\"";
-				DEVELOPMENT_TEAM = B82WJF6RBY;
+				DEVELOPMENT_TEAM = 382G4857JD;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = ScoreMatching/Info.plist;
@@ -785,7 +766,7 @@
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = B82WJF6RBY;
+				DEVELOPMENT_TEAM = 382G4857JD;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.mcomisso.ScoreMatchingScreenshots;
@@ -803,7 +784,7 @@
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = B82WJF6RBY;
+				DEVELOPMENT_TEAM = 382G4857JD;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.mcomisso.ScoreMatchingScreenshots;
@@ -878,7 +859,7 @@
 			repositoryURL = "https://github.com/firebase/firebase-ios-sdk.git";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 10.0.0;
+				minimumVersion = 12.0.0;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
@@ -898,11 +879,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = B9A8A7642A86373900139043 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseAnalytics;
-		};
-		B9A8A7672A86373900139043 /* FirebaseAnalyticsWithoutAdIdSupport */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = B9A8A7642A86373900139043 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
-			productName = FirebaseAnalyticsWithoutAdIdSupport;
 		};
 		B9A8A7692A86373900139043 /* FirebaseCrashlytics */ = {
 			isa = XCSwiftPackageProductDependency;
