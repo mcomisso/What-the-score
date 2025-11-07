@@ -147,7 +147,13 @@ public class Team {
     @Transient
     public var resolvedColor: Color {
         get {
-            Color(hex: color)
+            // If color is empty or invalid, generate and save a random color
+            if color.isEmpty {
+                let randomColor = Color.random
+                self.color = randomColor.toHex()
+                return randomColor
+            }
+            return Color(hex: color)
         }
         set {
             self.color = newValue.toHex(alpha: false)
@@ -172,7 +178,7 @@ public class Team {
 
 extension Team {
     public func toCodable() -> CodableTeamData {
-        .init(name: name, color: resolvedColor, score: score)
+        .init(name: name, color: Color(hex: color), score: score)
     }
 }
 

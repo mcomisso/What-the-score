@@ -25,6 +25,7 @@ struct SettingsView: View {
     @Environment(\.dismiss) var dimiss
     @Environment(\.openURL) var openURL
     @Environment(\.requestReview) var requestReview
+    @Environment(\.watchSyncCoordinator) var watchSyncCoordinator
 
     @Query(sort: \Team.creationDate) var teams: [Team]
     @Query(sort: \Interval.date) var intervals: [Interval]
@@ -57,6 +58,9 @@ struct SettingsView: View {
                     Text(team.name)
                 }
             }
+            .onChange(of: team.color) { _, _ in
+                watchSyncCoordinator?.sendTeamDataToWatch()
+            }
         }
         .onDelete(perform: remove(_:))
     }
@@ -70,6 +74,7 @@ struct SettingsView: View {
                 self.teams.forEach { modelContext.delete($0) }
                 self.intervals.forEach { modelContext.delete($0) }
                 Team.createBaseData(modelContext: modelContext)
+                watchSyncCoordinator?.sendTeamDataToWatch()
             }
         } message: {
             Text("The app will delete teams, scores, and intervals, and start with \"Team A\" and \"Team B\".")
@@ -85,6 +90,7 @@ struct SettingsView: View {
                 self.teams.forEach {
                     $0.score = []
                 }
+                watchSyncCoordinator?.sendTeamDataToWatch()
             }
         } message: {
             Text("Each team score will be set to 0.")
@@ -105,6 +111,7 @@ struct SettingsView: View {
                         Button("Add team") {
                             let team = Team(name: "Team \(teams.count + 1)")
                             modelContext.insert(team)
+                            watchSyncCoordinator?.sendTeamDataToWatch()
                         }.buttonStyle(.borderless)
                     }
 
@@ -246,6 +253,7 @@ struct SettingsView: View {
             let team = teams[idx]
             modelContext.delete(team)
         }
+        watchSyncCoordinator?.sendTeamDataToWatch()
     }
 }
 

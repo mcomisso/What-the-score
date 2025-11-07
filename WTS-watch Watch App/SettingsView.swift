@@ -5,6 +5,7 @@ import WhatScoreKit
 struct SettingsView: View {
     @Environment(\.dismiss) var dismiss
     @Environment(\.modelContext) var modelContext
+    @Environment(\.watchSyncCoordinator) var watchSyncCoordinator
 
     @Query(sort: \Team.creationDate) var teams: [Team]
     @Query(sort: \Interval.date) var intervals: [Interval]
@@ -14,8 +15,6 @@ struct SettingsView: View {
 
     @State private var showResetAlert = false
     @State private var showReinitializeAlert = false
-
-    private let syncCoordinator = WatchConnectivityManager.shared
 
     var body: some View {
         NavigationStack {
@@ -75,16 +74,18 @@ struct SettingsView: View {
 
     private func resetScores() {
         teams.forEach { $0.score = [] }
-        // Sync to iPhone
-        syncCoordinator.sendResetScores()
+        // Send command to iPhone and sync data
+        watchSyncCoordinator?.sendResetScoresToPhone()
+        watchSyncCoordinator?.sendTeamDataToPhone()
     }
 
     private func reinitializeApp() {
         teams.forEach { modelContext.delete($0) }
         intervals.forEach { modelContext.delete($0) }
         Team.createBaseData(modelContext: modelContext)
-        // Sync to iPhone
-        syncCoordinator.sendReinitializeApp()
+        // Send command to iPhone and sync data
+        watchSyncCoordinator?.sendReinitializeToPhone()
+        watchSyncCoordinator?.sendTeamDataToPhone()
     }
 }
 

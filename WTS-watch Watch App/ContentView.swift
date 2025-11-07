@@ -64,18 +64,7 @@ struct ContentView: View {
                     Team.createBaseData(modelContext: modelContext)
                 }
             }
-            .onChange(of: teams.count) { _, _ in
-                // Notify iPhone when teams change
-                watchSyncCoordinator?.notifyDataChanged()
-            }
-            .onChange(of: teams.map { $0.score.count }) { _, _ in
-                // Notify iPhone when scores change
-                watchSyncCoordinator?.notifyDataChanged()
-            }
-            .onChange(of: intervals.count) { _, _ in
-                // Notify iPhone when intervals change
-                watchSyncCoordinator?.notifyDataChanged()
-            }
+            // WatchConnectivity sends team data changes to iPhone instantly
         }
     }
 
@@ -153,8 +142,7 @@ struct ContentView: View {
         if index < teams.count {
             let team = teams[index]
             TeamButtonView(team: .constant(team)) {
-                // Notify iPhone when scores change
-                watchSyncCoordinator?.notifyDataChanged()
+                watchSyncCoordinator?.sendTeamDataToPhone()
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
         }

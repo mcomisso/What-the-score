@@ -24,23 +24,49 @@ struct ScoreMatchingApp: App {
     private let modelContainer: ModelContainer
 
     init() {
-        // Initialize model container with App Group for widget sharing and CloudKit for device sync
+        // Initialize model container with CloudKit for automatic sync across devices
+        // CloudKit handles syncing between iOS and watchOS automatically
         do {
             let schema = Schema([Team.self, Interval.self, Game.self])
             let modelConfiguration = ModelConfiguration(
                 schema: schema,
                 isStoredInMemoryOnly: false,
-                groupContainer: .identifier("group.mcsoftware.whatTheScore"),
-                cloudKitDatabase: .automatic
+                cloudKitDatabase: .private("iCloud.com.mcomisso.ScoreMatching")
             )
             modelContainer = try ModelContainer(for: schema, configurations: [modelConfiguration])
 
             watchSyncCoordinator = WatchSyncCoordinator(modelContainer: modelContainer)
 
-            // Notify watch that we're ready
-            watchSyncCoordinator.notifyDataChanged()
+            // Migrate any teams with empty colors
+            migrateTeamColors()
+
+            // Note: CloudKit sync happens automatically. WatchConnectivity is only used for
+            // commands like reset and reinitialize that need immediate execution.
         } catch {
             fatalError("Failed to create ModelContainer: \(error)")
+        }
+    }
+
+    private func migrateTeamColors() {
+        let context = ModelContext(modelContainer)
+        let descriptor = FetchDescriptor<Team>()
+
+        do {
+            let teams = try context.fetch(descriptor)
+            var needsSave = false
+
+            for team in teams {
+                if team.color.isEmpty {
+                    team.color = Color.random.toHex()
+                    needsSave = true
+                }
+            }
+
+            if needsSave {
+                try context.save()
+            }
+        } catch {
+            print("Failed to migrate team colors: \(error)")
         }
     }
 
@@ -72,8 +98,7 @@ struct ScoreMatchingApp: App {
         }
         totalLaunches += 1
 
-        // Notify watch that data may have changed
-        watchSyncCoordinator.notifyDataChanged()
+        // CloudKit automatically syncs data - no manual notification needed
     }
 
     private func requestReviewIfNeeded() {
@@ -99,28 +124,30 @@ extension EnvironmentValues {
 
 private let watchSyncLogger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "com.mcomisso.ScoreMatching", category: "WatchSync")
 
-/// Coordinates notifications between iOS and watchOS (data synced via CloudKit)
+/// Coordinates data and commands between iOS and watchOS
+/// WatchConnectivity handles immediate data transfer, CloudKit provides backup sync
 @Observable
 final class WatchSyncCoordinator {
 
     private let modelContext: ModelContext
+    private let modelContainer: ModelContainer
     private let connectivityManager = WatchConnectivityManager.shared
 
     init(modelContainer: ModelContainer) {
+        self.modelContainer = modelContainer
         self.modelContext = ModelContext(modelContainer)
         setupCallbacks()
         watchSyncLogger.info("WatchSyncCoordinator initialized")
+
+        // Send initial team data when session activates
+        connectivityManager.onSessionActivated = { [weak self] in
+            self?.sendTeamDataToWatch()
+        }
     }
 
     // MARK: - Setup
 
     private func setupCallbacks() {
-        // Handle data changed notification from watch
-        connectivityManager.onDataChanged = { [weak self] in
-            // CloudKit will handle the actual sync, just log it
-            watchSyncLogger.info("Received data changed notification from watch")
-        }
-
         // Handle reset scores command from watch
         connectivityManager.onResetScores = { [weak self] in
             self?.resetScores()
@@ -130,14 +157,71 @@ final class WatchSyncCoordinator {
         connectivityManager.onReinitializeApp = { [weak self] in
             self?.reinitializeApp()
         }
+
+        // Handle team data received from watch
+        connectivityManager.onTeamDataReceived = { [weak self] teamsData in
+            self?.updateTeamsFromWatch(teamsData)
+        }
     }
 
-    // MARK: - Notify Watch
+    // MARK: - Send Data to Watch
 
-    /// Notify watch that data has changed (CloudKit handles actual sync)
-    func notifyDataChanged() {
-        connectivityManager.sendDataChangedNotification()
-        watchSyncLogger.info("Notified watch that data changed")
+    /// Send current team data to the watch
+    public func sendTeamDataToWatch() {
+        let descriptor = FetchDescriptor<Team>(sortBy: [SortDescriptor(\.creationDate)])
+
+        do {
+            let teams = try modelContext.fetch(descriptor)
+            let teamsData = teams.map { team -> [String: Any] in
+                [
+                    "name": team.name,
+                    "color": team.color,
+                    "score": team.score.map { ["time": $0.time.timeIntervalSince1970, "value": $0.value] }
+                ]
+            }
+            connectivityManager.sendTeamData(teamsData)
+            watchSyncLogger.info("Sent team data to watch: \(teams.count) teams")
+        } catch {
+            watchSyncLogger.error("Failed to fetch teams for sending: \(error.localizedDescription)")
+        }
+    }
+
+    // MARK: - Receive Data from Watch
+
+    private func updateTeamsFromWatch(_ teamsData: [[String: Any]]) {
+        watchSyncLogger.info("Updating teams from watch data: \(teamsData.count) teams")
+
+        let descriptor = FetchDescriptor<Team>(sortBy: [SortDescriptor(\.creationDate)])
+
+        do {
+            let existingTeams = try modelContext.fetch(descriptor)
+
+            // Update existing teams with data from watch
+            for (index, teamData) in teamsData.enumerated() {
+                guard index < existingTeams.count else { break }
+
+                let team = existingTeams[index]
+
+                if let name = teamData["name"] as? String {
+                    team.name = name
+                }
+                if let color = teamData["color"] as? String {
+                    team.color = color
+                }
+                if let scoreData = teamData["score"] as? [[String: Any]] {
+                    team.score = scoreData.compactMap { dict in
+                        guard let timeInterval = dict["time"] as? TimeInterval,
+                              let value = dict["value"] as? Int else { return nil }
+                        return Score(time: Date(timeIntervalSince1970: timeInterval), value: value)
+                    }
+                }
+            }
+
+            try modelContext.save()
+            watchSyncLogger.info("Successfully updated teams from watch")
+        } catch {
+            watchSyncLogger.error("Failed to update teams from watch: \(error.localizedDescription)")
+        }
     }
 
     // MARK: - Handle Commands from Watch
@@ -151,6 +235,7 @@ final class WatchSyncCoordinator {
             let teams = try modelContext.fetch(descriptor)
             teams.forEach { $0.score = [] }
             try modelContext.save()
+            sendTeamDataToWatch()
             watchSyncLogger.info("Scores reset successfully")
         } catch {
             watchSyncLogger.error("Failed to reset scores: \(error.localizedDescription)")
@@ -172,6 +257,7 @@ final class WatchSyncCoordinator {
 
             Team.createBaseData(modelContext: modelContext)
             try modelContext.save()
+            sendTeamDataToWatch()
 
             watchSyncLogger.info("App reinitialized successfully")
         } catch {

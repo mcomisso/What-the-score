@@ -13,6 +13,7 @@ struct TapButton: View {
     @Binding var lastTapped: String?
 
     var isEnabled: Bool = true
+    var onScoreChanged: (() -> Void)?
     #if os(iOS)
     private let warningGenerator = UINotificationFeedbackGenerator()
     #endif
@@ -65,10 +66,12 @@ struct TapButton: View {
         if shouldAllowNegativePoints {
             score.append(Score(time: .now, value: -1))
             decreased += 1
+            onScoreChanged?()
         } else {
             if !score.isEmpty {
                 score.removeLast()
                 decreased += 1
+                onScoreChanged?()
             } else {
 #if os(iOS)
                 warningGenerator.notificationOccurred(.warning)
@@ -85,6 +88,7 @@ struct TapButton: View {
             increased += 1
 
             self.lastTapped = name
+            onScoreChanged?()
         }
     }
 }

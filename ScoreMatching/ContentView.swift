@@ -23,10 +23,6 @@ struct ContentView: View {
     @State private var showingQuickIntervalPrompt: Bool = false
     @State private var quickIntervalName: String = ""
 
-    // Track changes for sync
-    @State private var lastSyncedTeamsCount: Int = 0
-    @State private var lastSyncedScoresHash: Int = 0
-
     var body: some View {
         ZStack(alignment: .bottomTrailing) {
             if verticalSizeClass == .regular {
@@ -67,18 +63,7 @@ struct ContentView: View {
                 Team.createBaseData(modelContext: modelContext)
             }
         }
-        .onChange(of: teams.count) { _, _ in
-            // Notify watch when teams are added/removed
-            watchSyncCoordinator?.notifyDataChanged()
-        }
-        .onChange(of: teams.map { $0.score.count }) { _, _ in
-            // Notify watch when scores change
-            watchSyncCoordinator?.notifyDataChanged()
-        }
-        .onChange(of: intervals.count) { _, _ in
-            // Notify watch when intervals change
-            watchSyncCoordinator?.notifyDataChanged()
-        }
+        // WatchConnectivity sends team data changes to watch instantly
     }
 
     private func cleanupNegativeScores() {
@@ -104,7 +89,7 @@ struct ContentView: View {
                         }
                         .labelStyle(.iconOnly)
                         .imageScale(.large)
-                        .controlSize(.large)
+                        .controlSize(.extraLarge)
                         .buttonBorderShape(.circle)
                         .buttonStyle(.glass)
                     } else {
@@ -145,7 +130,7 @@ struct ContentView: View {
                         isVisualisingSettings.toggle()
                     }
                     .labelStyle(.iconOnly)
-                    .controlSize(.large)
+                    .controlSize(.extraLarge)
                     .buttonBorderShape(.circle)
                     .imageScale(.large)
                     .buttonStyle(.glass)
@@ -189,7 +174,10 @@ struct ContentView: View {
                 score: $bindingTeam.score,
                 colorHex: $bindingTeam.color,
                 name: $bindingTeam.name,
-                lastTapped: $lastTapped
+                lastTapped: $lastTapped,
+                onScoreChanged: {
+                    watchSyncCoordinator?.sendTeamDataToWatch()
+                }
             )
             .background(Color(hex: team.color))
             .overlay(alignment: .leading) {

@@ -16,18 +16,44 @@ struct WTS_watch_Watch_AppApp: App {
     private let modelContainer: ModelContainer
 
     init() {
-        // Initialize model container with App Group for sync with iPhone
+        // Initialize model container with CloudKit for automatic sync with iPhone
+        // CloudKit handles syncing between watchOS and iOS automatically
         do {
             let schema = Schema([Team.self, Interval.self, Game.self])
             let modelConfiguration = ModelConfiguration(
                 schema: schema,
                 isStoredInMemoryOnly: false,
-                groupContainer: .identifier("group.mcsoftware.whatTheScore"),
-                cloudKitDatabase: .automatic
+                cloudKitDatabase: .private("iCloud.com.mcomisso.ScoreMatching")
             )
             modelContainer = try ModelContainer(for: schema, configurations: [modelConfiguration])
+
+            // Migrate any teams with empty colors
+            migrateTeamColors()
         } catch {
             fatalError("Failed to create ModelContainer: \(error)")
+        }
+    }
+
+    private func migrateTeamColors() {
+        let context = ModelContext(modelContainer)
+        let descriptor = FetchDescriptor<Team>()
+
+        do {
+            let teams = try context.fetch(descriptor)
+            var needsSave = false
+
+            for team in teams {
+                if team.color.isEmpty {
+                    team.color = Color.random.toHex()
+                    needsSave = true
+                }
+            }
+
+            if needsSave {
+                try context.save()
+            }
+        } catch {
+            print("Failed to migrate team colors: \(error)")
         }
     }
 
@@ -38,17 +64,13 @@ struct WTS_watch_Watch_AppApp: App {
                 .onAppear {
                     if watchSyncCoordinator == nil {
                         watchSyncCoordinator = WatchSyncCoordinator(modelContainer: modelContainer)
-                        watchSyncCoordinator?.notifyDataChanged()
+                        // Note: Initial notification will be sent when app becomes active (onChange)
+                        // to ensure WCSession has time to activate
                     }
                 }
         }
         .modelContainer(modelContainer)
-        .onChange(of: scenePhase) { _, phase in
-            if phase == .active {
-                // Notify iPhone when app becomes active
-                watchSyncCoordinator?.notifyDataChanged()
-            }
-        }
+        // CloudKit automatically syncs data changes - no manual notification needed
     }
 }
 

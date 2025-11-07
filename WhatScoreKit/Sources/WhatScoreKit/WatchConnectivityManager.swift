@@ -17,6 +17,9 @@ public final class WatchConnectivityManager: NSObject, @unchecked Sendable {
     public var isSessionActivated = false
     public var isReachable = false
 
+    /// Callback for when session becomes activated
+    public var onSessionActivated: (() -> Void)?
+
     /// Callback for when data changed notification is received
     public var onDataChanged: (() -> Void)?
 
@@ -25,6 +28,9 @@ public final class WatchConnectivityManager: NSObject, @unchecked Sendable {
 
     /// Callback for when reinitialize command is received
     public var onReinitializeApp: (() -> Void)?
+
+    /// Callback for when team data is received (teams with colors and scores)
+    public var onTeamDataReceived: (([[String: Any]]) -> Void)?
 
     override private init() {
         super.init()
@@ -39,6 +45,31 @@ public final class WatchConnectivityManager: NSObject, @unchecked Sendable {
         }
     }
 
+    // MARK: - Sending Data
+
+    /// Send team data to the paired device using application context
+    /// This ensures the paired device always has the latest team colors and scores
+    public func sendTeamData(_ teams: [[String: Any]]) {
+        guard let session = session else {
+            logger.warning("Cannot send team data: session not available")
+            return
+        }
+
+        guard session.activationState == .activated else {
+            logger.warning("Cannot send team data: session not activated (state: \(session.activationState.rawValue))")
+            return
+        }
+
+        let context: [String: Any] = ["teams": teams]
+
+        do {
+            try session.updateApplicationContext(context)
+            logger.info("Team data sent via application context: \(teams.count) teams")
+        } catch {
+            logger.error("Failed to send team data: \(error.localizedDescription)")
+        }
+    }
+
     // MARK: - Sending Notifications
 
     /// Notify the paired device that data has changed (CloudKit will sync actual data)
@@ -48,19 +79,33 @@ public final class WatchConnectivityManager: NSObject, @unchecked Sendable {
             return
         }
 
+        // Check session is activated
+        guard session.activationState == .activated else {
+            logger.warning("Cannot send notification: session not activated (state: \(session.activationState.rawValue))")
+            return
+        }
+
         let message: [String: Any] = ["notification": "dataChanged"]
 
         // Try immediate message first if reachable
         if session.isReachable {
             session.sendMessage(message, replyHandler: nil, errorHandler: { error in
-                logger.error("Failed to send data changed notification: \(error.localizedDescription)")
+                logger.error("Failed to send data changed notification via message: \(error.localizedDescription)")
+                // Fallback to application context on error
+                self.updateNotificationContext(session: session, message: message)
             })
+            logger.info("Data changed notification sent via message")
+        } else {
+            // Use application context for background delivery when not reachable
+            updateNotificationContext(session: session, message: message)
         }
+    }
 
-        // Always update context as fallback for when app is not running
+    /// Update application context with notification (only called when message fails or not reachable)
+    private func updateNotificationContext(session: WCSession, message: [String: Any]) {
         do {
             try session.updateApplicationContext(message)
-            logger.info("Data changed notification sent")
+            logger.info("Data changed notification sent via application context")
         } catch {
             logger.error("Failed to update application context: \(error.localizedDescription)")
         }
@@ -68,7 +113,17 @@ public final class WatchConnectivityManager: NSObject, @unchecked Sendable {
 
     /// Send reset scores command to the paired device
     public func sendResetScores() {
-        guard let session = session, session.isReachable else {
+        guard let session = session else {
+            logger.warning("Cannot send reset command: session not available")
+            return
+        }
+
+        guard session.activationState == .activated else {
+            logger.warning("Cannot send reset command: session not activated")
+            return
+        }
+
+        guard session.isReachable else {
             logger.warning("Cannot send reset command: session not reachable")
             return
         }
@@ -82,7 +137,17 @@ public final class WatchConnectivityManager: NSObject, @unchecked Sendable {
 
     /// Send reinitialize app command to the paired device
     public func sendReinitializeApp() {
-        guard let session = session, session.isReachable else {
+        guard let session = session else {
+            logger.warning("Cannot send reinitialize command: session not available")
+            return
+        }
+
+        guard session.activationState == .activated else {
+            logger.warning("Cannot send reinitialize command: session not activated")
+            return
+        }
+
+        guard session.isReachable else {
             logger.warning("Cannot send reinitialize command: session not reachable")
             return
         }
@@ -97,16 +162,22 @@ public final class WatchConnectivityManager: NSObject, @unchecked Sendable {
 
 // MARK: - WCSessionDelegate
 
-extension WatchConnectivityManager: @preconcurrency WCSessionDelegate {
+extension WatchConnectivityManager: WCSessionDelegate {
 
-    nonisolated public func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: Error?) {
+
+    public func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: (any Error)?) {
         DispatchQueue.main.async {
+            let wasActivated = self.isSessionActivated
             self.isSessionActivated = activationState == .activated
 
             if let error = error {
                 logger.error("Session activation failed: \(error.localizedDescription)")
-            } else {
+            } else if activationState == .activated {
                 logger.info("Session activated successfully")
+                // Notify listeners if this is the first time we're activated
+                if !wasActivated {
+                    self.onSessionActivated?()
+                }
             }
         }
     }
@@ -171,15 +242,26 @@ extension WatchConnectivityManager: @preconcurrency WCSessionDelegate {
     // MARK: - Receiving Application Context
 
     nonisolated public func session(_ session: WCSession, didReceiveApplicationContext applicationContext: [String : Any]) {
-        logger.info("Received application context")
+        logger.info("Received application context with keys: \(applicationContext.keys)")
 
-        // Extract notification
-        let notification = applicationContext["notification"] as? String
+        // WatchConnectivity data is safe to pass across isolation boundaries (ObjC NSDictionary)
+        nonisolated(unsafe) let context = applicationContext
 
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
 
-            if let notification = notification, notification == "dataChanged" {
+            // Extract data on main queue
+            let teamsData = context["teams"] as? [[String: Any]]
+            let notificationString = context["notification"] as? String
+
+            // Handle team data first (higher priority)
+            if let teams = teamsData {
+                self.onTeamDataReceived?(teams)
+                logger.info("Received team data from application context: \(teams.count) teams")
+            }
+
+            // Handle notifications
+            if let notification = notificationString, notification == "dataChanged" {
                 self.onDataChanged?()
                 logger.info("Received data changed notification from application context")
             }

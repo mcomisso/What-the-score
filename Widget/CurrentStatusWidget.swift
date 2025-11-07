@@ -21,14 +21,13 @@ struct IncrementScoreIntent: AppIntent {
         self.teamName = teamName
     }
 
-    func perform() async throws -> some IntentResult {
-        // Access the shared model container
+    func perform() async throws -> some IntentResult & ReturnsValue<Bool> {
+        // Access CloudKit synced data (same container as main app)
         let schema = Schema([Team.self, Interval.self, Game.self])
         let modelConfiguration = ModelConfiguration(
             schema: schema,
             isStoredInMemoryOnly: false,
-            groupContainer: .identifier("group.mcsoftware.whatTheScore"),
-            cloudKitDatabase: .automatic
+            cloudKitDatabase: .private("iCloud.com.mcomisso.ScoreMatching")
         )
         let modelContainer = try ModelContainer(for: schema, configurations: [modelConfiguration])
         let context = ModelContext(modelContainer)
@@ -49,7 +48,10 @@ struct IncrementScoreIntent: AppIntent {
 
         try context.save()
 
-        return .result()
+        // Reload all widget timelines
+        WidgetCenter.shared.reloadAllTimelines()
+
+        return .result(value: true)
     }
 }
 
@@ -68,8 +70,7 @@ struct Provider: AppIntentTimelineProvider {
             let modelConfiguration = ModelConfiguration(
                 schema: schema,
                 isStoredInMemoryOnly: false,
-                groupContainer: .identifier("group.mcsoftware.whatTheScore"),
-                cloudKitDatabase: .automatic
+                cloudKitDatabase: .private("iCloud.com.mcomisso.ScoreMatching")
             )
             self.modelContainer = try ModelContainer(for: schema, configurations: [modelConfiguration])
         } catch {
