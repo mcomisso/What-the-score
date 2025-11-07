@@ -13,8 +13,8 @@ public final class WatchSyncCoordinator {
     private let modelContext: ModelContext
     private let connectivityManager = WatchConnectivityManager.shared
 
-    public init(modelContext: ModelContext) {
-        self.modelContext = modelContext
+    public init(modelContainer: ModelContainer) {
+        self.modelContext = ModelContext(modelContainer)
         setupCallbacks()
         logger.info("WatchSyncCoordinator initialized")
     }

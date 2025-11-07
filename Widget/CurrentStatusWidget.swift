@@ -14,7 +14,7 @@ struct Provider: TimelineProvider {
             let modelConfiguration = ModelConfiguration(
                 schema: schema,
                 isStoredInMemoryOnly: false,
-                groupContainer: .identifier("group.mcomisso.whatTheScore")
+                groupContainer: .identifier("group.mcsoftware.whatTheScore")
             )
             self.modelContainer = try ModelContainer(for: schema, configurations: [modelConfiguration])
         } catch {

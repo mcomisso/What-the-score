@@ -146,18 +146,8 @@
 		B9F9A8CB27B3DBCF00B4C805 /* TapButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TapButton.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
-/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		B9E532632EBE01DF00B1B4EA /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				WatchSyncCoordinator.swift,
-			);
-			target = B9788A2327B3CDA900EDF754 /* What the score */;
-		};
-/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
-
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		B9E532282EBD836600B1B4EA /* WTS-watch Watch App */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (B9E532632EBE01DF00B1B4EA /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = "WTS-watch Watch App"; sourceTree = "<group>"; };
+		B9E532282EBD836600B1B4EA /* WTS-watch Watch App */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = "WTS-watch Watch App"; sourceTree = "<group>"; };
 		B9E532362EBD837000B1B4EA /* WTS-watch Watch AppTests */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = "WTS-watch Watch AppTests"; sourceTree = "<group>"; };
 		B9E532402EBD837000B1B4EA /* WTS-watch Watch AppUITests */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = "WTS-watch Watch AppUITests"; sourceTree = "<group>"; };
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -541,11 +531,11 @@
 			projectRoot = "";
 			targets = (
 				B9788A2327B3CDA900EDF754 /* What the score */,
-				B9861D5B27CD485A00053D00 /* ScoreMatchingScreenshots */,
-				B96F151728DE670E00349258 /* WidgetExtension */,
 				B9E532262EBD836600B1B4EA /* WTS-watch Watch App */,
+				B96F151728DE670E00349258 /* WidgetExtension */,
 				B9E532322EBD837000B1B4EA /* WTS-watch Watch AppTests */,
 				B9E5323C2EBD837000B1B4EA /* WTS-watch Watch AppUITests */,
+				B9861D5B27CD485A00053D00 /* ScoreMatchingScreenshots */,
 			);
 		};
 /* End PBXProject section */
@@ -713,6 +703,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
+				MARKETING_VERSION = 1.8;
 				PRODUCT_BUNDLE_IDENTIFIER = com.mcomisso.ScoreMatching.MCWidget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -746,6 +737,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
+				MARKETING_VERSION = 1.8;
 				PRODUCT_BUNDLE_IDENTIFIER = com.mcomisso.ScoreMatching.MCWidget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -908,6 +900,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				MARKETING_VERSION = 1.8;
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_BUNDLE_IDENTIFIER = com.mcomisso.ScoreMatching;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -946,6 +939,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				MARKETING_VERSION = 1.8;
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_BUNDLE_IDENTIFIER = com.mcomisso.ScoreMatching;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1014,7 +1008,7 @@
 					"@executable_path/Frameworks",
 				);
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.8;
 				PRODUCT_BUNDLE_IDENTIFIER = com.mcomisso.ScoreMatching.watchkitapp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = watchos;
@@ -1027,7 +1021,7 @@
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 4;
-				WATCHOS_DEPLOYMENT_TARGET = 26.1;
+				WATCHOS_DEPLOYMENT_TARGET = 11.0;
 			};
 			name = Debug;
 		};
@@ -1051,7 +1045,7 @@
 					"@executable_path/Frameworks",
 				);
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.8;
 				PRODUCT_BUNDLE_IDENTIFIER = com.mcomisso.ScoreMatching.watchkitapp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = watchos;
@@ -1063,7 +1057,7 @@
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 4;
-				WATCHOS_DEPLOYMENT_TARGET = 26.1;
+				WATCHOS_DEPLOYMENT_TARGET = 11.0;
 			};
 			name = Release;
 		};

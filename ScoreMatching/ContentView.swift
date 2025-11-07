@@ -107,6 +107,7 @@ struct ContentView: View {
                             }
                         }
                         .labelStyle(.iconOnly)
+                        .imageScale(.large)
                         .controlSize(.large)
                         .buttonBorderShape(.circle)
                         .buttonStyle(.glass)
@@ -147,8 +148,10 @@ struct ContentView: View {
                     Button("Settings", systemImage: "gear") {
                         isVisualisingSettings.toggle()
                     }
+                    .labelStyle(.iconOnly)
                     .controlSize(.large)
                     .buttonBorderShape(.circle)
+                    .imageScale(.large)
                     .buttonStyle(.glass)
                 } else {
                     Button {

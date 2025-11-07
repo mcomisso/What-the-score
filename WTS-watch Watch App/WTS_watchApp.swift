@@ -37,7 +37,7 @@ struct WTS_watch_Watch_AppApp: App {
         guard let modelContainer = try? ModelContainer(for: Team.self, Interval.self, Game.self) else {
             return
         }
-        let coordinator = WatchSyncCoordinator(modelContext: modelContainer.mainContext)
+        let coordinator = WatchSyncCoordinator(modelContainer: modelContainer)
         watchSyncCoordinator = coordinator
 
         // Initial sync to iPhone
