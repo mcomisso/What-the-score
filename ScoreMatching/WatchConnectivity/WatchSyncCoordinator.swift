@@ -2,17 +2,18 @@ import Foundation
 import SwiftData
 import SwiftUI
 import OSLog
+import WhatScoreKit
 
 private let logger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "com.mcomisso.ScoreMatching", category: "WatchSync")
 
 /// Coordinates syncing between iOS SwiftData and Watch Connectivity
 @Observable
-final class WatchSyncCoordinator {
+public final class WatchSyncCoordinator {
 
     private let modelContext: ModelContext
     private let connectivityManager = WatchConnectivityManager.shared
 
-    init(modelContext: ModelContext) {
+    public init(modelContext: ModelContext) {
         self.modelContext = modelContext
         setupCallbacks()
         logger.info("WatchSyncCoordinator initialized")
@@ -50,7 +51,7 @@ final class WatchSyncCoordinator {
     // MARK: - Send to Watch
 
     /// Send current teams to watch
-    func syncTeamsToWatch() {
+    public func syncTeamsToWatch() {
         let descriptor = FetchDescriptor<Team>(sortBy: [SortDescriptor(\.creationDate)])
 
         do {
@@ -64,7 +65,7 @@ final class WatchSyncCoordinator {
     }
 
     /// Send current intervals to watch
-    func syncIntervalsToWatch() {
+    public func syncIntervalsToWatch() {
         let descriptor = FetchDescriptor<Interval>(sortBy: [SortDescriptor(\.date)])
 
         do {
@@ -78,7 +79,7 @@ final class WatchSyncCoordinator {
     }
 
     /// Send current settings to watch
-    func syncSettingsToWatch() {
+    public func syncSettingsToWatch() {
         let settings: [String: Any] = [
             "shouldAllowNegativePoints": UserDefaults.standard.bool(forKey: AppStorageValues.shouldAllowNegativePoints),
             "hasEnabledIntervals": UserDefaults.standard.bool(forKey: AppStorageValues.hasEnabledIntervals),

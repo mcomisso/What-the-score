@@ -1,18 +1,24 @@
 import Foundation
 import SwiftUI
 
-struct CodableTeamData: Codable {
-    let name: String
-    let color: Color
-    let score: [Score]
+public struct CodableTeamData: Codable {
+    public let name: String
+    public let color: Color
+    public let score: [Score]
+
+    public init(name: String, color: Color, score: [Score]) {
+        self.name = name
+        self.color = color
+        self.score = score
+    }
 }
 
 extension CodableTeamData: Identifiable {
-    var id: String { name }
+    public var id: String { name }
 }
 
 extension CodableTeamData {
-    func toTeam() -> Team {
+    public func toTeam() -> Team {
         Team(score: score, name: name, color: color.toHex())
     }
 }

@@ -1,4 +1,5 @@
 import Foundation
+import WhatScoreKit
 import PDFKit
 import SwiftUI
 import UIKit

@@ -17,16 +17,16 @@ public class Game {
     }
 }
 
-struct Score: Codable {
-    var time: Date
-    var value: Int
+public struct Score: Codable {
+    public var time: Date
+    public var value: Int
 
-    init(time: Date, value: Int = 1) {
+    public init(time: Date, value: Int = 1) {
         self.time = time
         self.value = value
     }
 
-    init(from decoder: Decoder) throws {
+    public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         self.time = try container.decode(Date.self, forKey: .time)
         self.value = try container.decodeIfPresent(Int.self, forKey: .value) ?? 1
@@ -34,42 +34,48 @@ struct Score: Codable {
 }
 
 extension Array where Element == Score {
-    var totalScore: Int {
+    public var totalScore: Int {
         map(\.value).reduce(0, +)
     }
 
     // Returns total score, ensuring it never goes below zero
-    var safeTotalScore: Int {
+    public var safeTotalScore: Int {
         Swift.max(0, totalScore)
     }
 
     // Removes all negative score entries
-    mutating func removeNegativeScores() {
+    public mutating func removeNegativeScores() {
         self.removeAll { $0.value < 0 }
     }
 }
 
 // Snapshot of a team's score at a specific point in time
-struct IntervalTeamSnapshot: Codable {
-    var teamName: String
-    var teamColor: String
-    var totalScore: Int
+public struct IntervalTeamSnapshot: Codable {
+    public var teamName: String
+    public var teamColor: String
+    public var totalScore: Int
+
+    public init(teamName: String, teamColor: String, totalScore: Int) {
+        self.teamName = teamName
+        self.teamColor = teamColor
+        self.totalScore = totalScore
+    }
 }
 
 @Model
 public class Interval {
-    var name: String // e.g., "Q1", "Q2", "Half 1", etc.
-    var teamSnapshots: [IntervalTeamSnapshot]
-    var date: Date
+    public var name: String // e.g., "Q1", "Q2", "Half 1", etc.
+    public var teamSnapshots: [IntervalTeamSnapshot]
+    public var date: Date
 
-    init(name: String, teamSnapshots: [IntervalTeamSnapshot], date: Date = .now) {
+    public init(name: String, teamSnapshots: [IntervalTeamSnapshot], date: Date = .now) {
         self.name = name
         self.teamSnapshots = teamSnapshots
         self.date = date
     }
 
     // Helper to create interval from current teams
-    static func create(name: String, from teams: [Team]) -> Interval {
+    public static func create(name: String, from teams: [Team]) -> Interval {
         let snapshots = teams.map { team in
             IntervalTeamSnapshot(
                 teamName: team.name,
@@ -82,7 +88,7 @@ public class Interval {
 }
 
 extension Interval {
-    static func generateData(modelContext: ModelContext) {
+    public static func generateData(modelContext: ModelContext) {
         let snapshot1 = IntervalTeamSnapshot(teamName: "Team A", teamColor: "FF0000", totalScore: 10)
         let snapshot2 = IntervalTeamSnapshot(teamName: "Team B", teamColor: "0000FF", totalScore: 8)
 
@@ -94,7 +100,7 @@ extension Interval {
     }
 
     // Calculate score gained in this interval compared to previous
-    func scoreGained(previousInterval: Interval?) -> [String: Int] {
+    public func scoreGained(previousInterval: Interval?) -> [String: Int] {
         var gains: [String: Int] = [:]
 
         for snapshot in teamSnapshots {
@@ -109,18 +115,36 @@ extension Interval {
 
         return gains
     }
+
+    /// Convert SwiftData Interval to Codable format
+    public func toCodable() -> CodableIntervalData {
+        CodableIntervalData(
+            name: name,
+            teamSnapshots: teamSnapshots,
+            date: date
+        )
+    }
+
+    /// Create Interval from Codable format
+    public static func from(codable: CodableIntervalData) -> Interval {
+        Interval(
+            name: codable.name,
+            teamSnapshots: codable.teamSnapshots,
+            date: codable.date
+        )
+    }
 }
 
 @Model
 public class Team {
-    var score: [Score] = []
-    var name: String = ""
-    var color: String
+    public var score: [Score] = []
+    public var name: String = ""
+    public var color: String
 
-    var creationDate: Date
+    public var creationDate: Date
 
     @Transient
-    var resolvedColor: Color {
+    public var resolvedColor: Color {
         get {
             Color(hex: color)
         }
@@ -129,14 +153,14 @@ public class Team {
         }
     }
 
-    init(score: [Score] = [], name: String, color: String = Color.random.toHex()) {
+    public init(score: [Score] = [], name: String, color: String = Color.random.toHex()) {
         self.creationDate = .now
         self.score = score
         self.name = name
         self.color = color
     }
 
-    static func createBaseData(modelContext: ModelContext) {
+    public static func createBaseData(modelContext: ModelContext) {
         let ta = Team(name: "Team A")
         let tb = Team(name: "Team B")
 
@@ -146,13 +170,13 @@ public class Team {
 }
 
 extension Team {
-    func toCodable() -> CodableTeamData {
+    public func toCodable() -> CodableTeamData {
         .init(name: name, color: resolvedColor, score: score)
     }
 }
 
 extension Team {
-    static func generateData(modelContext: ModelContext) {
+    public static func generateData(modelContext: ModelContext) {
         let team1 = Team(score: [], name: "SDTeam_1", color: "cacaca")
         let team2 = Team(score: [.init(time: .now)], name: "SDTeam_2", color: "fafafa")
 

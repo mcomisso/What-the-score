@@ -1,4 +1,5 @@
 import Foundation
+import WhatScoreKit
 import SwiftUI
 
 struct EditView: View {

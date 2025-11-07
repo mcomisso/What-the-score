@@ -7,6 +7,7 @@
  */
 
 import SwiftUI
+import WhatScoreKit
 import SwiftData
 
 struct ModelContainerPreview<Content: View>: View {

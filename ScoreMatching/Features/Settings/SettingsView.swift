@@ -3,6 +3,7 @@ import SwiftUI
 import PDFKit
 import SwiftData
 import StoreKit
+import WhatScoreKit
 
 enum AppStorageValues {
     static let shouldKeepScreenAwake = "shouldKeepScreenAwake"

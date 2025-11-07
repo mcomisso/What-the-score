@@ -1,6 +1,6 @@
 import SwiftUI
 import SwiftData
-import ScoreMatchingKit
+import WhatScoreKit
 
 struct SettingsView: View {
     @Environment(\.dismiss) var dismiss

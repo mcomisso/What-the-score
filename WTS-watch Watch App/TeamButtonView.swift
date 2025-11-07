@@ -1,5 +1,5 @@
 import SwiftUI
-import ScoreMatchingKit
+import WhatScoreKit
 
 struct TeamButtonView: View {
     @Binding var team: Team

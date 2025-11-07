@@ -2,18 +2,18 @@ import Foundation
 import SwiftData
 import SwiftUI
 import OSLog
-import ScoreMatchingKit
+import WhatScoreKit
 
 private let logger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "com.mcomisso.ScoreMatching.watchkit", category: "WatchSync")
 
 /// Coordinates syncing between watchOS SwiftData and Watch Connectivity
 @Observable
-final class WatchSyncCoordinator {
+public final class WatchSyncCoordinator {
 
     private let modelContext: ModelContext
     private let connectivityManager = WatchConnectivityManager.shared
 
-    init(modelContext: ModelContext) {
+    public init(modelContext: ModelContext) {
         self.modelContext = modelContext
         setupCallbacks()
         logger.info("WatchSyncCoordinator initialized")
@@ -51,7 +51,7 @@ final class WatchSyncCoordinator {
     // MARK: - Send to iPhone
 
     /// Send current teams to iPhone
-    func syncTeamsToPhone() {
+    public func syncTeamsToPhone() {
         let descriptor = FetchDescriptor<Team>(sortBy: [SortDescriptor(\.creationDate)])
 
         do {
@@ -65,7 +65,7 @@ final class WatchSyncCoordinator {
     }
 
     /// Send current intervals to iPhone
-    func syncIntervalsToPhone() {
+    public func syncIntervalsToPhone() {
         let descriptor = FetchDescriptor<Interval>(sortBy: [SortDescriptor(\.date)])
 
         do {

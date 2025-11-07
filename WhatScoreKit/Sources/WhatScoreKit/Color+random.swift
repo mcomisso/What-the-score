@@ -1,7 +1,7 @@
 import Foundation
 import SwiftUI
 
-extension Color {
+public extension Color {
     static var random: Color {
         Color(hue: Double.random(in: (0...1)),
               saturation: Double.random(in: (0.6...0.8)),

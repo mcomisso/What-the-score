@@ -1,9 +1,11 @@
 import SwiftUI
 import SwiftData
+import WhatScoreKit
 
 struct ContentView: View {
     @Environment(\.verticalSizeClass) var verticalSizeClass
     @Environment(\.modelContext) var modelContext
+    @Environment(\.watchSyncCoordinator) var watchSyncCoordinator
 
     @AppStorage(AppStorageValues.hasEnabledIntervals)
     var hasEnabledIntervals: Bool = false
@@ -20,6 +22,10 @@ struct ContentView: View {
     @State private var isShowingIntervals: Bool = false
     @State private var showingQuickIntervalPrompt: Bool = false
     @State private var quickIntervalName: String = ""
+
+    // Track changes for sync
+    @State private var lastSyncedTeamsCount: Int = 0
+    @State private var lastSyncedScoresHash: Int = 0
 
     var body: some View {
         ZStack(alignment: .bottomTrailing) {
@@ -61,6 +67,22 @@ struct ContentView: View {
                 Team.createBaseData(modelContext: modelContext)
             }
         }
+        .onChange(of: teams.count) { _, _ in
+            // Sync when teams are added/removed
+            syncToWatch()
+        }
+        .onChange(of: teams.map { $0.score.count }) { _, _ in
+            // Sync when scores change
+            syncToWatch()
+        }
+        .onChange(of: intervals.count) { _, _ in
+            // Sync when intervals change
+            watchSyncCoordinator?.syncIntervalsToWatch()
+        }
+    }
+
+    private func syncToWatch() {
+        watchSyncCoordinator?.syncTeamsToWatch()
     }
 
     private func cleanupNegativeScores() {

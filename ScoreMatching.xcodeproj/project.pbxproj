@@ -146,8 +146,18 @@
 		B9F9A8CB27B3DBCF00B4C805 /* TapButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TapButton.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		B9E532632EBE01DF00B1B4EA /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				WatchSyncCoordinator.swift,
+			);
+			target = B9788A2327B3CDA900EDF754 /* What the score */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		B9E532282EBD836600B1B4EA /* WTS-watch Watch App */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = "WTS-watch Watch App"; sourceTree = "<group>"; };
+		B9E532282EBD836600B1B4EA /* WTS-watch Watch App */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (B9E532632EBE01DF00B1B4EA /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = "WTS-watch Watch App"; sourceTree = "<group>"; };
 		B9E532362EBD837000B1B4EA /* WTS-watch Watch AppTests */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = "WTS-watch Watch AppTests"; sourceTree = "<group>"; };
 		B9E532402EBD837000B1B4EA /* WTS-watch Watch AppUITests */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = "WTS-watch Watch AppUITests"; sourceTree = "<group>"; };
 /* End PBXFileSystemSynchronizedRootGroup section */

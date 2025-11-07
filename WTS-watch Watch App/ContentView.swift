@@ -7,16 +7,16 @@
 
 import SwiftUI
 import SwiftData
-import ScoreMatchingKit 
+import WhatScoreKit
 
 struct ContentView: View {
     @Environment(\.modelContext) var modelContext
+    @Environment(\.watchSyncCoordinator) var watchSyncCoordinator
     @Query(sort: \Team.creationDate) var teams: [Team]
     @Query(sort: \Interval.date) var intervals: [Interval]
 
     @State private var isShowingSettings = false
     @State private var isShowingIntervals = false
-    @State private var syncCoordinator: WatchSyncCoordinator?
 
     @AppStorage("shouldAllowNegativePoints") var shouldAllowNegativePoints: Bool = false
     @AppStorage("hasEnabledIntervals") var hasEnabledIntervals: Bool = false
@@ -63,21 +63,24 @@ struct ContentView: View {
                 if teams.isEmpty {
                     Team.createBaseData(modelContext: modelContext)
                 }
-
-                // Initialize sync coordinator
-                if syncCoordinator == nil {
-                    syncCoordinator = WatchSyncCoordinator(modelContext: modelContext)
-                }
             }
             .onChange(of: teams.count) { _, _ in
                 // Sync when teams change
-                syncCoordinator?.syncTeamsToPhone()
+                syncToPhone()
+            }
+            .onChange(of: teams.map { $0.score.count }) { _, _ in
+                // Sync when scores change
+                syncToPhone()
             }
             .onChange(of: intervals.count) { _, _ in
                 // Sync when intervals change
-                syncCoordinator?.syncIntervalsToPhone()
+                watchSyncCoordinator?.syncIntervalsToPhone()
             }
         }
+    }
+
+    private func syncToPhone() {
+        watchSyncCoordinator?.syncTeamsToPhone()
     }
 
     // MARK: - Empty State
@@ -155,7 +158,7 @@ struct ContentView: View {
             let team = teams[index]
             TeamButtonView(team: .constant(team)) {
                 // Sync scores to iPhone when they change
-                syncCoordinator?.syncTeamsToPhone()
+                watchSyncCoordinator?.syncTeamsToPhone()
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
         }

@@ -37,7 +37,7 @@ extension Color {
 }
 
 extension Color: Codable {
-    init(hex: String) {
+    public init(hex: String) {
         let rgba = hex.toRGBA()
 
         self.init(.sRGB,
@@ -59,11 +59,11 @@ extension Color: Codable {
         try container.encode(toHex)
     }
 
-    var toHex: String? {
+    public var toHex: String? {
         return toHex()
     }
 
-    func toHex(alpha: Bool = false) -> String {
+    public func toHex(alpha: Bool = false) -> String {
         guard let components = cgColor?.components, components.count >= 3 else {
             return ""
         }
@@ -94,7 +94,7 @@ extension Color: Codable {
 }
 
 extension String {
-    func toRGBA() -> (r: CGFloat, g: CGFloat, b: CGFloat, alpha: CGFloat) {
+    public func toRGBA() -> (r: CGFloat, g: CGFloat, b: CGFloat, alpha: CGFloat) {
         var hexSanitized = self.trimmingCharacters(in: .whitespacesAndNewlines)
         hexSanitized = hexSanitized.replacingOccurrences(of: "#", with: "")
 

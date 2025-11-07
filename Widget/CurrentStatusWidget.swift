@@ -1,5 +1,7 @@
 import SwiftUI
 import SwiftData
+import WhatScoreKit
+
 #if canImport(WidgetKit)
 import WidgetKit
 
