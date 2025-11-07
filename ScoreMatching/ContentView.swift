@@ -77,17 +77,31 @@ struct ContentView: View {
     var bottomToolbar: some View {
         HStack {
             if hasEnabledIntervals {
-                Button {
-                    withAnimation(Animation.interactiveSpring()) {
-                        isShowingIntervals.toggle()
+                Group {
+                    if #available(iOS 26.0, *) {
+                        Button("Timer", systemImage: "timer") {
+                            withAnimation(Animation.interactiveSpring()) {
+                                isShowingIntervals.toggle()
+                            }
+                        }
+                        .labelStyle(.iconOnly)
+                        .controlSize(.large)
+                        .buttonBorderShape(.circle)
+                        .buttonStyle(.glass)
+                    } else {
+                        Button {
+                            withAnimation(Animation.interactiveSpring()) {
+                                isShowingIntervals.toggle()
+                            }
+                        } label: {
+                            Image(systemName: "timer")
+                                .foregroundStyle(.primary)
+                                .imageScale(.large)
+                                .padding()
+                                .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 16))
+                                .shadow(radius: 8)
+                        }
                     }
-                } label: {
-                    Image(systemName: "timer")
-                        .foregroundStyle(.primary)
-                        .imageScale(.large)
-                        .padding()
-                        .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 16))
-                        .shadow(radius: 8)
                 }
                 .contextMenu {
                     Button {
@@ -106,16 +120,27 @@ struct ContentView: View {
 
             Spacer()
 
-            Button {
-                isVisualisingSettings.toggle()
-            } label: {
-                Image(systemName: "gear")
-                    .foregroundStyle(.primary)
-                    .imageScale(.large)
-                    .padding()
-                    .background(.regularMaterial,
-                                in: RoundedRectangle(cornerRadius: 16))
-                    .shadow(radius: 8)
+            Group {
+                if #available(iOS 26.0, *) {
+                    Button("Settings", systemImage: "gear") {
+                        isVisualisingSettings.toggle()
+                    }
+                    .controlSize(.large)
+                    .buttonBorderShape(.circle)
+                    .buttonStyle(.glass)
+                } else {
+                    Button {
+                        isVisualisingSettings.toggle()
+                    } label: {
+                        Image(systemName: "gear")
+                            .foregroundStyle(.primary)
+                            .imageScale(.large)
+                            .padding()
+                            .background(.regularMaterial,
+                                        in: RoundedRectangle(cornerRadius: 16))
+                            .shadow(radius: 8)
+                    }
+                }
             }
             .contextMenu(menuItems: {
                 Button {
