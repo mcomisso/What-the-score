@@ -6,11 +6,11 @@ import SwiftUI
 // Once intervals feature is complete, this should group teams and intervals together for a full game session.
 @Model
 public class Game {
-    var date: Date
-    @Relationship(deleteRule: .nullify) var teams: [Team]
-    @Relationship(deleteRule: .nullify) var intervals: [Interval]
+    var date: Date = Date.now
+    @Relationship(deleteRule: .nullify, inverse: \Team.game) var teams: [Team]? = []
+    @Relationship(deleteRule: .nullify, inverse: \Interval.game) var intervals: [Interval]? = []
 
-    init(date: Date = .now, teams: [Team], intervals: [Interval]) {
+    init(date: Date = .now, teams: [Team] = [], intervals: [Interval] = []) {
         self.date = date
         self.teams = teams
         self.intervals = intervals
@@ -64,11 +64,12 @@ public struct IntervalTeamSnapshot: Codable {
 
 @Model
 public class Interval {
-    public var name: String // e.g., "Q1", "Q2", "Half 1", etc.
-    public var teamSnapshots: [IntervalTeamSnapshot]
-    public var date: Date
+    public var name: String = "" // e.g., "Q1", "Q2", "Half 1", etc.
+    public var teamSnapshots: [IntervalTeamSnapshot] = []
+    public var date: Date = Date.now
+    public var game: Game?
 
-    public init(name: String, teamSnapshots: [IntervalTeamSnapshot], date: Date = .now) {
+    public init(name: String = "", teamSnapshots: [IntervalTeamSnapshot] = [], date: Date = .now) {
         self.name = name
         self.teamSnapshots = teamSnapshots
         self.date = date
@@ -139,9 +140,9 @@ extension Interval {
 public class Team {
     public var score: [Score] = []
     public var name: String = ""
-    public var color: String
-
-    public var creationDate: Date
+    public var color: String = ""
+    public var creationDate: Date = Date.now
+    public var game: Game?
 
     @Transient
     public var resolvedColor: Color {
@@ -153,11 +154,11 @@ public class Team {
         }
     }
 
-    public init(score: [Score] = [], name: String, color: String = Color.random.toHex()) {
+    public init(score: [Score] = [], name: String = "", color: String = "") {
         self.creationDate = .now
         self.score = score
         self.name = name
-        self.color = color
+        self.color = color.isEmpty ? Color.random.toHex() : color
     }
 
     public static func createBaseData(modelContext: ModelContext) {
