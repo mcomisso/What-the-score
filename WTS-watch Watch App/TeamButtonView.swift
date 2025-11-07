@@ -1,9 +1,11 @@
 import SwiftUI
 import WhatScoreKit
+import SwiftData
 
 struct TeamButtonView: View {
     @Binding var team: Team
     @AppStorage("shouldAllowNegativePoints") var shouldAllowNegativePoints: Bool = false
+    @Environment(\.modelContext) var modelContext
 
     var onScoreChanged: (() -> Void)?
 
@@ -51,20 +53,32 @@ struct TeamButtonView: View {
         justAdded.toggle()
         team.score.append(Score(time: .now, value: 1))
         increased += 1
-        onScoreChanged?()
+        saveAndSync()
     }
 
     private func decrementScore() {
         if shouldAllowNegativePoints {
             team.score.append(Score(time: .now, value: -1))
             decreased += 1
-            onScoreChanged?()
+            saveAndSync()
         } else {
             if !team.score.isEmpty {
                 team.score.removeLast()
                 decreased += 1
+                saveAndSync()
+            }
+        }
+    }
+
+    private func saveAndSync() {
+        do {
+            try modelContext.save()
+            // Delay slightly to ensure save completes before sync
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                 onScoreChanged?()
             }
+        } catch {
+            print("⌚️ TeamButton: Failed to save: \(error)")
         }
     }
 

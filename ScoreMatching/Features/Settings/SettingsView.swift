@@ -51,15 +51,27 @@ struct SettingsView: View {
 
     var teamsSection: some View {
         ForEach(teams) { team in
-            @Bindable var team = team
-            ColorPicker(selection: $team.resolvedColor,
-                        supportsOpacity: false) {
-                NavigationLink(destination: EditView(team: team)) {
-                    Text(team.name)
+            @Bindable var bindableTeam = team
+            HStack {
+                ColorPicker(selection: Binding(
+                    get: {
+                        print("📱 iOS Settings: ColorPicker GET for '\(team.name)'")
+                        return bindableTeam.resolvedColor
+                    },
+                    set: { newColor in
+                        print("📱 iOS Settings: ColorPicker SET for '\(team.name)' - NEW COLOR: \(newColor.toHex(alpha: false))")
+                        bindableTeam.resolvedColor = newColor
+                        // Immediately send to watch after color change
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                            print("📱 iOS Settings: Triggering sendTeamDataToWatch after color change")
+                            watchSyncCoordinator?.sendTeamDataToWatch()
+                        }
+                    }
+                ), supportsOpacity: false) {
+                    NavigationLink(destination: EditView(team: team)) {
+                        Text(team.name)
+                    }
                 }
-            }
-            .onChange(of: team.color) { _, _ in
-                watchSyncCoordinator?.sendTeamDataToWatch()
             }
         }
         .onDelete(perform: remove(_:))
@@ -74,7 +86,16 @@ struct SettingsView: View {
                 self.teams.forEach { modelContext.delete($0) }
                 self.intervals.forEach { modelContext.delete($0) }
                 Team.createBaseData(modelContext: modelContext)
-                watchSyncCoordinator?.sendTeamDataToWatch()
+                do {
+                    try modelContext.save()
+                    print("📱 iOS Settings: Reinitialized, sending data to watch...")
+                    // Send to watch after save completes
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                        watchSyncCoordinator?.sendTeamDataToWatch()
+                    }
+                } catch {
+                    print("📱 iOS Settings: Failed to save after reinitialize: \(error)")
+                }
             }
         } message: {
             Text("The app will delete teams, scores, and intervals, and start with \"Team A\" and \"Team B\".")
@@ -90,7 +111,15 @@ struct SettingsView: View {
                 self.teams.forEach {
                     $0.score = []
                 }
-                watchSyncCoordinator?.sendTeamDataToWatch()
+                do {
+                    try modelContext.save()
+                    // Send to watch after save completes
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                        watchSyncCoordinator?.sendTeamDataToWatch()
+                    }
+                } catch {
+                    print("📱 iOS Settings: Failed to save after reset: \(error)")
+                }
             }
         } message: {
             Text("Each team score will be set to 0.")
@@ -111,7 +140,14 @@ struct SettingsView: View {
                         Button("Add team") {
                             let team = Team(name: "Team \(teams.count + 1)")
                             modelContext.insert(team)
-                            watchSyncCoordinator?.sendTeamDataToWatch()
+                            do {
+                                try modelContext.save()
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                                    watchSyncCoordinator?.sendTeamDataToWatch()
+                                }
+                            } catch {
+                                print("📱 iOS Settings: Failed to save after adding team: \(error)")
+                            }
                         }.buttonStyle(.borderless)
                     }
 
@@ -253,7 +289,14 @@ struct SettingsView: View {
             let team = teams[idx]
             modelContext.delete(team)
         }
-        watchSyncCoordinator?.sendTeamDataToWatch()
+        do {
+            try modelContext.save()
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                watchSyncCoordinator?.sendTeamDataToWatch()
+            }
+        } catch {
+            print("📱 iOS Settings: Failed to save after removing team: \(error)")
+        }
     }
 }
 

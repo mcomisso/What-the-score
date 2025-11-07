@@ -74,18 +74,31 @@ struct SettingsView: View {
 
     private func resetScores() {
         teams.forEach { $0.score = [] }
-        // Send command to iPhone and sync data
-        watchSyncCoordinator?.sendResetScoresToPhone()
-        watchSyncCoordinator?.sendTeamDataToPhone()
+        do {
+            try modelContext.save()
+            // Send data to iPhone after save completes
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                watchSyncCoordinator?.sendTeamDataToPhone()
+            }
+        } catch {
+            print("⌚️ Watch Settings: Failed to save after reset: \(error)")
+        }
     }
 
     private func reinitializeApp() {
         teams.forEach { modelContext.delete($0) }
         intervals.forEach { modelContext.delete($0) }
         Team.createBaseData(modelContext: modelContext)
-        // Send command to iPhone and sync data
-        watchSyncCoordinator?.sendReinitializeToPhone()
-        watchSyncCoordinator?.sendTeamDataToPhone()
+        do {
+            try modelContext.save()
+            print("⌚️ Watch Settings: Reinitialized, sending data to iPhone...")
+            // Send data to iPhone after save completes
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                watchSyncCoordinator?.sendTeamDataToPhone()
+            }
+        } catch {
+            print("⌚️ Watch Settings: Failed to save after reinitialize: \(error)")
+        }
     }
 }
 

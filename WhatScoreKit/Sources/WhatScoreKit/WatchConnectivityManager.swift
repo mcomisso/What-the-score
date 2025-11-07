@@ -39,9 +39,11 @@ public final class WatchConnectivityManager: NSObject, @unchecked Sendable {
             session = WCSession.default
             session?.delegate = self
             session?.activate()
-            logger.info("WCSession activation initiated")
+            logger.info("🔄 WCSession activation initiated")
+            print("🔄 WatchConnectivity: Activation initiated")
         } else {
-            logger.warning("WatchConnectivity is not supported on this device")
+            logger.warning("❌ WatchConnectivity is not supported on this device")
+            print("❌ WatchConnectivity: Not supported on this device")
         }
     }
 
@@ -51,12 +53,14 @@ public final class WatchConnectivityManager: NSObject, @unchecked Sendable {
     /// This ensures the paired device always has the latest team colors and scores
     public func sendTeamData(_ teams: [[String: Any]]) {
         guard let session = session else {
-            logger.warning("Cannot send team data: session not available")
+            logger.warning("❌ Cannot send team data: session not available")
+            print("❌ WatchConnectivity: Cannot send team data - session not available")
             return
         }
 
         guard session.activationState == .activated else {
-            logger.warning("Cannot send team data: session not activated (state: \(session.activationState.rawValue))")
+            logger.warning("❌ Cannot send team data: session not activated (state: \(session.activationState.rawValue))")
+            print("❌ WatchConnectivity: Session not activated, state: \(session.activationState.rawValue)")
             return
         }
 
@@ -64,9 +68,11 @@ public final class WatchConnectivityManager: NSObject, @unchecked Sendable {
 
         do {
             try session.updateApplicationContext(context)
-            logger.info("Team data sent via application context: \(teams.count) teams")
+            logger.info("✅ Team data sent via application context: \(teams.count) teams")
+            print("✅ WatchConnectivity: Sent \(teams.count) teams to paired device")
         } catch {
-            logger.error("Failed to send team data: \(error.localizedDescription)")
+            logger.error("❌ Failed to send team data: \(error.localizedDescription)")
+            print("❌ WatchConnectivity: Failed to send - \(error.localizedDescription)")
         }
     }
 
@@ -171,11 +177,14 @@ extension WatchConnectivityManager: WCSessionDelegate {
             self.isSessionActivated = activationState == .activated
 
             if let error = error {
-                logger.error("Session activation failed: \(error.localizedDescription)")
+                logger.error("❌ Session activation failed: \(error.localizedDescription)")
+                print("❌ WatchConnectivity: Session activation failed - \(error.localizedDescription)")
             } else if activationState == .activated {
-                logger.info("Session activated successfully")
+                logger.info("✅ Session activated successfully")
+                print("✅ WatchConnectivity: Session activated successfully")
                 // Notify listeners if this is the first time we're activated
                 if !wasActivated {
+                    print("🔔 WatchConnectivity: Calling onSessionActivated callback")
                     self.onSessionActivated?()
                 }
             }
@@ -256,8 +265,9 @@ extension WatchConnectivityManager: WCSessionDelegate {
 
             // Handle team data first (higher priority)
             if let teams = teamsData {
+                print("📥 WatchConnectivity: Received \(teams.count) teams from paired device")
                 self.onTeamDataReceived?(teams)
-                logger.info("Received team data from application context: \(teams.count) teams")
+                logger.info("✅ Received team data from application context: \(teams.count) teams")
             }
 
             // Handle notifications

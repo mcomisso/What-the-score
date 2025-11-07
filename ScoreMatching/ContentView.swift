@@ -151,15 +151,31 @@ struct ContentView: View {
             .contextMenu(menuItems: {
                 Button {
                     teams.forEach { $0.score = [] }
+                    do {
+                        try modelContext.save()
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                            watchSyncCoordinator?.sendTeamDataToWatch()
+                        }
+                    } catch {
+                        print("📱 ContentView: Failed to save after reset: \(error)")
+                    }
                 } label: {
                     Label("Set scores to 0", systemImage: "arrow.counterclockwise")
                 }
-                
+
                 Divider()
 
                 Button(role: .destructive) {
                     teams.forEach { modelContext.delete($0) }
                     Team.createBaseData(modelContext: modelContext)
+                    do {
+                        try modelContext.save()
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                            watchSyncCoordinator?.sendTeamDataToWatch()
+                        }
+                    } catch {
+                        print("📱 ContentView: Failed to save after reinitialize: \(error)")
+                    }
                 } label: {
                     Label("Reset all", systemImage: "trash")
                 }

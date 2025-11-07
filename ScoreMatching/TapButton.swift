@@ -1,11 +1,13 @@
 import Foundation
 import WhatScoreKit
 import SwiftUI
+import SwiftData
 import Pow
 
 struct TapButton: View {
     @AppStorage(AppStorageValues.shouldAllowNegativePoints)
     var shouldAllowNegativePoints: Bool = false
+    @Environment(\.modelContext) var modelContext
 
     @Binding var score: [Score]
     @Binding var colorHex: String
@@ -66,12 +68,12 @@ struct TapButton: View {
         if shouldAllowNegativePoints {
             score.append(Score(time: .now, value: -1))
             decreased += 1
-            onScoreChanged?()
+            saveAndSync()
         } else {
             if !score.isEmpty {
                 score.removeLast()
                 decreased += 1
-                onScoreChanged?()
+                saveAndSync()
             } else {
 #if os(iOS)
                 warningGenerator.notificationOccurred(.warning)
@@ -88,7 +90,19 @@ struct TapButton: View {
             increased += 1
 
             self.lastTapped = name
-            onScoreChanged?()
+            saveAndSync()
+        }
+    }
+
+    private func saveAndSync() {
+        do {
+            try modelContext.save()
+            // Delay slightly to ensure save completes before sync
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                onScoreChanged?()
+            }
+        } catch {
+            print("📱 TapButton: Failed to save: \(error)")
         }
     }
 }

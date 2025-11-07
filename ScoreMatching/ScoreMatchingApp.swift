@@ -31,6 +31,7 @@ struct ScoreMatchingApp: App {
             let modelConfiguration = ModelConfiguration(
                 schema: schema,
                 isStoredInMemoryOnly: false,
+                groupContainer: .identifier("group.mcsoftware.whatTheScore"),
                 cloudKitDatabase: .private("iCloud.com.mcomisso.ScoreMatching")
             )
             modelContainer = try ModelContainer(for: schema, configurations: [modelConfiguration])
@@ -140,8 +141,13 @@ final class WatchSyncCoordinator {
         watchSyncLogger.info("WatchSyncCoordinator initialized")
 
         // Send initial team data when session activates
+        // iOS is the source of truth - always send data to watch on activation
         connectivityManager.onSessionActivated = { [weak self] in
-            self?.sendTeamDataToWatch()
+            print("📱 iOS: Session activated, sending initial team data to watch (iOS is source of truth)")
+            // Delay slightly to ensure watch is ready to receive
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                self?.sendTeamDataToWatch()
+            }
         }
     }
 
@@ -160,6 +166,7 @@ final class WatchSyncCoordinator {
 
         // Handle team data received from watch
         connectivityManager.onTeamDataReceived = { [weak self] teamsData in
+            print("📱 iOS: onTeamDataReceived callback triggered with \(teamsData.count) teams")
             self?.updateTeamsFromWatch(teamsData)
         }
     }
@@ -173,54 +180,134 @@ final class WatchSyncCoordinator {
         do {
             let teams = try modelContext.fetch(descriptor)
             let teamsData = teams.map { team -> [String: Any] in
-                [
+                print("📱 iOS: Preparing team '\(team.name)' with color '\(team.color)' and \(team.score.count) scores")
+                return [
                     "name": team.name,
                     "color": team.color,
                     "score": team.score.map { ["time": $0.time.timeIntervalSince1970, "value": $0.value] }
                 ]
             }
+            print("📱 iOS: About to send \(teams.count) teams to watch via WatchConnectivity")
             connectivityManager.sendTeamData(teamsData)
             watchSyncLogger.info("Sent team data to watch: \(teams.count) teams")
+            print("📱 iOS: sendTeamData() call completed")
         } catch {
             watchSyncLogger.error("Failed to fetch teams for sending: \(error.localizedDescription)")
+            print("📱 iOS: ERROR fetching teams: \(error.localizedDescription)")
         }
     }
 
     // MARK: - Receive Data from Watch
 
     private func updateTeamsFromWatch(_ teamsData: [[String: Any]]) {
+        print("📱 iOS: Received \(teamsData.count) teams from watch, updating...")
         watchSyncLogger.info("Updating teams from watch data: \(teamsData.count) teams")
 
         let descriptor = FetchDescriptor<Team>(sortBy: [SortDescriptor(\.creationDate)])
 
         do {
             let existingTeams = try modelContext.fetch(descriptor)
+            print("📱 iOS: Found \(existingTeams.count) existing teams locally")
 
-            // Update existing teams with data from watch
-            for (index, teamData) in teamsData.enumerated() {
-                guard index < existingTeams.count else { break }
+            // Check if data is actually different before updating
+            var needsUpdate = false
+            if existingTeams.count != teamsData.count {
+                needsUpdate = true
+                print("📱 iOS: Team count mismatch - update needed")
+            } else {
+                // Check if any team data is different
+                for (index, teamData) in teamsData.enumerated() {
+                    guard index < existingTeams.count else { break }
+                    let existingTeam = existingTeams[index]
 
-                let team = existingTeams[index]
-
-                if let name = teamData["name"] as? String {
-                    team.name = name
-                }
-                if let color = teamData["color"] as? String {
-                    team.color = color
-                }
-                if let scoreData = teamData["score"] as? [[String: Any]] {
-                    team.score = scoreData.compactMap { dict in
-                        guard let timeInterval = dict["time"] as? TimeInterval,
-                              let value = dict["value"] as? Int else { return nil }
-                        return Score(time: Date(timeIntervalSince1970: timeInterval), value: value)
+                    if let name = teamData["name"] as? String, existingTeam.name != name {
+                        needsUpdate = true
+                        print("📱 iOS: Team name changed - update needed")
+                        break
+                    }
+                    if let color = teamData["color"] as? String, existingTeam.color != color {
+                        needsUpdate = true
+                        print("📱 iOS: Team color changed - update needed")
+                        break
+                    }
+                    if let scoreData = teamData["score"] as? [[String: Any]] {
+                        if existingTeam.score.count != scoreData.count {
+                            needsUpdate = true
+                            print("📱 iOS: Score count changed - update needed")
+                            break
+                        }
                     }
                 }
             }
 
+            if !needsUpdate {
+                print("📱 iOS: No changes detected, skipping update to avoid ping-pong")
+                return
+            }
+
+            // Handle team count changes
+            if teamsData.count > existingTeams.count {
+                // Add new teams
+                print("📱 iOS: Adding \(teamsData.count - existingTeams.count) new teams")
+                for index in existingTeams.count..<teamsData.count {
+                    let teamData = teamsData[index]
+                    guard let name = teamData["name"] as? String,
+                          let color = teamData["color"] as? String else { continue }
+
+                    let scores = extractScores(from: teamData)
+                    let team = Team(score: scores, name: name, color: color)
+                    modelContext.insert(team)
+                    print("📱 iOS: ✅ Added new team '\(name)'")
+                }
+            } else if teamsData.count < existingTeams.count {
+                // Remove excess teams
+                print("📱 iOS: Removing \(existingTeams.count - teamsData.count) teams")
+                for index in (teamsData.count..<existingTeams.count).reversed() {
+                    modelContext.delete(existingTeams[index])
+                }
+            }
+
+            // Update existing teams (preserving their identity/UUID)
+            let teamsToUpdate = try modelContext.fetch(descriptor)
+            for (index, teamData) in teamsData.enumerated() {
+                guard index < teamsToUpdate.count else { break }
+
+                guard let name = teamData["name"] as? String,
+                      let color = teamData["color"] as? String else {
+                    print("📱 iOS: ❌ Skipping team with missing name or color")
+                    continue
+                }
+
+                let team = teamsToUpdate[index]
+                team.name = name
+                team.color = color
+                team.score = extractScores(from: teamData)
+                print("📱 iOS: ✅ Updated team '\(name)' with color '\(color)'")
+            }
+
             try modelContext.save()
+
+            // Force refresh by triggering a notification
+            DispatchQueue.main.async {
+                NotificationCenter.default.post(name: NSNotification.Name("TeamsDidUpdate"), object: nil)
+            }
+
             watchSyncLogger.info("Successfully updated teams from watch")
+            print("📱 iOS: Teams updated successfully, UI should refresh")
         } catch {
             watchSyncLogger.error("Failed to update teams from watch: \(error.localizedDescription)")
+            print("📱 iOS: ERROR updating teams: \(error.localizedDescription)")
+        }
+    }
+
+    private func extractScores(from teamData: [String: Any]) -> [Score] {
+        guard let scoreData = teamData["score"] as? [[String: Any]] else {
+            return []
+        }
+        return scoreData.compactMap { dict in
+            guard let timeInterval = dict["time"] as? TimeInterval,
+                  let value = dict["value"] as? Int else { return nil }
+            return Score(time: Date(timeIntervalSince1970: timeInterval), value: value)
         }
     }
 
@@ -235,7 +322,7 @@ final class WatchSyncCoordinator {
             let teams = try modelContext.fetch(descriptor)
             teams.forEach { $0.score = [] }
             try modelContext.save()
-            sendTeamDataToWatch()
+            // DO NOT send data back - watch already has this data and sent us the command
             watchSyncLogger.info("Scores reset successfully")
         } catch {
             watchSyncLogger.error("Failed to reset scores: \(error.localizedDescription)")
@@ -257,8 +344,7 @@ final class WatchSyncCoordinator {
 
             Team.createBaseData(modelContext: modelContext)
             try modelContext.save()
-            sendTeamDataToWatch()
-
+            // DO NOT send data back - watch already has this data and sent us the command
             watchSyncLogger.info("App reinitialized successfully")
         } catch {
             watchSyncLogger.error("Failed to reinitialize app: \(error.localizedDescription)")

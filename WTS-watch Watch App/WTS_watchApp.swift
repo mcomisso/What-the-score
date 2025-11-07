@@ -23,6 +23,7 @@ struct WTS_watch_Watch_AppApp: App {
             let modelConfiguration = ModelConfiguration(
                 schema: schema,
                 isStoredInMemoryOnly: false,
+                groupContainer: .identifier("group.mcsoftware.whatTheScore"),
                 cloudKitDatabase: .private("iCloud.com.mcomisso.ScoreMatching")
             )
             modelContainer = try ModelContainer(for: schema, configurations: [modelConfiguration])
