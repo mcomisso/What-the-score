@@ -17,14 +17,8 @@ public final class WatchConnectivityManager: NSObject, @unchecked Sendable {
     public var isSessionActivated = false
     public var isReachable = false
 
-    /// Callback for when teams data is received
-    public var onTeamsReceived: (([CodableTeamData]) -> Void)?
-
-    /// Callback for when intervals data is received
-    public var onIntervalsReceived: (([CodableIntervalData]) -> Void)?
-
-    /// Callback for when settings are received
-    public var onSettingsReceived: (([String: Any]) -> Void)?
+    /// Callback for when data changed notification is received
+    public var onDataChanged: (() -> Void)?
 
     /// Callback for when reset command is received
     public var onResetScores: (() -> Void)?
@@ -45,65 +39,31 @@ public final class WatchConnectivityManager: NSObject, @unchecked Sendable {
         }
     }
 
-    // MARK: - Sending Data
+    // MARK: - Sending Notifications
 
-    /// Send teams data to the paired device
-    public func sendTeams(_ teams: [CodableTeamData]) {
-        guard let session = session, session.isReachable else {
-            logger.warning("Cannot send teams: session not reachable")
-            updateApplicationContext(with: teams)
+    /// Notify the paired device that data has changed (CloudKit will sync actual data)
+    public func sendDataChangedNotification() {
+        guard let session = session else {
+            logger.warning("Cannot send notification: session not available")
             return
         }
 
-        do {
-            let encoder = JSONEncoder()
-            let data = try encoder.encode(teams)
-            let message: [String: Any] = ["teams": data]
+        let message: [String: Any] = ["notification": "dataChanged"]
 
-            session.sendMessage(message, replyHandler: { reply in
-                logger.info("Teams sent successfully, reply: \(String(describing: reply))")
-            }, errorHandler: { error in
-                logger.error("Failed to send teams: \(error.localizedDescription)")
-                // Fallback to application context
-                self.updateApplicationContext(with: teams)
-            })
-        } catch {
-            logger.error("Failed to encode teams: \(error.localizedDescription)")
-        }
-    }
-
-    /// Send intervals data to the paired device
-    public func sendIntervals(_ intervals: [CodableIntervalData]) {
-        guard let session = session, session.isReachable else {
-            logger.warning("Cannot send intervals: session not reachable")
-            return
-        }
-
-        do {
-            let encoder = JSONEncoder()
-            let data = try encoder.encode(intervals)
-            let message: [String: Any] = ["intervals": data]
-
+        // Try immediate message first if reachable
+        if session.isReachable {
             session.sendMessage(message, replyHandler: nil, errorHandler: { error in
-                logger.error("Failed to send intervals: \(error.localizedDescription)")
+                logger.error("Failed to send data changed notification: \(error.localizedDescription)")
             })
+        }
+
+        // Always update context as fallback for when app is not running
+        do {
+            try session.updateApplicationContext(message)
+            logger.info("Data changed notification sent")
         } catch {
-            logger.error("Failed to encode intervals: \(error.localizedDescription)")
+            logger.error("Failed to update application context: \(error.localizedDescription)")
         }
-    }
-
-    /// Send settings to the paired device
-    public func sendSettings(_ settings: [String: Any]) {
-        guard let session = session, session.isReachable else {
-            logger.warning("Cannot send settings: session not reachable")
-            return
-        }
-
-        let message: [String: Any] = ["settings": settings]
-
-        session.sendMessage(message, replyHandler: nil, errorHandler: { error in
-            logger.error("Failed to send settings: \(error.localizedDescription)")
-        })
     }
 
     /// Send reset scores command to the paired device
@@ -132,24 +92,6 @@ public final class WatchConnectivityManager: NSObject, @unchecked Sendable {
         session.sendMessage(message, replyHandler: nil, errorHandler: { error in
             logger.error("Failed to send reinitialize command: \(error.localizedDescription)")
         })
-    }
-
-    // MARK: - Application Context (Background Transfer)
-
-    /// Update application context with teams data for background transfer
-    private func updateApplicationContext(with teams: [CodableTeamData]) {
-        guard let session = session else { return }
-
-        do {
-            let encoder = JSONEncoder()
-            let data = try encoder.encode(teams)
-            let context: [String: Any] = ["teams": data]
-
-            try session.updateApplicationContext(context)
-            logger.info("Application context updated with teams data")
-        } catch {
-            logger.error("Failed to update application context: \(error.localizedDescription)")
-        }
     }
 }
 
@@ -192,45 +134,22 @@ extension WatchConnectivityManager: @preconcurrency WCSessionDelegate {
     nonisolated public func session(_ session: WCSession, didReceiveMessage message: [String : Any]) {
         logger.info("Received message: \(message.keys)")
 
-        // Extract and process data synchronously
-        let teamsData = message["teams"] as? Data
-        let intervalsData = message["intervals"] as? Data
+        // Extract notification and command
+        let notification = message["notification"] as? String
         let command = message["command"] as? String
-
-        // Copy settings to avoid data race
-        nonisolated(unsafe) let settingsCopy: [String: Any]? = message["settings"] as? [String: Any]
 
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
 
-            // Handle teams data
-            if let teamsData = teamsData {
-                do {
-                    let decoder = JSONDecoder()
-                    let teams = try decoder.decode([CodableTeamData].self, from: teamsData)
-                    self.onTeamsReceived?(teams)
-                    logger.info("Decoded \(teams.count) teams")
-                } catch {
-                    logger.error("Failed to decode teams: \(error.localizedDescription)")
+            // Handle notifications
+            if let notification = notification {
+                switch notification {
+                case "dataChanged":
+                    self.onDataChanged?()
+                    logger.info("Received data changed notification")
+                default:
+                    logger.warning("Unknown notification: \(notification)")
                 }
-            }
-
-            // Handle intervals data
-            if let intervalsData = intervalsData {
-                do {
-                    let decoder = JSONDecoder()
-                    let intervals = try decoder.decode([CodableIntervalData].self, from: intervalsData)
-                    self.onIntervalsReceived?(intervals)
-                    logger.info("Decoded \(intervals.count) intervals")
-                } catch {
-                    logger.error("Failed to decode intervals: \(error.localizedDescription)")
-                }
-            }
-
-            // Handle settings data
-            if let settings = settingsCopy {
-                self.onSettingsReceived?(settings)
-                logger.info("Received settings update")
             }
 
             // Handle commands
@@ -254,21 +173,15 @@ extension WatchConnectivityManager: @preconcurrency WCSessionDelegate {
     nonisolated public func session(_ session: WCSession, didReceiveApplicationContext applicationContext: [String : Any]) {
         logger.info("Received application context")
 
-        // Extract data before async to avoid data race
-        let teamsData = applicationContext["teams"] as? Data
+        // Extract notification
+        let notification = applicationContext["notification"] as? String
 
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
 
-            if let teamsData = teamsData {
-                do {
-                    let decoder = JSONDecoder()
-                    let teams = try decoder.decode([CodableTeamData].self, from: teamsData)
-                    self.onTeamsReceived?(teams)
-                    logger.info("Decoded \(teams.count) teams from application context")
-                } catch {
-                    logger.error("Failed to decode teams from context: \(error.localizedDescription)")
-                }
+            if let notification = notification, notification == "dataChanged" {
+                self.onDataChanged?()
+                logger.info("Received data changed notification from application context")
             }
         }
     }

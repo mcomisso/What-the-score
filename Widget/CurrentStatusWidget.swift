@@ -1,11 +1,65 @@
 import SwiftUI
 import SwiftData
 import WhatScoreKit
+import AppIntents
 
 #if canImport(WidgetKit)
 import WidgetKit
 
-struct Provider: TimelineProvider {
+// MARK: - App Intent for Incrementing Scores
+
+struct IncrementScoreIntent: AppIntent {
+    static var title: LocalizedStringResource = "Increment Score"
+    static var description = IntentDescription("Increments the score for a team")
+
+    @Parameter(title: "Team Name")
+    var teamName: String
+
+    init() {}
+
+    init(teamName: String) {
+        self.teamName = teamName
+    }
+
+    func perform() async throws -> some IntentResult {
+        // Access the shared model container
+        let schema = Schema([Team.self, Interval.self, Game.self])
+        let modelConfiguration = ModelConfiguration(
+            schema: schema,
+            isStoredInMemoryOnly: false,
+            groupContainer: .identifier("group.mcsoftware.whatTheScore"),
+            cloudKitDatabase: .automatic
+        )
+        let modelContainer = try ModelContainer(for: schema, configurations: [modelConfiguration])
+        let context = ModelContext(modelContainer)
+
+        // Find the team
+        let descriptor = FetchDescriptor<Team>(
+            predicate: #Predicate { team in
+                team.name == teamName
+            }
+        )
+
+        guard let team = try context.fetch(descriptor).first else {
+            throw IncrementScoreError.teamNotFound
+        }
+
+        // Increment the score
+        team.score.append(Score(time: .now, value: 1))
+
+        try context.save()
+
+        return .result()
+    }
+}
+
+enum IncrementScoreError: Error {
+    case teamNotFound
+}
+
+// MARK: - Timeline Provider
+
+struct Provider: AppIntentTimelineProvider {
     let modelContainer: ModelContainer
 
     init() {
@@ -14,7 +68,8 @@ struct Provider: TimelineProvider {
             let modelConfiguration = ModelConfiguration(
                 schema: schema,
                 isStoredInMemoryOnly: false,
-                groupContainer: .identifier("group.mcsoftware.whatTheScore")
+                groupContainer: .identifier("group.mcsoftware.whatTheScore"),
+                cloudKitDatabase: .automatic
             )
             self.modelContainer = try ModelContainer(for: schema, configurations: [modelConfiguration])
         } catch {
@@ -36,26 +91,30 @@ struct Provider: TimelineProvider {
     func placeholder(in context: Context) -> SimpleEntry {
         let teamA = Team(name: "Team A")
         let teamB = Team(name: "Team B")
-        return SimpleEntry(date: Date(), teams: [teamA, teamB])
+        return SimpleEntry(date: Date(), teams: [teamA, teamB], configuration: ConfigurationAppIntent())
     }
 
-    func getSnapshot(in context: Context, completion: @escaping (SimpleEntry) -> ()) {
+    func snapshot(for configuration: ConfigurationAppIntent, in context: Context) async -> SimpleEntry {
         let teams = fetchTeams()
-        let entry = SimpleEntry(date: Date(), teams: teams)
-        completion(entry)
+        return SimpleEntry(date: Date(), teams: teams, configuration: configuration)
     }
 
-    func getTimeline(in context: Context, completion: @escaping (Timeline<Entry>) -> ()) {
+    func timeline(for configuration: ConfigurationAppIntent, in context: Context) async -> Timeline<SimpleEntry> {
         let teams = fetchTeams()
-        let entry = SimpleEntry(date: Date(), teams: teams)
-        let timeline = Timeline(entries: [entry], policy: .atEnd)
-        completion(timeline)
+        let entry = SimpleEntry(date: Date(), teams: teams, configuration: configuration)
+        return Timeline(entries: [entry], policy: .atEnd)
     }
 }
 
 struct SimpleEntry: TimelineEntry {
     let date: Date
     let teams: [Team]
+    let configuration: ConfigurationAppIntent
+}
+
+struct ConfigurationAppIntent: WidgetConfigurationIntent {
+    static var title: LocalizedStringResource = "Configuration"
+    static var description = IntentDescription("Widget Configuration")
 }
 
 struct WidgetEntryView : View {
@@ -64,20 +123,24 @@ struct WidgetEntryView : View {
     var body: some View {
         VStack(spacing: 0) {
             ForEach(entry.teams) { team in
-                team.resolvedColor
-                    .overlay {
-                        VStack{
-                            Text(team.name)
-                                .font(.subheadline)
-                            Text("\(team.score.safeTotalScore)")
-                                .font(
-                                    .system(.title, design: .rounded)
-                                )
+                Button(intent: IncrementScoreIntent(teamName: team.name)) {
+                    team.resolvedColor
+                        .overlay {
+                            VStack {
+                                Text(team.name)
+                                    .font(.subheadline)
+                                Text("\(team.score.safeTotalScore)")
+                                    .font(.system(.title, design: .rounded))
+                            }
+                            .foregroundColor(team.resolvedColor)
+                            .colorInvert()
                         }
-                        .foregroundColor(team.resolvedColor)
-                        .colorInvert()
-                    }
+                }
+                .buttonStyle(.plain)
             }
+        }
+        .containerBackground(for: .widget) {
+            Color.clear
         }
     }
 }
@@ -88,18 +151,18 @@ struct CurrentStatusWidget: Widget {
     let kind: String = "Widget"
 
     var body: some WidgetConfiguration {
-        StaticConfiguration(kind: kind, provider: Provider()) { entry in
+        AppIntentConfiguration(kind: kind, intent: ConfigurationAppIntent.self, provider: Provider()) { entry in
             WidgetEntryView(entry: entry)
                 .modelContainer(for: [Team.self, Interval.self, Game.self])
         }
         .contentMarginsDisabled()
         .supportedFamilies([.systemSmall, .systemMedium])
         .configurationDisplayName("Current game")
-        .description("Displays the current score for all teams.")
+        .description("Tap teams to increment their score.")
     }
 }
 
 #Preview {
-    WidgetEntryView(entry: .init(date: .now, teams: []))
+    WidgetEntryView(entry: .init(date: .now, teams: [], configuration: ConfigurationAppIntent()))
 }
 #endif

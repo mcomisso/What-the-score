@@ -65,22 +65,18 @@ struct ContentView: View {
                 }
             }
             .onChange(of: teams.count) { _, _ in
-                // Sync when teams change
-                syncToPhone()
+                // Notify iPhone when teams change
+                watchSyncCoordinator?.notifyDataChanged()
             }
             .onChange(of: teams.map { $0.score.count }) { _, _ in
-                // Sync when scores change
-                syncToPhone()
+                // Notify iPhone when scores change
+                watchSyncCoordinator?.notifyDataChanged()
             }
             .onChange(of: intervals.count) { _, _ in
-                // Sync when intervals change
-                watchSyncCoordinator?.syncIntervalsToPhone()
+                // Notify iPhone when intervals change
+                watchSyncCoordinator?.notifyDataChanged()
             }
         }
-    }
-
-    private func syncToPhone() {
-        watchSyncCoordinator?.syncTeamsToPhone()
     }
 
     // MARK: - Empty State
@@ -157,8 +153,8 @@ struct ContentView: View {
         if index < teams.count {
             let team = teams[index]
             TeamButtonView(team: .constant(team)) {
-                // Sync scores to iPhone when they change
-                watchSyncCoordinator?.syncTeamsToPhone()
+                // Notify iPhone when scores change
+                watchSyncCoordinator?.notifyDataChanged()
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
         }

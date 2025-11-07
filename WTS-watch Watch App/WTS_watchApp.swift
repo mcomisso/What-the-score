@@ -13,36 +13,42 @@ import WhatScoreKit
 struct WTS_watch_Watch_AppApp: App {
     @Environment(\.scenePhase) var scenePhase
     @State private var watchSyncCoordinator: WatchSyncCoordinator?
+    private let modelContainer: ModelContainer
+
+    init() {
+        // Initialize model container with App Group for sync with iPhone
+        do {
+            let schema = Schema([Team.self, Interval.self, Game.self])
+            let modelConfiguration = ModelConfiguration(
+                schema: schema,
+                isStoredInMemoryOnly: false,
+                groupContainer: .identifier("group.mcsoftware.whatTheScore"),
+                cloudKitDatabase: .automatic
+            )
+            modelContainer = try ModelContainer(for: schema, configurations: [modelConfiguration])
+        } catch {
+            fatalError("Failed to create ModelContainer: \(error)")
+        }
+    }
 
     var body: some Scene {
         WindowGroup {
             ContentView()
                 .environment(\.watchSyncCoordinator, watchSyncCoordinator)
+                .onAppear {
+                    if watchSyncCoordinator == nil {
+                        watchSyncCoordinator = WatchSyncCoordinator(modelContainer: modelContainer)
+                        watchSyncCoordinator?.notifyDataChanged()
+                    }
+                }
         }
-        .modelContainer(for: [Team.self, Interval.self, Game.self])
+        .modelContainer(modelContainer)
         .onChange(of: scenePhase) { _, phase in
             if phase == .active {
-                if watchSyncCoordinator == nil {
-                    initializeWatchSync()
-                } else {
-                    // Sync when app becomes active
-                    watchSyncCoordinator?.syncTeamsToPhone()
-                    watchSyncCoordinator?.syncIntervalsToPhone()
-                }
+                // Notify iPhone when app becomes active
+                watchSyncCoordinator?.notifyDataChanged()
             }
         }
-    }
-
-    private func initializeWatchSync() {
-        guard let modelContainer = try? ModelContainer(for: Team.self, Interval.self, Game.self) else {
-            return
-        }
-        let coordinator = WatchSyncCoordinator(modelContainer: modelContainer)
-        watchSyncCoordinator = coordinator
-
-        // Initial sync to iPhone
-        coordinator.syncTeamsToPhone()
-        coordinator.syncIntervalsToPhone()
     }
 }
 

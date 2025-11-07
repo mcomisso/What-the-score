@@ -24,22 +24,21 @@ struct ScoreMatchingApp: App {
     private let modelContainer: ModelContainer
 
     init() {
-        // Initialize model container once with App Group for widget sharing
+        // Initialize model container with App Group for widget sharing and CloudKit for device sync
         do {
             let schema = Schema([Team.self, Interval.self, Game.self])
             let modelConfiguration = ModelConfiguration(
                 schema: schema,
                 isStoredInMemoryOnly: false,
-                groupContainer: .identifier("group.mcsoftware.whatTheScore")
+                groupContainer: .identifier("group.mcsoftware.whatTheScore"),
+                cloudKitDatabase: .automatic
             )
             modelContainer = try ModelContainer(for: schema, configurations: [modelConfiguration])
 
             watchSyncCoordinator = WatchSyncCoordinator(modelContainer: modelContainer)
 
-            // Initial sync to watch
-            watchSyncCoordinator.syncTeamsToWatch()
-            watchSyncCoordinator.syncIntervalsToWatch()
-            watchSyncCoordinator.syncSettingsToWatch()
+            // Notify watch that we're ready
+            watchSyncCoordinator.notifyDataChanged()
         } catch {
             fatalError("Failed to create ModelContainer: \(error)")
         }
@@ -73,10 +72,8 @@ struct ScoreMatchingApp: App {
         }
         totalLaunches += 1
 
-        // Sync to watch when app becomes active
-        watchSyncCoordinator.syncTeamsToWatch()
-        watchSyncCoordinator.syncIntervalsToWatch()
-        watchSyncCoordinator.syncSettingsToWatch()
+        // Notify watch that data may have changed
+        watchSyncCoordinator.notifyDataChanged()
     }
 
     private func requestReviewIfNeeded() {
@@ -102,7 +99,7 @@ extension EnvironmentValues {
 
 private let watchSyncLogger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "com.mcomisso.ScoreMatching", category: "WatchSync")
 
-/// Coordinates syncing between iOS SwiftData and Watch Connectivity
+/// Coordinates notifications between iOS and watchOS (data synced via CloudKit)
 @Observable
 final class WatchSyncCoordinator {
 
@@ -118,19 +115,10 @@ final class WatchSyncCoordinator {
     // MARK: - Setup
 
     private func setupCallbacks() {
-        // Handle teams received from watch
-        connectivityManager.onTeamsReceived = { [weak self] teams in
-            self?.updateTeamsFromWatch(teams)
-        }
-
-        // Handle intervals received from watch
-        connectivityManager.onIntervalsReceived = { [weak self] intervals in
-            self?.updateIntervalsFromWatch(intervals)
-        }
-
-        // Handle settings received from watch
-        connectivityManager.onSettingsReceived = { [weak self] settings in
-            self?.updateSettingsFromWatch(settings)
+        // Handle data changed notification from watch
+        connectivityManager.onDataChanged = { [weak self] in
+            // CloudKit will handle the actual sync, just log it
+            watchSyncLogger.info("Received data changed notification from watch")
         }
 
         // Handle reset scores command from watch
@@ -144,120 +132,15 @@ final class WatchSyncCoordinator {
         }
     }
 
-    // MARK: - Send to Watch
+    // MARK: - Notify Watch
 
-    /// Send current teams to watch
-    func syncTeamsToWatch() {
-        let descriptor = FetchDescriptor<Team>(sortBy: [SortDescriptor(\.creationDate)])
-
-        do {
-            let teams = try modelContext.fetch(descriptor)
-            let codableTeams = teams.map { $0.toCodable() }
-            connectivityManager.sendTeams(codableTeams)
-            watchSyncLogger.info("Synced \(teams.count) teams to watch")
-        } catch {
-            watchSyncLogger.error("Failed to fetch teams for sync: \(error.localizedDescription)")
-        }
+    /// Notify watch that data has changed (CloudKit handles actual sync)
+    func notifyDataChanged() {
+        connectivityManager.sendDataChangedNotification()
+        watchSyncLogger.info("Notified watch that data changed")
     }
 
-    /// Send current intervals to watch
-    func syncIntervalsToWatch() {
-        let descriptor = FetchDescriptor<Interval>(sortBy: [SortDescriptor(\.date)])
-
-        do {
-            let intervals = try modelContext.fetch(descriptor)
-            let codableIntervals = intervals.map { $0.toCodable() }
-            connectivityManager.sendIntervals(codableIntervals)
-            watchSyncLogger.info("Synced \(intervals.count) intervals to watch")
-        } catch {
-            watchSyncLogger.error("Failed to fetch intervals for sync: \(error.localizedDescription)")
-        }
-    }
-
-    /// Send current settings to watch
-    func syncSettingsToWatch() {
-        let settings: [String: Any] = [
-            "shouldAllowNegativePoints": UserDefaults.standard.bool(forKey: AppStorageValues.shouldAllowNegativePoints),
-            "hasEnabledIntervals": UserDefaults.standard.bool(forKey: AppStorageValues.hasEnabledIntervals),
-            "shouldKeepScreenAwake": UserDefaults.standard.bool(forKey: AppStorageValues.shouldKeepScreenAwake)
-        ]
-        connectivityManager.sendSettings(settings)
-        watchSyncLogger.info("Synced settings to watch")
-    }
-
-    // MARK: - Receive from Watch
-
-    private func updateTeamsFromWatch(_ codableTeams: [CodableTeamData]) {
-        watchSyncLogger.info("Updating teams from watch: \(codableTeams.count)")
-
-        let descriptor = FetchDescriptor<Team>(sortBy: [SortDescriptor(\.creationDate)])
-
-        do {
-            let existingTeams = try modelContext.fetch(descriptor)
-
-            // Create a map of existing teams by name for quick lookup
-            var teamMap: [String: Team] = [:]
-            for team in existingTeams {
-                teamMap[team.name] = team
-            }
-
-            // Update or create teams from watch data
-            for codableTeam in codableTeams {
-                if let existingTeam = teamMap[codableTeam.name] {
-                    // Update existing team
-                    existingTeam.score = codableTeam.score
-                    existingTeam.color = codableTeam.color.toHex()
-                } else {
-                    // Create new team
-                    let newTeam = codableTeam.toTeam()
-                    modelContext.insert(newTeam)
-                }
-            }
-
-            try modelContext.save()
-            watchSyncLogger.info("Successfully updated teams from watch")
-        } catch {
-            watchSyncLogger.error("Failed to update teams from watch: \(error.localizedDescription)")
-        }
-    }
-
-    private func updateIntervalsFromWatch(_ codableIntervals: [CodableIntervalData]) {
-        watchSyncLogger.info("Updating intervals from watch: \(codableIntervals.count)")
-
-        let descriptor = FetchDescriptor<Interval>(sortBy: [SortDescriptor(\.date)])
-
-        do {
-            let existingIntervals = try modelContext.fetch(descriptor)
-
-            // Check if we need to add new intervals
-            if codableIntervals.count > existingIntervals.count {
-                for codableInterval in codableIntervals.suffix(codableIntervals.count - existingIntervals.count) {
-                    let newInterval = Interval.from(codable: codableInterval)
-                    modelContext.insert(newInterval)
-                }
-                try modelContext.save()
-                watchSyncLogger.info("Added \(codableIntervals.count - existingIntervals.count) new intervals from watch")
-            }
-        } catch {
-            watchSyncLogger.error("Failed to update intervals from watch: \(error.localizedDescription)")
-        }
-    }
-
-    private func updateSettingsFromWatch(_ settings: [String: Any]) {
-        watchSyncLogger.info("Updating settings from watch")
-
-        if let negativePoints = settings["shouldAllowNegativePoints"] as? Bool {
-            UserDefaults.standard.set(negativePoints, forKey: AppStorageValues.shouldAllowNegativePoints)
-        }
-
-        if let intervals = settings["hasEnabledIntervals"] as? Bool {
-            UserDefaults.standard.set(intervals, forKey: AppStorageValues.hasEnabledIntervals)
-        }
-
-        if let keepAwake = settings["shouldKeepScreenAwake"] as? Bool {
-            UserDefaults.standard.set(keepAwake, forKey: AppStorageValues.shouldKeepScreenAwake)
-        }
-    }
+    // MARK: - Handle Commands from Watch
 
     private func resetScores() {
         watchSyncLogger.info("Resetting scores from watch command")

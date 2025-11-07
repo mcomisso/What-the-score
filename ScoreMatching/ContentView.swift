@@ -68,21 +68,17 @@ struct ContentView: View {
             }
         }
         .onChange(of: teams.count) { _, _ in
-            // Sync when teams are added/removed
-            syncToWatch()
+            // Notify watch when teams are added/removed
+            watchSyncCoordinator?.notifyDataChanged()
         }
         .onChange(of: teams.map { $0.score.count }) { _, _ in
-            // Sync when scores change
-            syncToWatch()
+            // Notify watch when scores change
+            watchSyncCoordinator?.notifyDataChanged()
         }
         .onChange(of: intervals.count) { _, _ in
-            // Sync when intervals change
-            watchSyncCoordinator?.syncIntervalsToWatch()
+            // Notify watch when intervals change
+            watchSyncCoordinator?.notifyDataChanged()
         }
-    }
-
-    private func syncToWatch() {
-        watchSyncCoordinator?.syncTeamsToWatch()
     }
 
     private func cleanupNegativeScores() {
