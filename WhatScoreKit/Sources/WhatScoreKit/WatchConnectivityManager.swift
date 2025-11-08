@@ -9,7 +9,7 @@ private let logger = Logger(subsystem: "com.mcomisso.ScoreMatching.WhatScoreKit"
 @Observable
 public final class WatchConnectivityManager: NSObject, @unchecked Sendable {
 
-    public nonisolated(unsafe) static let shared = WatchConnectivityManager()
+    public static let shared = WatchConnectivityManager()
 
     private var session: WCSession?
 
@@ -52,8 +52,9 @@ public final class WatchConnectivityManager: NSObject, @unchecked Sendable {
 
     // MARK: - Sending Data
 
-    /// Send team and interval data to the paired device using application context
-    /// This ensures the paired device always has the latest team colors, scores, and intervals
+    /// Send team and interval data to the paired device
+    /// Uses immediate message delivery when reachable for real-time updates,
+    /// falls back to application context for background delivery
     public func sendTeamData(_ teams: [[String: Any]], intervals: [[String: Any]] = []) {
         guard let session = session else {
             logger.warning("❌ Cannot send data: session not available")
@@ -67,18 +68,38 @@ public final class WatchConnectivityManager: NSObject, @unchecked Sendable {
             return
         }
 
-        let context: [String: Any] = [
+        let message: [String: Any] = [
             "teams": teams,
             "intervals": intervals
         ]
 
+        // Try immediate message first if reachable for real-time updates
+        if session.isReachable {
+            session.sendMessage(message, replyHandler: nil, errorHandler: { [weak self] error in
+                logger.error("❌ Failed to send immediate message: \(error.localizedDescription)")
+                print("❌ WatchConnectivity: Failed to send immediate message - \(error.localizedDescription)")
+                // Fallback to application context on error
+                self?.updateTeamDataContext(session: session, message: message, teams: teams, intervals: intervals)
+            })
+            logger.info("✅ Data sent via immediate message (real-time): \(teams.count) teams, \(intervals.count) intervals")
+            print("✅ WatchConnectivity: Sent \(teams.count) teams, \(intervals.count) intervals via immediate message")
+        } else {
+            // Use application context for background delivery when not reachable
+            logger.info("⏳ Watch not reachable, using application context for background delivery")
+            print("⏳ WatchConnectivity: Watch not reachable, using application context")
+            updateTeamDataContext(session: session, message: message, teams: teams, intervals: intervals)
+        }
+    }
+
+    /// Update application context with team data (fallback or background delivery)
+    private func updateTeamDataContext(session: WCSession, message: [String: Any], teams: [[String: Any]], intervals: [[String: Any]]) {
         do {
-            try session.updateApplicationContext(context)
+            try session.updateApplicationContext(message)
             logger.info("✅ Data sent via application context: \(teams.count) teams, \(intervals.count) intervals")
-            print("✅ WatchConnectivity: Sent \(teams.count) teams, \(intervals.count) intervals to paired device")
+            print("✅ WatchConnectivity: Sent \(teams.count) teams, \(intervals.count) intervals via application context")
         } catch {
-            logger.error("❌ Failed to send data: \(error.localizedDescription)")
-            print("❌ WatchConnectivity: Failed to send - \(error.localizedDescription)")
+            logger.error("❌ Failed to update application context: \(error.localizedDescription)")
+            print("❌ WatchConnectivity: Failed to update application context - \(error.localizedDescription)")
         }
     }
 

@@ -27,7 +27,7 @@ public final class WatchConnectivityDataSyncService: DataSyncService {
             logger.info("Received data from paired device")
 
             // Build dictionary for SyncData parsing
-            var dict: [String: Any] = [
+            let dict: [String: Any] = [
                 "teams": teamsDict,
                 "intervals": intervalsDict
             ]

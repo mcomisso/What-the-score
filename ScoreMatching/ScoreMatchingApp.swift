@@ -20,7 +20,7 @@ struct ScoreMatchingApp: App {
     @AppStorage(AppStorageValues.shouldKeepScreenAwake)
     var shouldKeepScreenAwake: Bool = false
 
-    @State private var watchSyncCoordinator: WatchSyncCoordinator
+    @State private var watchSyncCoordinator: iOSWatchSyncCoordinator
     private let modelContainer: ModelContainer
 
     init() {
@@ -36,7 +36,7 @@ struct ScoreMatchingApp: App {
             )
             modelContainer = try ModelContainer(for: schema, configurations: [modelConfiguration])
 
-            watchSyncCoordinator = WatchSyncCoordinator(modelContainer: modelContainer)
+            watchSyncCoordinator = iOSWatchSyncCoordinator(modelContainer: modelContainer, syncService: nil, conversionService: nil)
 
             // Migrate any teams with empty colors
             migrateTeamColors()
@@ -111,11 +111,11 @@ struct ScoreMatchingApp: App {
 
 // Environment key for watch sync coordinator
 private struct WatchSyncCoordinatorKey: EnvironmentKey {
-    static let defaultValue: WatchSyncCoordinator? = nil
+    static let defaultValue: iOSWatchSyncCoordinator? = nil
 }
 
 extension EnvironmentValues {
-    var watchSyncCoordinator: WatchSyncCoordinator? {
+    var watchSyncCoordinator: iOSWatchSyncCoordinator? {
         get { self[WatchSyncCoordinatorKey.self] }
         set { self[WatchSyncCoordinatorKey.self] = newValue }
     }

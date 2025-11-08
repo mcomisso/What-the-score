@@ -12,7 +12,7 @@ import WhatScoreKit
 @main
 struct WTS_watch_Watch_AppApp: App {
     @Environment(\.scenePhase) var scenePhase
-    @State private var watchSyncCoordinator: WatchSyncCoordinator
+    @State private var watchSyncCoordinator: WatchOSWatchSyncCoordinator
     private let modelContainer: ModelContainer
 
     init() {
@@ -29,7 +29,7 @@ struct WTS_watch_Watch_AppApp: App {
             modelContainer = try ModelContainer(for: schema, configurations: [modelConfiguration])
 
             // Initialize WatchSyncCoordinator early so callbacks are set up before data arrives
-            watchSyncCoordinator = WatchSyncCoordinator(modelContainer: modelContainer)
+            watchSyncCoordinator = WatchOSWatchSyncCoordinator(modelContainer: modelContainer, syncService: nil, conversionService: nil)
 
             // Migrate any teams with empty colors
             migrateTeamColors()
@@ -73,11 +73,11 @@ struct WTS_watch_Watch_AppApp: App {
 
 // Environment key for watch sync coordinator
 private struct WatchSyncCoordinatorKey: EnvironmentKey {
-    static let defaultValue: WatchSyncCoordinator? = nil
+    static let defaultValue: WatchOSWatchSyncCoordinator? = nil
 }
 
 extension EnvironmentValues {
-    var watchSyncCoordinator: WatchSyncCoordinator? {
+    var watchSyncCoordinator: WatchOSWatchSyncCoordinator? {
         get { self[WatchSyncCoordinatorKey.self] }
         set { self[WatchSyncCoordinatorKey.self] = newValue }
     }

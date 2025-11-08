@@ -7,19 +7,21 @@ import OSLog
 private let logger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "com.mcomisso.ScoreMatching", category: "WatchSync")
 
 /// Coordinates data synchronization between iOS and watchOS using structured services
+/// @deprecated Use iOSWatchSyncCoordinator for iOS or WatchOSWatchSyncCoordinator for watchOS instead
+@available(*, deprecated, message: "Use iOSWatchSyncCoordinator for iOS or WatchOSWatchSyncCoordinator for watchOS instead")
 @MainActor
 @Observable
 public final class WatchSyncCoordinator {
 
     private let modelContainer: ModelContainer
-    private var syncService: DataSyncService
-    private let conversionService: DataConversionService
+    private var syncService: any DataSyncService
+    private let conversionService: any DataConversionService
     private let isWatch: Bool
 
     public init(
         modelContainer: ModelContainer,
-        syncService: DataSyncService? = nil,
-        conversionService: DataConversionService? = nil
+        syncService: (any DataSyncService)? = nil,
+        conversionService: (any DataConversionService)? = nil
     ) {
         self.modelContainer = modelContainer
         self.syncService = syncService ?? WatchConnectivityDataSyncService()
@@ -49,7 +51,7 @@ public final class WatchSyncCoordinator {
                 logger.info("Session activated, sending initial data to watch")
                 Task { @MainActor [weak self] in
                     try? await Task.sleep(nanoseconds: 1_000_000_000) // 1 second delay
-                    await self?.sendData()
+                    self?.sendData()
                 }
             }
         }
@@ -67,10 +69,10 @@ public final class WatchSyncCoordinator {
     /// Send current data to the paired device
     public func sendData() {
         let context = ModelContext(modelContainer)
+        let destination = isWatch ? "iPhone" : "watch"
 
         do {
             let syncData = try conversionService.createSyncData(from: context)
-            let destination = isWatch ? "iPhone" : "watch"
             logger.info("Sending data to \(destination): \(syncData.teams.count) teams, \(syncData.intervals.count) intervals")
             syncService.sendData(syncData)
         } catch {
@@ -94,18 +96,11 @@ public final class WatchSyncCoordinator {
 
     private func updateFromPairedDevice(_ syncData: SyncData) {
         let context = ModelContext(modelContainer)
-
+        let source = isWatch ? "iPhone" : "watch"
         do {
             try conversionService.updateModels(with: syncData, in: context)
-            let source = isWatch ? "iPhone" : "watch"
             logger.info("Successfully updated from \(source) data")
-
-            // Trigger UI refresh
-            DispatchQueue.main.async {
-                NotificationCenter.default.post(name: NSNotification.Name("TeamsDidUpdate"), object: nil)
-            }
         } catch {
-            let source = isWatch ? "iPhone" : "watch"
             logger.error("Failed to update from \(source): \(error.localizedDescription)")
         }
     }
