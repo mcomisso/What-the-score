@@ -12,7 +12,7 @@ import WhatScoreKit
 @main
 struct WTS_watch_Watch_AppApp: App {
     @Environment(\.scenePhase) var scenePhase
-    @State private var watchSyncCoordinator: WatchSyncCoordinator?
+    @State private var watchSyncCoordinator: WatchSyncCoordinator
     private let modelContainer: ModelContainer
 
     init() {
@@ -27,6 +27,9 @@ struct WTS_watch_Watch_AppApp: App {
                 cloudKitDatabase: .private("iCloud.com.mcomisso.ScoreMatching")
             )
             modelContainer = try ModelContainer(for: schema, configurations: [modelConfiguration])
+
+            // Initialize WatchSyncCoordinator early so callbacks are set up before data arrives
+            watchSyncCoordinator = WatchSyncCoordinator(modelContainer: modelContainer)
 
             // Migrate any teams with empty colors
             migrateTeamColors()
@@ -62,16 +65,9 @@ struct WTS_watch_Watch_AppApp: App {
         WindowGroup {
             ContentView()
                 .environment(\.watchSyncCoordinator, watchSyncCoordinator)
-                .onAppear {
-                    if watchSyncCoordinator == nil {
-                        watchSyncCoordinator = WatchSyncCoordinator(modelContainer: modelContainer)
-                        // Note: Initial notification will be sent when app becomes active (onChange)
-                        // to ensure WCSession has time to activate
-                    }
-                }
         }
         .modelContainer(modelContainer)
-        // CloudKit automatically syncs data changes - no manual notification needed
+        // WatchConnectivity handles real-time sync, CloudKit provides backup sync
     }
 }
 

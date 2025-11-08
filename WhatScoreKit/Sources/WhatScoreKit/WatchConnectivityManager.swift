@@ -29,7 +29,10 @@ public final class WatchConnectivityManager: NSObject, @unchecked Sendable {
     /// Callback for when reinitialize command is received
     public var onReinitializeApp: (() -> Void)?
 
-    /// Callback for when team data is received (teams with colors and scores)
+    /// Callback for when team and interval data is received
+    public var onDataReceived: ((_ teams: [[String: Any]], _ intervals: [[String: Any]]) -> Void)?
+
+    /// Legacy callback for backward compatibility (deprecated, use onDataReceived)
     public var onTeamDataReceived: (([[String: Any]]) -> Void)?
 
     override private init() {
@@ -49,29 +52,32 @@ public final class WatchConnectivityManager: NSObject, @unchecked Sendable {
 
     // MARK: - Sending Data
 
-    /// Send team data to the paired device using application context
-    /// This ensures the paired device always has the latest team colors and scores
-    public func sendTeamData(_ teams: [[String: Any]]) {
+    /// Send team and interval data to the paired device using application context
+    /// This ensures the paired device always has the latest team colors, scores, and intervals
+    public func sendTeamData(_ teams: [[String: Any]], intervals: [[String: Any]] = []) {
         guard let session = session else {
-            logger.warning("❌ Cannot send team data: session not available")
-            print("❌ WatchConnectivity: Cannot send team data - session not available")
+            logger.warning("❌ Cannot send data: session not available")
+            print("❌ WatchConnectivity: Cannot send data - session not available")
             return
         }
 
         guard session.activationState == .activated else {
-            logger.warning("❌ Cannot send team data: session not activated (state: \(session.activationState.rawValue))")
+            logger.warning("❌ Cannot send data: session not activated (state: \(session.activationState.rawValue))")
             print("❌ WatchConnectivity: Session not activated, state: \(session.activationState.rawValue)")
             return
         }
 
-        let context: [String: Any] = ["teams": teams]
+        let context: [String: Any] = [
+            "teams": teams,
+            "intervals": intervals
+        ]
 
         do {
             try session.updateApplicationContext(context)
-            logger.info("✅ Team data sent via application context: \(teams.count) teams")
-            print("✅ WatchConnectivity: Sent \(teams.count) teams to paired device")
+            logger.info("✅ Data sent via application context: \(teams.count) teams, \(intervals.count) intervals")
+            print("✅ WatchConnectivity: Sent \(teams.count) teams, \(intervals.count) intervals to paired device")
         } catch {
-            logger.error("❌ Failed to send team data: \(error.localizedDescription)")
+            logger.error("❌ Failed to send data: \(error.localizedDescription)")
             print("❌ WatchConnectivity: Failed to send - \(error.localizedDescription)")
         }
     }
@@ -261,13 +267,22 @@ extension WatchConnectivityManager: WCSessionDelegate {
 
             // Extract data on main queue
             let teamsData = context["teams"] as? [[String: Any]]
+            let intervalsData = context["intervals"] as? [[String: Any]]
             let notificationString = context["notification"] as? String
 
-            // Handle team data first (higher priority)
+            // Handle team and interval data (higher priority)
             if let teams = teamsData {
-                print("📥 WatchConnectivity: Received \(teams.count) teams from paired device")
-                self.onTeamDataReceived?(teams)
-                logger.info("✅ Received team data from application context: \(teams.count) teams")
+                let intervals = intervalsData ?? []
+                print("📥 WatchConnectivity: Received \(teams.count) teams, \(intervals.count) intervals from paired device")
+
+                // Call new callback if set, otherwise fall back to legacy callback
+                if self.onDataReceived != nil {
+                    self.onDataReceived?(teams, intervals)
+                    logger.info("✅ Received data from application context: \(teams.count) teams, \(intervals.count) intervals")
+                } else {
+                    self.onTeamDataReceived?(teams)
+                    logger.info("✅ Received team data from application context (legacy): \(teams.count) teams")
+                }
             }
 
             // Handle notifications
