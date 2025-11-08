@@ -38,9 +38,16 @@ public final class WatchConnectivityManager: NSObject, @unchecked Sendable {
     override private init() {
         super.init()
 
+        #if os(iOS)
+        print("📱 WatchConnectivityManager: Initializing on iOS")
+        #elseif os(watchOS)
+        print("⌚️ WatchConnectivityManager: Initializing on watchOS")
+        #endif
+
         if WCSession.isSupported() {
             session = WCSession.default
             session?.delegate = self
+            print("🔄 WatchConnectivity: About to activate session...")
             session?.activate()
             logger.info("🔄 WCSession activation initiated")
             print("🔄 WatchConnectivity: Activation initiated")
@@ -73,8 +80,14 @@ public final class WatchConnectivityManager: NSObject, @unchecked Sendable {
             "intervals": intervals
         ]
 
+        // Log current reachability status
+        let reachabilityStatus = session.isReachable ? "✅ REACHABLE" : "⏸️ NOT REACHABLE"
+        print("🔍 WatchConnectivity: Current session status - \(reachabilityStatus)")
+        logger.info("Current session reachability: \(session.isReachable)")
+
         // Try immediate message first if reachable for real-time updates
         if session.isReachable {
+            print("📤 WatchConnectivity: Attempting to send via immediate message (real-time)...")
             session.sendMessage(message, replyHandler: nil, errorHandler: { [weak self] error in
                 logger.error("❌ Failed to send immediate message: \(error.localizedDescription)")
                 print("❌ WatchConnectivity: Failed to send immediate message - \(error.localizedDescription)")
@@ -232,21 +245,44 @@ extension WatchConnectivityManager: WCSessionDelegate {
     nonisolated public func sessionReachabilityDidChange(_ session: WCSession) {
         DispatchQueue.main.async {
             self.isReachable = session.isReachable
-            logger.info("Session reachability changed: \(session.isReachable)")
+            let status = session.isReachable ? "✅ REACHABLE" : "⏸️ NOT REACHABLE"
+            logger.info("Session reachability changed: \(status)")
+            print("🔄 WatchConnectivity: Session reachability changed: \(status)")
         }
     }
 
     // MARK: - Receiving Messages
 
     nonisolated public func session(_ session: WCSession, didReceiveMessage message: [String : Any]) {
-        logger.info("Received message: \(message.keys)")
+        logger.info("📨 Received immediate message with keys: \(message.keys)")
+        print("📨 WatchConnectivity: Received immediate message with keys: \(message.keys)")
 
-        // Extract notification and command
-        let notification = message["notification"] as? String
-        let command = message["command"] as? String
+        // WatchConnectivity data is safe to pass across isolation boundaries (ObjC NSDictionary)
+        nonisolated(unsafe) let msg = message
 
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
+
+            // Extract data types from message
+            let teamsData = msg["teams"] as? [[String: Any]]
+            let intervalsData = msg["intervals"] as? [[String: Any]]
+            let notification = msg["notification"] as? String
+            let command = msg["command"] as? String
+
+            // Handle team and interval data (real-time sync)
+            if let teams = teamsData {
+                let intervals = intervalsData ?? []
+                print("📥 WatchConnectivity: Received \(teams.count) teams, \(intervals.count) intervals via immediate message")
+
+                // Call callback if set
+                if self.onDataReceived != nil {
+                    self.onDataReceived?(teams, intervals)
+                    logger.info("✅ Received data from immediate message: \(teams.count) teams, \(intervals.count) intervals")
+                } else {
+                    self.onTeamDataReceived?(teams)
+                    logger.info("✅ Received team data from immediate message (legacy): \(teams.count) teams")
+                }
+            }
 
             // Handle notifications
             if let notification = notification {

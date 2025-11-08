@@ -13,18 +13,32 @@ public final class WatchConnectivityDataSyncService: DataSyncService {
     public var onDataReceived: ((SyncData) -> Void)?
     public var onSessionActivated: (() -> Void)? {
         didSet {
+            // Update the connectivity manager's callback
             connectivityManager.onSessionActivated = onSessionActivated
+
+            // If session is already activated, call the callback immediately
+            if connectivityManager.isSessionActivated {
+                logger.info("Session already activated, calling onSessionActivated immediately")
+                print("⚡️ WatchConnectivity: Session already activated, triggering callback now")
+                onSessionActivated?()
+            }
         }
     }
 
     public init(connectivityManager: WatchConnectivityManager = .shared) {
+        print("🔧 WatchConnectivityDataSyncService: init() called")
+        print("🔧 WatchConnectivityDataSyncService: Getting WatchConnectivityManager.shared...")
         self.connectivityManager = connectivityManager
+        print("🔧 WatchConnectivityDataSyncService: Setting up callbacks...")
         setupCallbacks()
+        print("✅ WatchConnectivityDataSyncService: Initialization complete")
     }
 
     private func setupCallbacks() {
+        // Set up data received callback
         connectivityManager.onDataReceived = { [weak self] teamsDict, intervalsDict in
             logger.info("Received data from paired device")
+            print("📥 WatchConnectivityDataSyncService: Processing received data")
 
             // Build dictionary for SyncData parsing
             let dict: [String: Any] = [
@@ -34,9 +48,11 @@ public final class WatchConnectivityDataSyncService: DataSyncService {
 
             guard let syncData = SyncData.from(dictionary: dict) else {
                 logger.error("Failed to parse SyncData from received dictionary")
+                print("❌ WatchConnectivityDataSyncService: Failed to parse SyncData")
                 return
             }
 
+            print("✅ WatchConnectivityDataSyncService: Parsed SyncData successfully, calling onDataReceived callback")
             self?.onDataReceived?(syncData)
         }
     }

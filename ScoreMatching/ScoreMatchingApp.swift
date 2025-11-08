@@ -84,7 +84,7 @@ struct ScoreMatchingApp: App {
                 .onChange(of: shouldKeepScreenAwake, initial: false) { _, newValue in
                     UIApplication.shared.isIdleTimerDisabled = newValue
                 }
-                .environment(watchSyncCoordinator)
+                .environment(\.watchSyncCoordinator, watchSyncCoordinator)
         }
         .modelContainer(modelContainer)
     }

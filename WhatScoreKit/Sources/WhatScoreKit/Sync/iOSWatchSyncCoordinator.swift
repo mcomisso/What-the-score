@@ -19,23 +19,33 @@ public final class iOSWatchSyncCoordinator: WatchSyncCoordinatorProtocol {
         syncService: (any DataSyncService)? = nil,
         conversionService: (any DataConversionService)? = nil
     ) {
+        print("📱 iOSWatchSyncCoordinator: init() called")
         self.modelContainer = modelContainer
+        print("📱 iOSWatchSyncCoordinator: Creating WatchConnectivityDataSyncService...")
         self.syncService = syncService ?? WatchConnectivityDataSyncService()
+        print("📱 iOSWatchSyncCoordinator: Creating SwiftDataConversionService...")
         self.conversionService = conversionService ?? SwiftDataConversionService()
 
+        print("📱 iOSWatchSyncCoordinator: About to setup callbacks...")
         setupCallbacks()
         logger.info("iOS Watch Sync Coordinator initialized")
+        print("✅ iOSWatchSyncCoordinator: Initialization complete")
     }
 
     // MARK: - Setup
 
     private func setupCallbacks() {
+        print("📱 iOSWatchSyncCoordinator: Setting up callbacks")
+
         // Send initial data when session activates (iOS is source of truth)
         syncService.onSessionActivated = { [weak self] in
             logger.info("WatchConnectivity session activated, sending initial data to Apple Watch")
+            print("🔔 iOSWatchSyncCoordinator: onSessionActivated callback triggered!")
             Task { @MainActor [weak self] in
                 // Small delay to ensure session is fully ready
+                print("⏳ iOSWatchSyncCoordinator: Waiting 1 second before initial sync...")
                 try? await Task.sleep(nanoseconds: 1_000_000_000) // 1 second
+                print("📤 iOSWatchSyncCoordinator: Sending initial data now...")
                 await self?.sendData()
             }
         }
@@ -43,22 +53,33 @@ public final class iOSWatchSyncCoordinator: WatchSyncCoordinatorProtocol {
         // Handle data received from Apple Watch (bidirectional sync)
         syncService.onDataReceived = { [weak self] syncData in
             logger.info("Received data from Apple Watch: \(syncData.teams.count) teams, \(syncData.intervals.count) intervals")
-            self?.updateFromWatch(syncData)
+            print("📥 iOSWatchSyncCoordinator: Received data from Watch - \(syncData.teams.count) teams, \(syncData.intervals.count) intervals")
+
+            Task { @MainActor [weak self] in
+                self?.updateFromWatch(syncData)
+            }
         }
+
+        print("✅ iOSWatchSyncCoordinator: Callbacks setup complete")
     }
 
     // MARK: - Send Data to Watch
 
     /// Send current iPhone data to Apple Watch
     public func sendData() {
+        print("🚀 iOSWatchSyncCoordinator: sendData() called")
         let context = ModelContext(modelContainer)
 
         do {
             let syncData = try conversionService.createSyncData(from: context)
             logger.info("Sending data to Apple Watch: \(syncData.teams.count) teams, \(syncData.intervals.count) intervals")
+            print("📊 iOSWatchSyncCoordinator: Created SyncData - \(syncData.teams.count) teams, \(syncData.intervals.count) intervals")
+            print("📤 iOSWatchSyncCoordinator: Calling syncService.sendData()...")
             syncService.sendData(syncData)
+            print("✅ iOSWatchSyncCoordinator: syncService.sendData() completed")
         } catch {
             logger.error("Failed to create sync data for Apple Watch: \(error.localizedDescription)")
+            print("❌ iOSWatchSyncCoordinator: Failed to create sync data - \(error.localizedDescription)")
         }
     }
 

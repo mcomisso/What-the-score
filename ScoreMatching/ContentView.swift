@@ -192,7 +192,10 @@ struct ContentView: View {
                 name: $bindingTeam.name,
                 lastTapped: $lastTapped,
                 onScoreChanged: {
+                    print("📱 ContentView: Score changed callback triggered!")
+                    print("📱 ContentView: watchSyncCoordinator is \(watchSyncCoordinator == nil ? "nil" : "not nil")")
                     watchSyncCoordinator?.sendTeamDataToWatch()
+                    print("📱 ContentView: Called sendTeamDataToWatch()")
                 }
             )
             .background(Color(hex: team.color))

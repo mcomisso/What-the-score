@@ -19,27 +19,41 @@ public final class WatchOSWatchSyncCoordinator: WatchSyncCoordinatorProtocol {
         syncService: (any DataSyncService)? = nil,
         conversionService: (any DataConversionService)? = nil
     ) {
+        print("⌚️ WatchOSWatchSyncCoordinator: init() called")
         self.modelContainer = modelContainer
+        print("⌚️ WatchOSWatchSyncCoordinator: Creating WatchConnectivityDataSyncService...")
         self.syncService = syncService ?? WatchConnectivityDataSyncService()
+        print("⌚️ WatchOSWatchSyncCoordinator: Creating SwiftDataConversionService...")
         self.conversionService = conversionService ?? SwiftDataConversionService()
 
+        print("⌚️ WatchOSWatchSyncCoordinator: About to setup callbacks...")
         setupCallbacks()
         logger.info("watchOS Watch Sync Coordinator initialized")
+        print("✅ WatchOSWatchSyncCoordinator: Initialization complete")
     }
 
     // MARK: - Setup
 
     private func setupCallbacks() {
+        print("⌚️ WatchOSWatchSyncCoordinator: Setting up callbacks")
+
         // Watch waits to receive data from iPhone (iPhone is source of truth)
         syncService.onSessionActivated = {
             logger.info("WatchConnectivity session activated, waiting to receive data from iPhone")
+            print("🔔 WatchOSWatchSyncCoordinator: onSessionActivated callback triggered - waiting for iPhone data")
         }
 
         // Handle data received from iPhone
         syncService.onDataReceived = { [weak self] syncData in
             logger.info("Received data from iPhone: \(syncData.teams.count) teams, \(syncData.intervals.count) intervals")
-            self?.updateFromiPhone(syncData)
+            print("📥 WatchOSWatchSyncCoordinator: Received data from iPhone - \(syncData.teams.count) teams, \(syncData.intervals.count) intervals")
+
+            Task { @MainActor [weak self] in
+                self?.updateFromiPhone(syncData)
+            }
         }
+
+        print("✅ WatchOSWatchSyncCoordinator: Callbacks setup complete")
     }
 
     // MARK: - Send Data to iPhone
