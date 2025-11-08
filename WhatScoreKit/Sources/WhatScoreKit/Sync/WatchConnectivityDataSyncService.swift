@@ -11,6 +11,14 @@ public final class WatchConnectivityDataSyncService: DataSyncService {
     private let connectivityManager: WatchConnectivityManager
 
     public var onDataReceived: ((SyncData) -> Void)?
+    public var onPreferencesReceived: (([String: Any]) -> Void)? {
+        didSet {
+            // Forward the callback to the connectivity manager
+            connectivityManager.onPreferencesReceived = { [weak self] preferences in
+                self?.onPreferencesReceived?(preferences)
+            }
+        }
+    }
     public var onSessionActivated: (() -> Void)? {
         didSet {
             // Update the connectivity manager's callback
@@ -55,6 +63,8 @@ public final class WatchConnectivityDataSyncService: DataSyncService {
             print("✅ WatchConnectivityDataSyncService: Parsed SyncData successfully, calling onDataReceived callback")
             self?.onDataReceived?(syncData)
         }
+
+        // Preferences callback is now handled by didSet on onPreferencesReceived property
     }
 
     public func sendData(_ syncData: SyncData) {
@@ -69,6 +79,12 @@ public final class WatchConnectivityDataSyncService: DataSyncService {
 
         logger.info("Sending data: \(teams.count) teams, \(intervals.count) intervals")
         connectivityManager.sendTeamData(teams, intervals: intervals)
+    }
+
+    public func sendPreferences(_ preferences: [String: Any]) {
+        logger.info("Sending preferences: \(preferences.keys)")
+        print("📤 WatchConnectivityDataSyncService: Sending preferences - \(preferences.keys)")
+        connectivityManager.sendPreferences(preferences)
     }
 }
 

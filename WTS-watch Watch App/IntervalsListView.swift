@@ -5,6 +5,7 @@ import WhatScoreKit
 struct IntervalsListView: View {
     @Environment(\.dismiss) var dismiss
     @Environment(\.modelContext) var modelContext
+    @Environment(\.watchSyncCoordinator) var watchSyncCoordinator
 
     @Query(sort: \Team.creationDate) var teams: [Team]
     @Query(sort: \Interval.date) var intervals: [Interval]
@@ -120,6 +121,17 @@ struct IntervalsListView: View {
         let interval = Interval.create(name: name, from: teams)
         modelContext.insert(interval)
         newIntervalName = ""
+
+        // Immediately sync to iPhone after creating interval
+        do {
+            try modelContext.save()
+            print("⌚️ Watch IntervalsListView: Created interval '\(name)', syncing to iPhone...")
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                watchSyncCoordinator?.sendData()
+            }
+        } catch {
+            print("❌ Watch IntervalsListView: Failed to save after creating interval: \(error)")
+        }
     }
 }
 

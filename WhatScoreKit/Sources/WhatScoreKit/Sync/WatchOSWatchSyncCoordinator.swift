@@ -53,6 +53,16 @@ public final class WatchOSWatchSyncCoordinator: WatchSyncCoordinatorProtocol {
             }
         }
 
+        // Handle preferences received from iPhone
+        syncService.onPreferencesReceived = { [weak self] preferences in
+            logger.info("Received preferences from iPhone: \(preferences.keys)")
+            print("📥 WatchOSWatchSyncCoordinator: Received preferences from iPhone - \(preferences.keys)")
+
+            Task { @MainActor [weak self] in
+                self?.updatePreferences(preferences)
+            }
+        }
+
         print("✅ WatchOSWatchSyncCoordinator: Callbacks setup complete")
     }
 
@@ -87,5 +97,36 @@ public final class WatchOSWatchSyncCoordinator: WatchSyncCoordinatorProtocol {
         } catch {
             logger.error("Failed to update from iPhone: \(error.localizedDescription)")
         }
+    }
+
+    // MARK: - Preferences Sync
+
+    /// Send preferences to iPhone
+    public func sendPreferences(_ preferences: [String: Any]) {
+        print("📤 WatchOSWatchSyncCoordinator: Sending preferences to iPhone - \(preferences.keys)")
+        logger.info("Sending preferences to iPhone: \(preferences.keys)")
+        syncService.sendPreferences(preferences)
+    }
+
+    /// Update local preferences from iPhone
+    private func updatePreferences(_ preferences: [String: Any]) {
+        print("🔄 WatchOSWatchSyncCoordinator: Updating local preferences from iPhone")
+        logger.info("Updating preferences from iPhone: \(preferences.keys)")
+
+        // Update UserDefaults with received preferences
+        for (key, value) in preferences {
+            UserDefaults.standard.set(value, forKey: key)
+            print("📝 WatchOSWatchSyncCoordinator: Updated preference '\(key)' = \(value)")
+        }
+
+        // Synchronize to ensure changes are persisted immediately
+        UserDefaults.standard.synchronize()
+
+        // Post notification to trigger @AppStorage updates
+        #if canImport(WatchKit)
+        NotificationCenter.default.post(name: UserDefaults.didChangeNotification, object: nil)
+        #endif
+
+        logger.info("Successfully updated preferences from iPhone")
     }
 }

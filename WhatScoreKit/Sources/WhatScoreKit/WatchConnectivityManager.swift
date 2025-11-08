@@ -35,6 +35,9 @@ public final class WatchConnectivityManager: NSObject, @unchecked Sendable {
     /// Legacy callback for backward compatibility (deprecated, use onDataReceived)
     public var onTeamDataReceived: (([[String: Any]]) -> Void)?
 
+    /// Callback for when preferences are received
+    public var onPreferencesReceived: ((_ preferences: [String: Any]) -> Void)?
+
     override private init() {
         super.init()
 
@@ -204,6 +207,61 @@ public final class WatchConnectivityManager: NSObject, @unchecked Sendable {
             logger.error("Failed to send reinitialize command: \(error.localizedDescription)")
         })
     }
+
+    // MARK: - Sending Preferences
+
+    /// Send preferences update to the paired device
+    /// - Parameter preferences: Dictionary of preference keys and values to sync
+    public func sendPreferences(_ preferences: [String: Any]) {
+        guard let session = session else {
+            logger.warning("Cannot send preferences: session not available")
+            print("❌ WatchConnectivity: Cannot send preferences - session not available")
+            return
+        }
+
+        guard session.activationState == .activated else {
+            logger.warning("Cannot send preferences: session not activated (state: \(session.activationState.rawValue))")
+            print("❌ WatchConnectivity: Session not activated, state: \(session.activationState.rawValue)")
+            return
+        }
+
+        let message: [String: Any] = ["preferences": preferences]
+
+        // Log current reachability status
+        let reachabilityStatus = session.isReachable ? "✅ REACHABLE" : "⏸️ NOT REACHABLE"
+        print("🔍 WatchConnectivity: Sending preferences - \(reachabilityStatus)")
+        logger.info("Sending preferences, reachability: \(session.isReachable)")
+
+        // Try immediate message first if reachable for real-time updates
+        if session.isReachable {
+            print("📤 WatchConnectivity: Sending preferences via immediate message...")
+            session.sendMessage(message, replyHandler: nil, errorHandler: { [weak self] error in
+                logger.error("❌ Failed to send preferences via message: \(error.localizedDescription)")
+                print("❌ WatchConnectivity: Failed to send preferences - \(error.localizedDescription)")
+                // Fallback to application context on error
+                self?.updatePreferencesContext(session: session, message: message, preferences: preferences)
+            })
+            logger.info("✅ Preferences sent via immediate message: \(preferences.keys)")
+            print("✅ WatchConnectivity: Sent preferences via immediate message: \(preferences.keys)")
+        } else {
+            // Use application context for background delivery when not reachable
+            logger.info("⏳ Watch not reachable, using application context for preferences")
+            print("⏳ WatchConnectivity: Watch not reachable, using application context for preferences")
+            updatePreferencesContext(session: session, message: message, preferences: preferences)
+        }
+    }
+
+    /// Update application context with preferences (fallback or background delivery)
+    private func updatePreferencesContext(session: WCSession, message: [String: Any], preferences: [String: Any]) {
+        do {
+            try session.updateApplicationContext(message)
+            logger.info("✅ Preferences sent via application context: \(preferences.keys)")
+            print("✅ WatchConnectivity: Sent preferences via application context: \(preferences.keys)")
+        } catch {
+            logger.error("❌ Failed to update application context with preferences: \(error.localizedDescription)")
+            print("❌ WatchConnectivity: Failed to update application context with preferences - \(error.localizedDescription)")
+        }
+    }
 }
 
 // MARK: - WCSessionDelegate
@@ -268,6 +326,7 @@ extension WatchConnectivityManager: WCSessionDelegate {
             let intervalsData = msg["intervals"] as? [[String: Any]]
             let notification = msg["notification"] as? String
             let command = msg["command"] as? String
+            let preferences = msg["preferences"] as? [String: Any]
 
             // Handle team and interval data (real-time sync)
             if let teams = teamsData {
@@ -282,6 +341,13 @@ extension WatchConnectivityManager: WCSessionDelegate {
                     self.onTeamDataReceived?(teams)
                     logger.info("✅ Received team data from immediate message (legacy): \(teams.count) teams")
                 }
+            }
+
+            // Handle preferences
+            if let preferences = preferences {
+                print("📥 WatchConnectivity: Received preferences via immediate message: \(preferences.keys)")
+                self.onPreferencesReceived?(preferences)
+                logger.info("✅ Received preferences from immediate message: \(preferences.keys)")
             }
 
             // Handle notifications
@@ -326,6 +392,7 @@ extension WatchConnectivityManager: WCSessionDelegate {
             let teamsData = context["teams"] as? [[String: Any]]
             let intervalsData = context["intervals"] as? [[String: Any]]
             let notificationString = context["notification"] as? String
+            let preferences = context["preferences"] as? [String: Any]
 
             // Handle team and interval data (higher priority)
             if let teams = teamsData {
@@ -340,6 +407,13 @@ extension WatchConnectivityManager: WCSessionDelegate {
                     self.onTeamDataReceived?(teams)
                     logger.info("✅ Received team data from application context (legacy): \(teams.count) teams")
                 }
+            }
+
+            // Handle preferences
+            if let preferences = preferences {
+                print("📥 WatchConnectivity: Received preferences from application context: \(preferences.keys)")
+                self.onPreferencesReceived?(preferences)
+                logger.info("✅ Received preferences from application context: \(preferences.keys)")
             }
 
             // Handle notifications

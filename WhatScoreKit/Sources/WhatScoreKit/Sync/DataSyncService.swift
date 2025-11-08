@@ -6,8 +6,14 @@ public protocol DataSyncService {
     /// Send data to paired device
     func sendData(_ syncData: SyncData)
 
+    /// Send preferences to paired device
+    func sendPreferences(_ preferences: [String: Any])
+
     /// Callback when data is received from paired device
     var onDataReceived: ((SyncData) -> Void)? { get set }
+
+    /// Callback when preferences are received from paired device
+    var onPreferencesReceived: (([String: Any]) -> Void)? { get set }
 
     /// Callback when session becomes activated
     var onSessionActivated: (() -> Void)? { get set }

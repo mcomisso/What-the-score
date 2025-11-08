@@ -5,6 +5,7 @@ import SwiftData
 
 struct IntervalsList: View {
     @Environment(\.modelContext) var modelContext
+    @Environment(\.watchSyncCoordinator) var watchSyncCoordinator
     @Query(sort: \Interval.date) var intervals: [Interval]
     @Query(sort: \Team.creationDate) var teams: [Team]
 
@@ -30,6 +31,16 @@ struct IntervalsList: View {
                     .onDelete { indexSet in
                         indexSet.forEach {
                             modelContext.delete(intervals[$0])
+                        }
+                        // Sync to watch after deleting intervals
+                        do {
+                            try modelContext.save()
+                            print("📱 iOS IntervalsList: Deleted intervals, syncing to watch...")
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                                watchSyncCoordinator?.sendData()
+                            }
+                        } catch {
+                            print("❌ iOS IntervalsList: Failed to save after deleting intervals: \(error)")
                         }
                     }
                 }
@@ -63,6 +74,17 @@ struct IntervalsList: View {
         let interval = Interval.create(name: name, from: teams)
         modelContext.insert(interval)
         newIntervalName = ""
+
+        // Immediately sync to watch after creating interval
+        do {
+            try modelContext.save()
+            print("📱 iOS IntervalsList: Created interval '\(name)', syncing to watch...")
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                watchSyncCoordinator?.sendData()
+            }
+        } catch {
+            print("❌ iOS IntervalsList: Failed to save after creating interval: \(error)")
+        }
     }
 }
 

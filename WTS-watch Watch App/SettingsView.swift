@@ -22,7 +22,21 @@ struct SettingsView: View {
                 // Settings section
                 Section("Preferences") {
                     Toggle("Negative Points", isOn: $shouldAllowNegativePoints)
+                        .onChange(of: shouldAllowNegativePoints) { oldValue, newValue in
+                            print("⌚️ Watch Settings: shouldAllowNegativePoints changed from \(oldValue) to \(newValue)")
+                            let preferences: [String: Any] = [
+                                "shouldAllowNegativePoints": newValue
+                            ]
+                            watchSyncCoordinator?.sendPreferences(preferences)
+                        }
                     Toggle("Intervals", isOn: $hasEnabledIntervals)
+                        .onChange(of: hasEnabledIntervals) { oldValue, newValue in
+                            print("⌚️ Watch Settings: hasEnabledIntervals changed from \(oldValue) to \(newValue)")
+                            let preferences: [String: Any] = [
+                                "hasEnabledIntervals": newValue
+                            ]
+                            watchSyncCoordinator?.sendPreferences(preferences)
+                        }
                 }
 
                 // Actions section

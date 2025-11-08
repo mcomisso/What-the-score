@@ -75,6 +75,17 @@ struct ContentView: View {
     private func createQuickInterval(name: String) {
         let interval = Interval.create(name: name, from: teams)
         modelContext.insert(interval)
+
+        // Immediately sync to watch after creating quick interval
+        do {
+            try modelContext.save()
+            print("📱 iOS ContentView: Created quick interval '\(name)', syncing to watch...")
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                watchSyncCoordinator?.sendData()
+            }
+        } catch {
+            print("❌ iOS ContentView: Failed to save after creating quick interval: \(error)")
+        }
     }
 
     var bottomToolbar: some View {

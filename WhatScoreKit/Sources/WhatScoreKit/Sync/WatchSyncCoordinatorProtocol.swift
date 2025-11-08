@@ -15,4 +15,7 @@ public protocol WatchSyncCoordinatorProtocol: AnyObject, Observable {
 
     /// Send current data to the paired device
     func sendData()
+
+    /// Send preferences to the paired device
+    func sendPreferences(_ preferences: [String: Any])
 }

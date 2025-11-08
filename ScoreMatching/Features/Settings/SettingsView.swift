@@ -177,6 +177,13 @@ struct SettingsView: View {
                             "Keep screen awake",
                             isOn: $shouldKeepScreenAwake
                         )
+                        .onChange(of: shouldKeepScreenAwake) { oldValue, newValue in
+                            print("📱 iOS Settings: shouldKeepScreenAwake changed from \(oldValue) to \(newValue)")
+                            let preferences: [String: Any] = [
+                                "shouldKeepScreenAwake": newValue
+                            ]
+                            watchSyncCoordinator?.sendPreferences(preferences)
+                        }
                     }
 
 
@@ -186,10 +193,24 @@ struct SettingsView: View {
                             "Use intervals",
                             isOn: $hasEnabledIntervals
                         )
+                        .onChange(of: hasEnabledIntervals) { oldValue, newValue in
+                            print("📱 iOS Settings: hasEnabledIntervals changed from \(oldValue) to \(newValue)")
+                            let preferences: [String: Any] = [
+                                "hasEnabledIntervals": newValue
+                            ]
+                            watchSyncCoordinator?.sendPreferences(preferences)
+                        }
                         Toggle(
                             "Allow negative points",
                             isOn: $shouldAllowNegativePoints
                         )
+                        .onChange(of: shouldAllowNegativePoints) { oldValue, newValue in
+                            print("📱 iOS Settings: shouldAllowNegativePoints changed from \(oldValue) to \(newValue)")
+                            let preferences: [String: Any] = [
+                                "shouldAllowNegativePoints": newValue
+                            ]
+                            watchSyncCoordinator?.sendPreferences(preferences)
+                        }
                     }
 
                     // MARK: - About

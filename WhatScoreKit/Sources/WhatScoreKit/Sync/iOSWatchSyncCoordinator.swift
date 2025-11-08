@@ -2,6 +2,10 @@ import Foundation
 import SwiftData
 import OSLog
 
+#if canImport(UIKit)
+import UIKit
+#endif
+
 private let logger = Logger(subsystem: "com.mcomisso.ScoreMatching.WhatScoreKit", category: "iOSWatchSync")
 
 /// iOS-specific Watch Sync Coordinator
@@ -60,6 +64,16 @@ public final class iOSWatchSyncCoordinator: WatchSyncCoordinatorProtocol {
             }
         }
 
+        // Handle preferences received from Apple Watch
+        syncService.onPreferencesReceived = { [weak self] preferences in
+            logger.info("Received preferences from Apple Watch: \(preferences.keys)")
+            print("📥 iOSWatchSyncCoordinator: Received preferences from Watch - \(preferences.keys)")
+
+            Task { @MainActor [weak self] in
+                self?.updatePreferences(preferences)
+            }
+        }
+
         print("✅ iOSWatchSyncCoordinator: Callbacks setup complete")
     }
 
@@ -99,5 +113,36 @@ public final class iOSWatchSyncCoordinator: WatchSyncCoordinatorProtocol {
         } catch {
             logger.error("Failed to update from Apple Watch: \(error.localizedDescription)")
         }
+    }
+
+    // MARK: - Preferences Sync
+
+    /// Send preferences to Apple Watch
+    public func sendPreferences(_ preferences: [String: Any]) {
+        print("📤 iOSWatchSyncCoordinator: Sending preferences to Watch - \(preferences.keys)")
+        logger.info("Sending preferences to Apple Watch: \(preferences.keys)")
+        syncService.sendPreferences(preferences)
+    }
+
+    /// Update local preferences from Apple Watch
+    private func updatePreferences(_ preferences: [String: Any]) {
+        print("🔄 iOSWatchSyncCoordinator: Updating local preferences from Watch")
+        logger.info("Updating preferences from Apple Watch: \(preferences.keys)")
+
+        // Update UserDefaults with received preferences
+        for (key, value) in preferences {
+            UserDefaults.standard.set(value, forKey: key)
+            print("📝 iOSWatchSyncCoordinator: Updated preference '\(key)' = \(value)")
+        }
+
+        // Synchronize to ensure changes are persisted immediately
+        UserDefaults.standard.synchronize()
+
+        // Post notification to trigger @AppStorage updates
+        #if canImport(UIKit)
+        NotificationCenter.default.post(name: UserDefaults.didChangeNotification, object: nil)
+        #endif
+
+        logger.info("Successfully updated preferences from Apple Watch")
     }
 }
