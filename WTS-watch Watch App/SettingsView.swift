@@ -50,10 +50,25 @@ struct SettingsView: View {
                     }
                 }
 
-                // Info section
+                // Teams section
                 Section("Teams") {
-                    Text("\(teams.count) teams")
-                        .foregroundStyle(.secondary)
+                    ForEach(teams) { team in
+                        NavigationLink(destination: EditTeamView(team: team)) {
+                            HStack {
+                                Circle()
+                                    .fill(team.resolvedColor)
+                                    .frame(width: 12, height: 12)
+                                Text(team.name)
+                            }
+                        }
+                    }
+                    .onDelete(perform: deleteTeams)
+
+                    Button {
+                        addTeam()
+                    } label: {
+                        Label("Add Team", systemImage: "plus.circle.fill")
+                    }
                 }
             }
             .navigationTitle("Settings")
@@ -112,6 +127,46 @@ struct SettingsView: View {
             }
         } catch {
             print("⌚️ Watch Settings: Failed to save after reinitialize: \(error)")
+        }
+    }
+
+    private func addTeam() {
+        let team = Team(name: "Team \(teams.count + 1)")
+        modelContext.insert(team)
+        do {
+            try modelContext.save()
+            print("⌚️ Watch Settings: Added team '\(team.name)', sending data to iPhone...")
+            // Send data to iPhone after save completes
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                watchSyncCoordinator?.sendTeamDataToPhone()
+            }
+        } catch {
+            print("⌚️ Watch Settings: Failed to save after adding team: \(error)")
+        }
+    }
+
+    private func deleteTeams(at offsets: IndexSet) {
+        // Ensure at least 2 teams remain
+        guard teams.count - offsets.count >= 2 else {
+            print("⌚️ Watch Settings: Cannot delete team - must have at least 2 teams")
+            return
+        }
+
+        for index in offsets {
+            let team = teams[index]
+            print("⌚️ Watch Settings: Deleting team '\(team.name)'")
+            modelContext.delete(team)
+        }
+
+        do {
+            try modelContext.save()
+            print("⌚️ Watch Settings: Deleted teams, sending data to iPhone...")
+            // Send data to iPhone after save completes
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                watchSyncCoordinator?.sendTeamDataToPhone()
+            }
+        } catch {
+            print("⌚️ Watch Settings: Failed to save after deleting teams: \(error)")
         }
     }
 }
