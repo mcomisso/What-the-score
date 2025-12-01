@@ -1251,7 +1251,7 @@
 			repositoryURL = "https://github.com/TelemetryDeck/SwiftClient";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 1.0.0;
+				minimumVersion = 2.0.0;
 			};
 		};
 		B9A8A7642A86373900139043 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
@@ -1259,7 +1259,7 @@
 			repositoryURL = "https://github.com/firebase/firebase-ios-sdk.git";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 12.0.0;
+				minimumVersion = 12.6.0;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */

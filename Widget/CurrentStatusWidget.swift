@@ -46,6 +46,7 @@ struct IncrementScoreIntent: AppIntent {
 
         // Increment the score
         team.score.append(Score(time: .now, value: 1))
+        Analytics.log(.widgetScoreIncrement)
 
         try context.save()
 

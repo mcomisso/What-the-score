@@ -34,6 +34,7 @@ final class Connectivity: NSObject {
 
         startObserving()
         startPublishing()
+        Analytics.log(.multipeerStarted)
     }
 
     deinit {
@@ -53,6 +54,7 @@ final class Connectivity: NSObject {
         if !peers.isEmpty {
             do {
                 try session.send(data, toPeers: Array(peers), with: .reliable)
+                Analytics.log(.multipeerDataSent, with: ["peer_count": "\(peers.count)"])
             } catch {
                 logger.error("Failed to send data: \(error.localizedDescription)")
             }
@@ -77,6 +79,7 @@ extension Connectivity: MCNearbyServiceBrowserDelegate {
     func browser(_ browser: MCNearbyServiceBrowser, foundPeer peerID: MCPeerID, withDiscoveryInfo info: [String : String]?) {
         logger.info("Found peer: \(peerID.displayName)")
         self.peers.insert(peerID)
+        Analytics.log(.multipeerPeerFound, with: ["total_peers": "\(peers.count)"])
     }
 
     func browser(_ browser: MCNearbyServiceBrowser, lostPeer peerID: MCPeerID) {
@@ -104,6 +107,7 @@ extension Connectivity: MCSessionDelegate {
         logger.info("Data received from peer: \(peerID.displayName)")
         let jsonDecoder = JSONDecoder()
         if let decodedData = try? jsonDecoder.decode([CodableTeamData].self, from: data) {
+            Analytics.log(.multipeerDataReceived, with: ["team_count": "\(decodedData.count)"])
             DispatchQueue.main.async {
                 self.readOnlyData = decodedData
             }
@@ -116,10 +120,12 @@ extension Connectivity: MCSessionDelegate {
         switch state {
             case .connected:
                 logger.info("Peer \(peerID.displayName) connected")
+                Analytics.log(.multipeerConnected, with: ["connected_peers": "\(session.connectedPeers.count)"])
             case .connecting:
                 logger.info("Peer \(peerID.displayName) connecting")
             case .notConnected:
                 logger.info("Peer \(peerID.displayName) not connected")
+                Analytics.log(.multipeerDisconnected)
             @unknown default:
                 logger.warning("Peer \(peerID.displayName) entered unknown state")
         }

@@ -1,5 +1,5 @@
 {
-  "originHash" : "bb56893f355565d161efe9e97a961ea3e3dbdae79f3a5bd128aa2a763867d874",
+  "originHash" : "8a26c31ed68496b722be057cf40e8ea56b0b87a17df761030d6696090ba94285",
   "pins" : [
     {
       "identity" : "abseil-cpp-binary",
@@ -24,8 +24,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/firebase/firebase-ios-sdk.git",
       "state" : {
-        "revision" : "793b67f4652e1a39d03fab6650033768afe6d15e",
-        "version" : "12.5.0"
+        "revision" : "087bb95235f676c1a37e928769a5b6645dcbd325",
+        "version" : "12.6.0"
       }
     },
     {
@@ -141,8 +141,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/TelemetryDeck/SwiftClient",
       "state" : {
-        "revision" : "d20ccc4b8266cf739eede58cdfc7e9c6ffb41cda",
-        "version" : "1.5.1"
+        "revision" : "bc7467592166e8f93fbde0140d2757b0635e1712",
+        "version" : "2.9.10"
       }
     }
   ],

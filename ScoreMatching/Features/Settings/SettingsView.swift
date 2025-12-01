@@ -61,6 +61,7 @@ struct SettingsView: View {
                     set: { newColor in
                         print("📱 iOS Settings: ColorPicker SET for '\(team.name)' - NEW COLOR: \(newColor.toHex(alpha: false))")
                         bindableTeam.resolvedColor = newColor
+                        Analytics.log(.teamColorChanged)
                         // Immediately send to watch after color change
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
                             print("📱 iOS Settings: Triggering sendTeamDataToWatch after color change")
@@ -86,6 +87,7 @@ struct SettingsView: View {
                 self.teams.forEach { modelContext.delete($0) }
                 self.intervals.forEach { modelContext.delete($0) }
                 Team.createBaseData(modelContext: modelContext)
+                Analytics.log(.appReinitialized, with: ["team_count": "\(teams.count)", "interval_count": "\(intervals.count)"])
                 do {
                     try modelContext.save()
                     print("📱 iOS Settings: Reinitialized, sending data to watch...")
@@ -108,9 +110,11 @@ struct SettingsView: View {
         }
         .alert("Are you sure?", isPresented: $showZeroScoreAlert) {
             Button("Yes, reset scores", role: .destructive) {
+                let totalScore = teams.reduce(0) { $0 + $1.score.totalScore }
                 self.teams.forEach {
                     $0.score = []
                 }
+                Analytics.log(.scoresReset, with: ["team_count": "\(teams.count)", "total_score": "\(totalScore)"])
                 do {
                     try modelContext.save()
                     // Send to watch after save completes
@@ -140,6 +144,7 @@ struct SettingsView: View {
                         Button("Add team") {
                             let team = Team(name: "Team \(teams.count + 1)")
                             modelContext.insert(team)
+                            Analytics.log(.teamCreated, with: ["team_count": "\(teams.count + 1)"])
                             do {
                                 try modelContext.save()
                                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
@@ -159,6 +164,7 @@ struct SettingsView: View {
 
                     Section("Export") {
                         Button {
+                            Analytics.log(.pdfExportStarted, with: ["team_count": "\(teams.count)", "interval_count": "\(intervals.count)"])
                             generatePDF()
                         } label: {
                             Label("Export Scoreboard as PDF", systemImage: "doc.text")
@@ -179,6 +185,7 @@ struct SettingsView: View {
                         )
                         .onChange(of: shouldKeepScreenAwake) { oldValue, newValue in
                             print("📱 iOS Settings: shouldKeepScreenAwake changed from \(oldValue) to \(newValue)")
+                            Analytics.log(newValue ? .keepAwakeEnabled : .keepAwakeDisabled)
                             let preferences: [String: Any] = [
                                 "shouldKeepScreenAwake": newValue
                             ]
@@ -195,6 +202,7 @@ struct SettingsView: View {
                         )
                         .onChange(of: hasEnabledIntervals) { oldValue, newValue in
                             print("📱 iOS Settings: hasEnabledIntervals changed from \(oldValue) to \(newValue)")
+                            Analytics.log(newValue ? .intervalsEnabled : .intervalsDisabled)
                             let preferences: [String: Any] = [
                                 "hasEnabledIntervals": newValue
                             ]
@@ -206,6 +214,7 @@ struct SettingsView: View {
                         )
                         .onChange(of: shouldAllowNegativePoints) { oldValue, newValue in
                             print("📱 iOS Settings: shouldAllowNegativePoints changed from \(oldValue) to \(newValue)")
+                            Analytics.log(newValue ? .negativePointsEnabled : .negativePointsDisabled)
                             let preferences: [String: Any] = [
                                 "shouldAllowNegativePoints": newValue
                             ]
@@ -223,6 +232,7 @@ struct SettingsView: View {
                     ) {
                         
                         Button {
+                            Analytics.log(.reviewRequested)
                             Task {
                                 requestReview()
                             }
@@ -296,6 +306,7 @@ struct SettingsView: View {
             return
         }
 
+        Analytics.log(.pdfExportCompleted)
         pdfURL = url
         showShareSheet = true
     }
@@ -310,6 +321,7 @@ struct SettingsView: View {
             let team = teams[idx]
             modelContext.delete(team)
         }
+        Analytics.log(.teamDeleted, with: ["remaining_teams": "\(teams.count - indexSet.count)"])
         do {
             try modelContext.save()
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {

@@ -13,11 +13,17 @@ let package = Package(
             targets: ["WhatScoreKit"]
         ),
     ],
+    dependencies: [
+        .package(url: "https://github.com/TelemetryDeck/SwiftClient", from: "2.0.0"),
+    ],
     targets: [
         // Targets are the basic building blocks of a package, defining a module or a test suite.
         // Targets can depend on other targets in this package and products from dependencies.
         .target(
             name: "WhatScoreKit",
+            dependencies: [
+                .product(name: "TelemetryClient", package: "SwiftClient"),
+            ],
             swiftSettings: [
                 .enableUpcomingFeature("ExistentialAny")
             ]

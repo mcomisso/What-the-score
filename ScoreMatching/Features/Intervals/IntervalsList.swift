@@ -32,6 +32,7 @@ struct IntervalsList: View {
                         indexSet.forEach {
                             modelContext.delete(intervals[$0])
                         }
+                        Analytics.log(.intervalDeleted, with: ["remaining_intervals": "\(intervals.count - indexSet.count)"])
                         // Sync to watch after deleting intervals
                         do {
                             try modelContext.save()
@@ -74,6 +75,7 @@ struct IntervalsList: View {
         let interval = Interval.create(name: name, from: teams)
         modelContext.insert(interval)
         newIntervalName = ""
+        Analytics.log(.intervalCreated, with: ["interval_count": "\(intervals.count + 1)", "source": "intervals_list"])
 
         // Immediately sync to watch after creating interval
         do {

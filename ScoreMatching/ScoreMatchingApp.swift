@@ -75,6 +75,7 @@ struct ScoreMatchingApp: App {
         WindowGroup {
             ContentView()
                 .onAppear {
+                    trackAppLaunch()
                     requestReviewIfNeeded()
                     setAwakeState()
                 }
@@ -102,8 +103,16 @@ struct ScoreMatchingApp: App {
         // CloudKit automatically syncs data - no manual notification needed
     }
 
+    private func trackAppLaunch() {
+        if totalLaunches == 1 {
+            Analytics.log(.appFirstLaunch)
+        }
+        Analytics.log(.appLaunched, with: ["launch_count": "\(totalLaunches)"])
+    }
+
     private func requestReviewIfNeeded() {
         if totalLaunches % 3 == 0 {
+            Analytics.log(.reviewPromptShown, with: ["launch_count": "\(totalLaunches)"])
             requestReview()
         }
     }

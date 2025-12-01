@@ -38,9 +38,15 @@ struct ContentView: View {
         .sheet(isPresented: $isShowingIntervals) {
             IntervalsList()
                 .presentationDetents([.medium])
+                .onAppear {
+                    Analytics.log(.intervalsViewed, with: ["interval_count": "\(intervals.count)"])
+                }
         }
         .sheet(isPresented: $isVisualisingSettings, onDismiss: nil, content: {
             SettingsView()
+                .onAppear {
+                    Analytics.log(.settingsOpened, with: ["team_count": "\(teams.count)"])
+                }
         })
         .alert("Name this interval", isPresented: $showingQuickIntervalPrompt) {
             TextField("e.g., Q1, Half 1", text: $quickIntervalName)
@@ -75,6 +81,7 @@ struct ContentView: View {
     private func createQuickInterval(name: String) {
         let interval = Interval.create(name: name, from: teams)
         modelContext.insert(interval)
+        Analytics.log(.intervalCreated, with: ["interval_count": "\(intervals.count + 1)", "source": "quick_add"])
 
         // Immediately sync to watch after creating quick interval
         do {
@@ -161,7 +168,9 @@ struct ContentView: View {
             }
             .contextMenu(menuItems: {
                 Button {
+                    let totalScore = teams.reduce(0) { $0 + $1.score.totalScore }
                     teams.forEach { $0.score = [] }
+                    Analytics.log(.scoresReset, with: ["team_count": "\(teams.count)", "total_score": "\(totalScore)", "source": "context_menu"])
                     do {
                         try modelContext.save()
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
@@ -177,6 +186,7 @@ struct ContentView: View {
                 Divider()
 
                 Button(role: .destructive) {
+                    Analytics.log(.appReinitialized, with: ["team_count": "\(teams.count)", "interval_count": "\(intervals.count)", "source": "context_menu"])
                     teams.forEach { modelContext.delete($0) }
                     Team.createBaseData(modelContext: modelContext)
                     do {
