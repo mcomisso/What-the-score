@@ -1,12 +1,12 @@
 import Foundation
-import TelemetryClient
+import TelemetryDeck
 
 /// Analytics helper for tracking user interactions and feature usage.
 /// Uses TelemetryDeck for privacy-focused analytics.
 ///
 /// Event naming convention: `category.action` (e.g., "team.created", "settings.changed")
 /// Parameters are optional key-value pairs for additional context.
-public enum Analytics {
+public enum Analytics: Sendable {
 
     // MARK: - Event Categories
 
@@ -74,23 +74,18 @@ public enum Analytics {
     /// This is used when Analytics.configure() is called without an ID (e.g., from Widget)
     private static let defaultAppID = "A2B016DF-35D6-4C92-8DA4-C333E3ABD791"
 
-    private static var isConfigured = false
-
     /// Configure TelemetryDeck with your app ID.
     /// Call this once at app launch (in AppDelegate or App init).
     public static func configure(appID: String) {
-        guard !isConfigured else { return }
-        let configuration = TelemetryManagerConfiguration(appID: appID)
-        TelemetryManager.initialize(with: configuration)
-        isConfigured = true
+        let config = TelemetryDeck.Config(appID: appID)
+        TelemetryDeck.initialize(config: config)
     }
 
     /// Ensures TelemetryDeck is configured before sending events.
     /// Uses the default app ID if not already configured.
     private static func ensureConfigured() {
-        if !isConfigured {
-            configure(appID: defaultAppID)
-        }
+        // TelemetryDeck handles multiple init calls gracefully
+        configure(appID: defaultAppID)
     }
 
     // MARK: - Logging Methods
@@ -98,24 +93,24 @@ public enum Analytics {
     /// Log an event without parameters
     public static func log(_ event: Event) {
         ensureConfigured()
-        TelemetryManager.send(event.rawValue)
+        TelemetryDeck.signal(event.rawValue)
     }
 
     /// Log an event with additional parameters
     public static func log(_ event: Event, with parameters: [String: String]) {
         ensureConfigured()
-        TelemetryManager.send(event.rawValue, with: parameters)
+        TelemetryDeck.signal(event.rawValue, parameters: parameters)
     }
 
     /// Log a raw event string (for backwards compatibility or custom events)
     public static func log(_ event: String) {
         ensureConfigured()
-        TelemetryManager.send(event)
+        TelemetryDeck.signal(event)
     }
 
     /// Log a raw event string with parameters
     public static func log(_ event: String, with parameters: [String: String]) {
         ensureConfigured()
-        TelemetryManager.send(event, with: parameters)
+        TelemetryDeck.signal(event, parameters: parameters)
     }
 }
