@@ -135,7 +135,7 @@ struct WidgetEntryView : View {
                                 Text("\(team.score.safeTotalScore)")
                                     .font(.system(.title, design: .rounded))
                             }
-                            .foregroundColor(team.resolvedColor)
+                            .foregroundStyle(team.resolvedColor)
                             .colorInvert()
                         }
                 }

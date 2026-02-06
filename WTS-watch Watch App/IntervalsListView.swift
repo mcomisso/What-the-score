@@ -1,6 +1,9 @@
 import SwiftUI
 import SwiftData
 import WhatScoreKit
+import OSLog
+
+private let logger = Logger(subsystem: "com.mcomisso.ScoreMatching.watchkitapp", category: "IntervalsListView")
 
 struct IntervalsListView: View {
     @Environment(\.dismiss) var dismiss
@@ -125,12 +128,11 @@ struct IntervalsListView: View {
         // Immediately sync to iPhone after creating interval
         do {
             try modelContext.save()
-            print("⌚️ Watch IntervalsListView: Created interval '\(name)', syncing to iPhone...")
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
                 watchSyncCoordinator?.sendData()
             }
         } catch {
-            print("❌ Watch IntervalsListView: Failed to save after creating interval: \(error)")
+            logger.error("Failed to save after creating interval: \(error.localizedDescription)")
         }
     }
 }

@@ -1,6 +1,9 @@
 import SwiftUI
 import SwiftData
 import WhatScoreKit
+import OSLog
+
+private let logger = Logger(subsystem: "com.mcomisso.ScoreMatching.watchkitapp", category: "Settings")
 
 struct SettingsView: View {
     @Environment(\.dismiss) var dismiss
@@ -23,7 +26,6 @@ struct SettingsView: View {
                 Section("Preferences") {
                     Toggle("Negative Points", isOn: $shouldAllowNegativePoints)
                         .onChange(of: shouldAllowNegativePoints) { oldValue, newValue in
-                            print("⌚️ Watch Settings: shouldAllowNegativePoints changed from \(oldValue) to \(newValue)")
                             let preferences: [String: Any] = [
                                 "shouldAllowNegativePoints": newValue
                             ]
@@ -31,7 +33,6 @@ struct SettingsView: View {
                         }
                     Toggle("Intervals", isOn: $hasEnabledIntervals)
                         .onChange(of: hasEnabledIntervals) { oldValue, newValue in
-                            print("⌚️ Watch Settings: hasEnabledIntervals changed from \(oldValue) to \(newValue)")
                             let preferences: [String: Any] = [
                                 "hasEnabledIntervals": newValue
                             ]
@@ -110,7 +111,7 @@ struct SettingsView: View {
                 watchSyncCoordinator?.sendTeamDataToPhone()
             }
         } catch {
-            print("⌚️ Watch Settings: Failed to save after reset: \(error)")
+            logger.error("Failed to save after reset: \(error.localizedDescription)")
         }
     }
 
@@ -120,13 +121,12 @@ struct SettingsView: View {
         Team.createBaseData(modelContext: modelContext)
         do {
             try modelContext.save()
-            print("⌚️ Watch Settings: Reinitialized, sending data to iPhone...")
             // Send data to iPhone after save completes
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
                 watchSyncCoordinator?.sendTeamDataToPhone()
             }
         } catch {
-            print("⌚️ Watch Settings: Failed to save after reinitialize: \(error)")
+            logger.error("Failed to save after reinitialize: \(error.localizedDescription)")
         }
     }
 
@@ -135,38 +135,33 @@ struct SettingsView: View {
         modelContext.insert(team)
         do {
             try modelContext.save()
-            print("⌚️ Watch Settings: Added team '\(team.name)', sending data to iPhone...")
             // Send data to iPhone after save completes
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
                 watchSyncCoordinator?.sendTeamDataToPhone()
             }
         } catch {
-            print("⌚️ Watch Settings: Failed to save after adding team: \(error)")
+            logger.error("Failed to save after adding team: \(error.localizedDescription)")
         }
     }
 
     private func deleteTeams(at offsets: IndexSet) {
         // Ensure at least 2 teams remain
         guard teams.count - offsets.count >= 2 else {
-            print("⌚️ Watch Settings: Cannot delete team - must have at least 2 teams")
             return
         }
 
         for index in offsets {
-            let team = teams[index]
-            print("⌚️ Watch Settings: Deleting team '\(team.name)'")
-            modelContext.delete(team)
+            modelContext.delete(teams[index])
         }
 
         do {
             try modelContext.save()
-            print("⌚️ Watch Settings: Deleted teams, sending data to iPhone...")
             // Send data to iPhone after save completes
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
                 watchSyncCoordinator?.sendTeamDataToPhone()
             }
         } catch {
-            print("⌚️ Watch Settings: Failed to save after deleting teams: \(error)")
+            logger.error("Failed to save after deleting teams: \(error.localizedDescription)")
         }
     }
 }

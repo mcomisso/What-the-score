@@ -67,7 +67,7 @@ struct ScoreMatchingApp: App {
                 try context.save()
             }
         } catch {
-            print("Failed to migrate team colors: \(error)")
+            Logger(subsystem: Bundle.main.bundleIdentifier ?? "com.mcomisso.ScoreMatching", category: "Migration").error("Failed to migrate team colors: \(error.localizedDescription)")
         }
     }
 

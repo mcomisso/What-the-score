@@ -8,6 +8,7 @@
 import SwiftUI
 import SwiftData
 import WhatScoreKit
+import OSLog
 
 @main
 struct WTS_watch_Watch_AppApp: App {
@@ -57,7 +58,7 @@ struct WTS_watch_Watch_AppApp: App {
                 try context.save()
             }
         } catch {
-            print("Failed to migrate team colors: \(error)")
+            Logger(subsystem: "com.mcomisso.ScoreMatching.watchkitapp", category: "Migration").error("Failed to migrate team colors: \(error.localizedDescription)")
         }
     }
 

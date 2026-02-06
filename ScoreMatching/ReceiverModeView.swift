@@ -8,7 +8,7 @@ struct ReceiverModeView: View {
         ZStack(alignment: .bottom) {
             ConnectivityView()
             Button {
-                withAnimation {
+                withAnimation(.smooth) {
                     isReceiverMode = false
                 }
             } label: {
@@ -21,8 +21,6 @@ struct ReceiverModeView: View {
 }
 
 
-struct ReceiverModeView_Previews: PreviewProvider {
-    static var previews: some View {
-        ReceiverModeView(isReceiverMode: .constant(true))
-    }
+#Preview {
+    ReceiverModeView(isReceiverMode: .constant(true))
 }

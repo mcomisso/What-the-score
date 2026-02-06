@@ -2,6 +2,9 @@ import Foundation
 import WhatScoreKit
 import SwiftUI
 import SwiftData
+import OSLog
+
+private let logger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "com.mcomisso.ScoreMatching", category: "IntervalsList")
 
 struct IntervalsList: View {
     @Environment(\.modelContext) var modelContext
@@ -13,7 +16,7 @@ struct IntervalsList: View {
     @State private var newIntervalName = ""
 
     var body: some View {
-        NavigationView {
+        NavigationStack {
             List {
                 if intervals.isEmpty {
                     ContentUnavailableView(
@@ -36,12 +39,11 @@ struct IntervalsList: View {
                         // Sync to watch after deleting intervals
                         do {
                             try modelContext.save()
-                            print("📱 iOS IntervalsList: Deleted intervals, syncing to watch...")
                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
                                 watchSyncCoordinator?.sendData()
                             }
                         } catch {
-                            print("❌ iOS IntervalsList: Failed to save after deleting intervals: \(error)")
+                            logger.error("Failed to save after deleting intervals: \(error.localizedDescription)")
                         }
                     }
                 }
@@ -80,12 +82,11 @@ struct IntervalsList: View {
         // Immediately sync to watch after creating interval
         do {
             try modelContext.save()
-            print("📱 iOS IntervalsList: Created interval '\(name)', syncing to watch...")
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
                 watchSyncCoordinator?.sendData()
             }
         } catch {
-            print("❌ iOS IntervalsList: Failed to save after creating interval: \(error)")
+            logger.error("Failed to save after creating interval: \(error.localizedDescription)")
         }
     }
 }

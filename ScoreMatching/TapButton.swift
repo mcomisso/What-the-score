@@ -3,6 +3,9 @@ import WhatScoreKit
 import SwiftUI
 import SwiftData
 import Pow
+import OSLog
+
+private let logger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "com.mcomisso.ScoreMatching", category: "TapButton")
 
 struct TapButton: View {
     @AppStorage(AppStorageValues.shouldAllowNegativePoints)
@@ -20,10 +23,10 @@ struct TapButton: View {
     private let warningGenerator = UINotificationFeedbackGenerator()
     #endif
 
-    @State var increased: Int = 0
-    @State var decreased: Int = 0
+    @State private var increased: Int = 0
+    @State private var decreased: Int = 0
 
-    @State var justAdded: Bool = false
+    @State private var justAdded: Bool = false
 
     var body: some View {
         ZStack {
@@ -33,6 +36,8 @@ struct TapButton: View {
                     let displayScore = shouldAllowNegativePoints ? score.totalScore : score.safeTotalScore
                     Text("\(displayScore)")
                         .font(.system(size: fontSize, design: .rounded))
+                        .contentTransition(.numericText())
+                        .animation(.snappy, value: displayScore)
                         .frame(maxWidth: .infinity,
                                maxHeight: .infinity)
                     Text(name)
@@ -48,6 +53,9 @@ struct TapButton: View {
                 .onTapGesture {
                     didTapOnButton()
                 }
+                .accessibilityAddTraits(.isButton)
+                .accessibilityLabel("\(name), score \(shouldAllowNegativePoints ? score.totalScore : score.safeTotalScore)")
+                .accessibilityHint("Tap to add a point, swipe to remove")
                 .gesture(DragGesture().onEnded(onGestureEnd))
                 #if os(iOS)
                 .sensoryFeedback(.increase, trigger: increased)
@@ -102,7 +110,7 @@ struct TapButton: View {
                 onScoreChanged?()
             }
         } catch {
-            print("📱 TapButton: Failed to save: \(error)")
+            logger.error("Failed to save: \(error.localizedDescription)")
         }
     }
 }

@@ -4,6 +4,9 @@ import PDFKit
 import SwiftData
 import StoreKit
 import WhatScoreKit
+import OSLog
+
+private let logger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "com.mcomisso.ScoreMatching", category: "Settings")
 
 enum AppStorageValues {
     static let shouldKeepScreenAwake = "shouldKeepScreenAwake"
@@ -22,7 +25,7 @@ private enum AppLinks {
 
 struct SettingsView: View {
 
-    @Environment(\.dismiss) var dimiss
+    @Environment(\.dismiss) var dismiss
     @Environment(\.openURL) var openURL
     @Environment(\.requestReview) var requestReview
     @Environment(\.watchSyncCoordinator) var watchSyncCoordinator
@@ -47,24 +50,18 @@ struct SettingsView: View {
     @AppStorage(AppStorageValues.hasEnabledIntervals)
     var hasEnabledIntervals: Bool = false
 
-    @State var colorSelection: Color = .random
-
     var teamsSection: some View {
         ForEach(teams) { team in
             @Bindable var bindableTeam = team
             HStack {
                 ColorPicker(selection: Binding(
                     get: {
-                        print("📱 iOS Settings: ColorPicker GET for '\(team.name)'")
-                        return bindableTeam.resolvedColor
+                        bindableTeam.resolvedColor
                     },
                     set: { newColor in
-                        print("📱 iOS Settings: ColorPicker SET for '\(team.name)' - NEW COLOR: \(newColor.toHex(alpha: false))")
                         bindableTeam.resolvedColor = newColor
                         Analytics.log(.teamColorChanged)
-                        // Immediately send to watch after color change
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-                            print("📱 iOS Settings: Triggering sendTeamDataToWatch after color change")
                             watchSyncCoordinator?.sendTeamDataToWatch()
                         }
                     }
@@ -90,13 +87,11 @@ struct SettingsView: View {
                 Analytics.log(.appReinitialized, with: ["team_count": "\(teams.count)", "interval_count": "\(intervals.count)"])
                 do {
                     try modelContext.save()
-                    print("📱 iOS Settings: Reinitialized, sending data to watch...")
-                    // Send to watch after save completes
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
                         watchSyncCoordinator?.sendTeamDataToWatch()
                     }
                 } catch {
-                    print("📱 iOS Settings: Failed to save after reinitialize: \(error)")
+                    logger.error("Failed to save after reinitialize: \(error.localizedDescription)")
                 }
             }
         } message: {
@@ -117,12 +112,11 @@ struct SettingsView: View {
                 Analytics.log(.scoresReset, with: ["team_count": "\(teams.count)", "total_score": "\(totalScore)"])
                 do {
                     try modelContext.save()
-                    // Send to watch after save completes
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
                         watchSyncCoordinator?.sendTeamDataToWatch()
                     }
                 } catch {
-                    print("📱 iOS Settings: Failed to save after reset: \(error)")
+                    logger.error("Failed to save after reset: \(error.localizedDescription)")
                 }
             }
         } message: {
@@ -131,7 +125,7 @@ struct SettingsView: View {
     }
 
     var body: some View {
-        NavigationView {
+        NavigationStack {
 
             VStack {
                 List {
@@ -151,7 +145,7 @@ struct SettingsView: View {
                                     watchSyncCoordinator?.sendTeamDataToWatch()
                                 }
                             } catch {
-                                print("📱 iOS Settings: Failed to save after adding team: \(error)")
+                                logger.error("Failed to save after adding team: \(error.localizedDescription)")
                             }
                         }.buttonStyle(.borderless)
                     }
@@ -184,7 +178,6 @@ struct SettingsView: View {
                             isOn: $shouldKeepScreenAwake
                         )
                         .onChange(of: shouldKeepScreenAwake) { oldValue, newValue in
-                            print("📱 iOS Settings: shouldKeepScreenAwake changed from \(oldValue) to \(newValue)")
                             Analytics.log(newValue ? .keepAwakeEnabled : .keepAwakeDisabled)
                             let preferences: [String: Any] = [
                                 "shouldKeepScreenAwake": newValue
@@ -201,7 +194,6 @@ struct SettingsView: View {
                             isOn: $hasEnabledIntervals
                         )
                         .onChange(of: hasEnabledIntervals) { oldValue, newValue in
-                            print("📱 iOS Settings: hasEnabledIntervals changed from \(oldValue) to \(newValue)")
                             Analytics.log(newValue ? .intervalsEnabled : .intervalsDisabled)
                             let preferences: [String: Any] = [
                                 "hasEnabledIntervals": newValue
@@ -213,7 +205,6 @@ struct SettingsView: View {
                             isOn: $shouldAllowNegativePoints
                         )
                         .onChange(of: shouldAllowNegativePoints) { oldValue, newValue in
-                            print("📱 iOS Settings: shouldAllowNegativePoints changed from \(oldValue) to \(newValue)")
                             Analytics.log(newValue ? .negativePointsEnabled : .negativePointsDisabled)
                             let preferences: [String: Any] = [
                                 "shouldAllowNegativePoints": newValue
@@ -271,7 +262,7 @@ struct SettingsView: View {
                                         .resizable()
                                         .aspectRatio(contentMode: .fit)
                                         .frame(width: 32, height: 32)
-                                        .cornerRadius(8)
+                                        .clipShape(.rect(cornerRadius: 8))
                                     Text("My Vinyl+")
                                 }
                             }
@@ -285,7 +276,7 @@ struct SettingsView: View {
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Dismiss") {
-                        dimiss()
+                        dismiss()
                     }
                 }
             }
@@ -328,7 +319,7 @@ struct SettingsView: View {
                 watchSyncCoordinator?.sendTeamDataToWatch()
             }
         } catch {
-            print("📱 iOS Settings: Failed to save after removing team: \(error)")
+            logger.error("Failed to save after removing team: \(error.localizedDescription)")
         }
     }
 }

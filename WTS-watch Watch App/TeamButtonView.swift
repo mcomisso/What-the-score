@@ -1,6 +1,9 @@
 import SwiftUI
 import WhatScoreKit
 import SwiftData
+import OSLog
+
+private let logger = Logger(subsystem: "com.mcomisso.ScoreMatching.watchkitapp", category: "TeamButton")
 
 struct TeamButtonView: View {
     @Binding var team: Team
@@ -78,14 +81,16 @@ struct TeamButtonView: View {
                 onScoreChanged?()
             }
         } catch {
-            print("⌚️ TeamButton: Failed to save: \(error)")
+            logger.error("Failed to save: \(error.localizedDescription)")
         }
     }
 
     private func contrastingColor(for backgroundColor: Color) -> Color {
-        // For simplicity, use white for dark colors and black for light colors
-        // This is a heuristic that works well for most cases
-        return .white
+        var r: CGFloat = 0, g: CGFloat = 0, b: CGFloat = 0
+        UIColor(backgroundColor).getRed(&r, green: &g, blue: &b, alpha: nil)
+        // Relative luminance formula (WCAG 2.0)
+        let luminance = 0.299 * r + 0.587 * g + 0.114 * b
+        return luminance > 0.5 ? .black : .white
     }
 }
 

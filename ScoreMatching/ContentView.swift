@@ -1,6 +1,9 @@
 import SwiftUI
 import SwiftData
 import WhatScoreKit
+import OSLog
+
+private let logger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "com.mcomisso.ScoreMatching", category: "ContentView")
 
 struct ContentView: View {
     @Environment(\.verticalSizeClass) var verticalSizeClass
@@ -86,12 +89,11 @@ struct ContentView: View {
         // Immediately sync to watch after creating quick interval
         do {
             try modelContext.save()
-            print("📱 iOS ContentView: Created quick interval '\(name)', syncing to watch...")
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
                 watchSyncCoordinator?.sendData()
             }
         } catch {
-            print("❌ iOS ContentView: Failed to save after creating quick interval: \(error)")
+            logger.error("Failed to save after creating quick interval: \(error.localizedDescription)")
         }
     }
 
@@ -166,19 +168,9 @@ struct ContentView: View {
                     }
                 }
             }
-            .contextMenu(menuItems: {
+            .contextMenu {
                 Button {
-                    let totalScore = teams.reduce(0) { $0 + $1.score.totalScore }
-                    teams.forEach { $0.score = [] }
-                    Analytics.log(.scoresReset, with: ["team_count": "\(teams.count)", "total_score": "\(totalScore)", "source": "context_menu"])
-                    do {
-                        try modelContext.save()
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                            watchSyncCoordinator?.sendTeamDataToWatch()
-                        }
-                    } catch {
-                        print("📱 ContentView: Failed to save after reset: \(error)")
-                    }
+                    resetScoresToZero()
                 } label: {
                     Label("Set scores to 0", systemImage: "arrow.counterclockwise")
                 }
@@ -186,22 +178,37 @@ struct ContentView: View {
                 Divider()
 
                 Button(role: .destructive) {
-                    Analytics.log(.appReinitialized, with: ["team_count": "\(teams.count)", "interval_count": "\(intervals.count)", "source": "context_menu"])
-                    teams.forEach { modelContext.delete($0) }
-                    Team.createBaseData(modelContext: modelContext)
-                    do {
-                        try modelContext.save()
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                            watchSyncCoordinator?.sendTeamDataToWatch()
-                        }
-                    } catch {
-                        print("📱 ContentView: Failed to save after reinitialize: \(error)")
-                    }
+                    reinitializeApp()
                 } label: {
                     Label("Reset all", systemImage: "trash")
                 }
-            })
+            }
         }.symbolRenderingMode(.hierarchical)
+    }
+
+    private func resetScoresToZero() {
+        let totalScore = teams.reduce(0) { $0 + $1.score.totalScore }
+        teams.forEach { $0.score = [] }
+        Analytics.log(.scoresReset, with: ["team_count": "\(teams.count)", "total_score": "\(totalScore)", "source": "context_menu"])
+        saveAndSync()
+    }
+
+    private func reinitializeApp() {
+        Analytics.log(.appReinitialized, with: ["team_count": "\(teams.count)", "interval_count": "\(intervals.count)", "source": "context_menu"])
+        teams.forEach { modelContext.delete($0) }
+        Team.createBaseData(modelContext: modelContext)
+        saveAndSync()
+    }
+
+    private func saveAndSync() {
+        do {
+            try modelContext.save()
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                watchSyncCoordinator?.sendTeamDataToWatch()
+            }
+        } catch {
+            logger.error("Failed to save: \(error.localizedDescription)")
+        }
     }
 
     var buttons: some View {
@@ -213,10 +220,7 @@ struct ContentView: View {
                 name: $bindingTeam.name,
                 lastTapped: $lastTapped,
                 onScoreChanged: {
-                    print("📱 ContentView: Score changed callback triggered!")
-                    print("📱 ContentView: watchSyncCoordinator is \(watchSyncCoordinator == nil ? "nil" : "not nil")")
                     watchSyncCoordinator?.sendTeamDataToWatch()
-                    print("📱 ContentView: Called sendTeamDataToWatch()")
                 }
             )
             .background(Color(hex: team.color))
@@ -227,8 +231,10 @@ struct ContentView: View {
                         .foregroundStyle(team.resolvedColor)
                         .frame(width: 32, height: 32)
                         .colorInvert()
+                        .transition(.scale.combined(with: .opacity))
                 }
             }
+            .animation(.smooth, value: lastTapped)
         }
     }
 

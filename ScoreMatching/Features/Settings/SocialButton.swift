@@ -7,20 +7,11 @@ struct SocialButton: View {
     let icon: Image
 
     var body: some View {
-        Label.init(
-            title: { Link(
-                "Follow \(username)",
-                destination: url
-            ) },
-            icon: { 
-                icon
-//                .resizable()
-//                .renderingMode(.template)
-//                .aspectRatio(contentMode: .fit)
-//                .frame(width: 20, height: 20)
-//                .foregroundColor(.primary)
-            }
-        )
+        Label {
+            Link("Follow \(username)", destination: url)
+        } icon: {
+            icon
+        }
     }
 }
 

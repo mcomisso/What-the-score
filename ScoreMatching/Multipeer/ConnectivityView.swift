@@ -48,7 +48,7 @@ struct ConnectivityView: View {
                 }
 
                 ProgressView()
-                    .progressViewStyle(CircularProgressViewStyle())
+                    .progressViewStyle(.circular)
             }
 
             Section("Connected") {
