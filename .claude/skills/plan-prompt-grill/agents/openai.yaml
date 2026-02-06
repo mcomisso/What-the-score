@@ -1,0 +1,4 @@
+interface:
+  display_name: "Plan Prompt Grill"
+  short_description: "Relentless discovery questions before planning"
+  default_prompt: "Use $plan-prompt-grill to interrogate my idea before any plan."
