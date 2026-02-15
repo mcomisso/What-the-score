@@ -76,8 +76,24 @@ struct ContentView: View {
     }
 
     private func cleanupNegativeScores() {
+        var didChange = false
         for team in teams {
+            let beforeCount = team.score.count
             team.score.removeNegativeScores()
+            if team.score.count != beforeCount {
+                didChange = true
+            }
+        }
+
+        guard didChange else {
+            return
+        }
+
+        do {
+            try modelContext.save()
+            watchSyncCoordinator?.sendTeamDataToWatch()
+        } catch {
+            logger.error("Failed to save after removing negative scores: \(error.localizedDescription)")
         }
     }
 
@@ -196,6 +212,7 @@ struct ContentView: View {
     private func reinitializeApp() {
         Analytics.log(.appReinitialized, with: ["team_count": "\(teams.count)", "interval_count": "\(intervals.count)", "source": "context_menu"])
         teams.forEach { modelContext.delete($0) }
+        intervals.forEach { modelContext.delete($0) }
         Team.createBaseData(modelContext: modelContext)
         saveAndSync()
     }

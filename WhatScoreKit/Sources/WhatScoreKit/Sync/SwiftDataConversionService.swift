@@ -22,7 +22,8 @@ public final class SwiftDataConversionService: DataConversionService {
             TeamData(
                 name: team.name,
                 color: team.color,
-                scores: team.score.map { ScoreData(time: $0.time, value: $0.value) }
+                scores: team.score.map { ScoreData(time: $0.time, value: $0.value) },
+                creationDate: team.creationDate
             )
         }
 
@@ -64,32 +65,27 @@ public final class SwiftDataConversionService: DataConversionService {
             return
         }
 
-        // Handle count changes
-        if teamsData.count > existingTeams.count {
-            // Add new teams
-            for index in existingTeams.count..<teamsData.count {
-                let teamData = teamsData[index]
+        var unmatchedExisting = existingTeams
+
+        for teamData in teamsData {
+            if let matchedIndex = indexForMatchingTeam(teamData, in: unmatchedExisting) {
+                let team = unmatchedExisting.remove(at: matchedIndex)
+                applyTeamData(teamData, to: team)
+                logger.info("Updated team: \(teamData.name)")
+            } else {
                 let scores = teamData.scores.map { Score(time: $0.time, value: $0.value) }
                 let team = Team(score: scores, name: teamData.name, color: teamData.color)
+                if let creationDate = teamData.creationDate {
+                    team.creationDate = creationDate
+                }
                 context.insert(team)
                 logger.info("Added new team: \(teamData.name)")
             }
-        } else if teamsData.count < existingTeams.count {
-            // Remove excess teams
-            for index in (teamsData.count..<existingTeams.count).reversed() {
-                context.delete(existingTeams[index])
-                logger.info("Removed team at index \(index)")
-            }
         }
 
-        // Update existing teams (preserving UUID)
-        let teamsToUpdate = try context.fetch(descriptor)
-        for (index, teamData) in teamsData.enumerated() where index < teamsToUpdate.count {
-            let team = teamsToUpdate[index]
-            team.name = teamData.name
-            team.color = teamData.color
-            team.score = teamData.scores.map { Score(time: $0.time, value: $0.value) }
-            logger.info("Updated team: \(teamData.name)")
+        for team in unmatchedExisting {
+            context.delete(team)
+            logger.info("Removed team: \(team.name)")
         }
     }
 
@@ -98,16 +94,10 @@ public final class SwiftDataConversionService: DataConversionService {
             return true
         }
 
-        for (index, teamData) in teamsData.enumerated() where index < existingTeams.count {
-            let existingTeam = existingTeams[index]
-            if existingTeam.name != teamData.name ||
-               existingTeam.color != teamData.color ||
-               existingTeam.score.count != teamData.scores.count {
-                return true
-            }
-        }
+        let incomingSignatures = teamsData.map(teamSignature).sorted()
+        let existingSignatures = existingTeams.map(teamSignature).sorted()
 
-        return false
+        return incomingSignatures != existingSignatures
     }
 
     // MARK: - Intervals
@@ -124,11 +114,16 @@ public final class SwiftDataConversionService: DataConversionService {
             return
         }
 
-        // Handle count changes
-        if intervalsData.count > existingIntervals.count {
-            // Add new intervals
-            for index in existingIntervals.count..<intervalsData.count {
-                let intervalData = intervalsData[index]
+        var unmatchedExisting = existingIntervals
+
+        for intervalData in intervalsData {
+            if let matchedIndex = indexForMatchingInterval(intervalData, in: unmatchedExisting) {
+                let interval = unmatchedExisting.remove(at: matchedIndex)
+                interval.name = intervalData.name
+                interval.date = intervalData.date
+                interval.teamSnapshots = intervalData.teamSnapshots
+                logger.info("Updated interval: \(intervalData.name)")
+            } else {
                 let interval = Interval(
                     name: intervalData.name,
                     teamSnapshots: intervalData.teamSnapshots,
@@ -137,22 +132,11 @@ public final class SwiftDataConversionService: DataConversionService {
                 context.insert(interval)
                 logger.info("Added new interval: \(intervalData.name)")
             }
-        } else if intervalsData.count < existingIntervals.count {
-            // Remove excess intervals
-            for index in (intervalsData.count..<existingIntervals.count).reversed() {
-                context.delete(existingIntervals[index])
-                logger.info("Removed interval at index \(index)")
-            }
         }
 
-        // Update existing intervals (preserving UUID)
-        let intervalsToUpdate = try context.fetch(descriptor)
-        for (index, intervalData) in intervalsData.enumerated() where index < intervalsToUpdate.count {
-            let interval = intervalsToUpdate[index]
-            interval.name = intervalData.name
-            interval.date = intervalData.date
-            interval.teamSnapshots = intervalData.teamSnapshots
-            logger.info("Updated interval: \(intervalData.name)")
+        for interval in unmatchedExisting {
+            context.delete(interval)
+            logger.info("Removed interval: \(interval.name)")
         }
     }
 
@@ -161,14 +145,10 @@ public final class SwiftDataConversionService: DataConversionService {
             return true
         }
 
-        for (index, intervalData) in intervalsData.enumerated() where index < existingIntervals.count {
-            let existingInterval = existingIntervals[index]
-            if existingInterval.name != intervalData.name {
-                return true
-            }
-        }
+        let incomingSignatures = intervalsData.map(intervalSignature).sorted()
+        let existingSignatures = existingIntervals.map(intervalSignature).sorted()
 
-        return false
+        return incomingSignatures != existingSignatures
     }
 
     // MARK: - Settings
@@ -177,5 +157,68 @@ public final class SwiftDataConversionService: DataConversionService {
         UserDefaults.standard.set(settings.allowNegativePoints, forKey: "shouldAllowNegativePoints")
         UserDefaults.standard.set(settings.intervalsEnabled, forKey: "hasEnabledIntervals")
         logger.info("Applied settings: negative=\(settings.allowNegativePoints), intervals=\(settings.intervalsEnabled)")
+    }
+
+    // MARK: - Matching and Signatures
+
+    private func applyTeamData(_ teamData: TeamData, to team: Team) {
+        team.name = teamData.name
+        team.color = teamData.color
+        team.score = teamData.scores.map { Score(time: $0.time, value: $0.value) }
+        if let creationDate = teamData.creationDate {
+            team.creationDate = creationDate
+        }
+    }
+
+    private func indexForMatchingTeam(_ teamData: TeamData, in teams: [Team]) -> Int? {
+        if let creationDate = teamData.creationDate,
+           let index = teams.firstIndex(where: { abs($0.creationDate.timeIntervalSince1970 - creationDate.timeIntervalSince1970) < 0.001 }) {
+            return index
+        }
+        if let index = teams.firstIndex(where: { $0.name == teamData.name }) {
+            return index
+        }
+        return nil
+    }
+
+    private func indexForMatchingInterval(_ intervalData: IntervalData, in intervals: [Interval]) -> Int? {
+        if let index = intervals.firstIndex(where: {
+            $0.name == intervalData.name &&
+            abs($0.date.timeIntervalSince1970 - intervalData.date.timeIntervalSince1970) < 0.001
+        }) {
+            return index
+        }
+        if let index = intervals.firstIndex(where: { $0.name == intervalData.name }) {
+            return index
+        }
+        return nil
+    }
+
+    private func teamSignature(_ teamData: TeamData) -> String {
+        let scoreSignature = teamData.scores
+            .map { "\($0.time.timeIntervalSince1970):\($0.value)" }
+            .joined(separator: ",")
+        return "\(teamData.name)|\(teamData.color)|\(scoreSignature)"
+    }
+
+    private func teamSignature(_ team: Team) -> String {
+        let scoreSignature = team.score
+            .map { "\($0.time.timeIntervalSince1970):\($0.value)" }
+            .joined(separator: ",")
+        return "\(team.name)|\(team.color)|\(scoreSignature)"
+    }
+
+    private func intervalSignature(_ intervalData: IntervalData) -> String {
+        let snapshotSignature = intervalData.teamSnapshots
+            .map { "\($0.teamName):\($0.teamColor):\($0.totalScore)" }
+            .joined(separator: ",")
+        return "\(intervalData.name)|\(intervalData.date.timeIntervalSince1970)|\(snapshotSignature)"
+    }
+
+    private func intervalSignature(_ interval: Interval) -> String {
+        let snapshotSignature = interval.teamSnapshots
+            .map { "\($0.teamName):\($0.teamColor):\($0.totalScore)" }
+            .joined(separator: ",")
+        return "\(interval.name)|\(interval.date.timeIntervalSince1970)|\(snapshotSignature)"
     }
 }

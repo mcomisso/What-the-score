@@ -51,19 +51,25 @@ public struct TeamData: Codable {
     public let name: String
     public let color: String
     public let scores: [ScoreData]
+    public let creationDate: Date?
 
-    public init(name: String, color: String, scores: [ScoreData]) {
+    public init(name: String, color: String, scores: [ScoreData], creationDate: Date? = nil) {
         self.name = name
         self.color = color
         self.scores = scores
+        self.creationDate = creationDate
     }
 
     public func toDictionary() -> [String: Any] {
-        return [
+        var dictionary: [String: Any] = [
             "name": name,
             "color": color,
             "score": scores.map { $0.toDictionary() }
         ]
+        if let creationDate {
+            dictionary["creationDate"] = creationDate.timeIntervalSince1970
+        }
+        return dictionary
     }
 
     public static func from(dictionary: [String: Any]) -> TeamData? {
@@ -74,8 +80,11 @@ public struct TeamData: Codable {
 
         let scoreData = (dictionary["score"] as? [[String: Any]]) ?? []
         let scores = scoreData.compactMap { ScoreData.from(dictionary: $0) }
+        let creationDate = (dictionary["creationDate"] as? TimeInterval).map {
+            Date(timeIntervalSince1970: $0)
+        }
 
-        return TeamData(name: name, color: color, scores: scores)
+        return TeamData(name: name, color: color, scores: scores, creationDate: creationDate)
     }
 }
 
