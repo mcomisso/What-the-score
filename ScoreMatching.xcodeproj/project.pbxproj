@@ -9,7 +9,6 @@
 /* Begin PBXBuildFile section */
 		B919B9C027CAA67A00014942 /* IntervalsList.swift in Sources */ = {isa = PBXBuildFile; fileRef = B919B9BF27CAA67A00014942 /* IntervalsList.swift */; };
 		B919B9C927CC591300014942 /* ReceiverModeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B919B9C827CC591300014942 /* ReceiverModeView.swift */; };
-		B93805A22B4F486A00E57CC9 /* Pow in Frameworks */ = {isa = PBXBuildFile; productRef = B93805A12B4F486A00E57CC9 /* Pow */; };
 		B95C37E927B473D7009A2C5F /* ScoreboardPDFPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = B95C37E827B473D7009A2C5F /* ScoreboardPDFPage.swift */; };
 		B95C37EB27B4748A009A2C5F /* PDFGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = B95C37EA27B4748A009A2C5F /* PDFGenerator.swift */; };
 		B95C37EF27B474EA009A2C5F /* Connectivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = B95C37EE27B474EA009A2C5F /* Connectivity.swift */; };
@@ -40,6 +39,14 @@
 		B9E5325D2EBD84AC00B1B4EA /* WhatScoreKit in Frameworks */ = {isa = PBXBuildFile; productRef = B9E5325C2EBD84AC00B1B4EA /* WhatScoreKit */; };
 		B9E5325F2EBD84B900B1B4EA /* WhatScoreKit in Frameworks */ = {isa = PBXBuildFile; productRef = B9E5325E2EBD84B900B1B4EA /* WhatScoreKit */; };
 		B9E532612EBD84C000B1B4EA /* WhatScoreKit in Frameworks */ = {isa = PBXBuildFile; productRef = B9E532602EBD84C000B1B4EA /* WhatScoreKit */; };
+		A27C00000000000000000001 /* ScoreboardIntents.swift in Sources */ = {isa = PBXBuildFile; fileRef = A27C00000000000000000002 /* ScoreboardIntents.swift */; };
+		A27C00000000000000000003 /* WhatScoreIntents in Frameworks */ = {isa = PBXBuildFile; productRef = A27C00000000000000000007 /* WhatScoreIntents */; };
+		A27C00000000000000000004 /* WhatScoreIntents in Frameworks */ = {isa = PBXBuildFile; productRef = A27C00000000000000000008 /* WhatScoreIntents */; };
+		A27C00000000000000000009 /* ScoreboardActionsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A27C0000000000000000000A /* ScoreboardActionsTests.swift */; };
+		A27C0000000000000000000B /* WhatScoreKit in Frameworks */ = {isa = PBXBuildFile; productRef = A27C0000000000000000000C /* WhatScoreKit */; };
+		A27C00000000000000000020 /* SportCatalogStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A27C00000000000000000021 /* SportCatalogStore.swift */; };
+		A27C00000000000000000022 /* catalog-v1.json in Resources */ = {isa = PBXBuildFile; fileRef = A27C00000000000000000023 /* catalog-v1.json */; };
+		A27C00000000000000000024 /* NewGameSetupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A27C00000000000000000025 /* NewGameSetupView.swift */; };
 		B9F9A8CA27B3DAD900B4C805 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9F9A8C927B3DAD900B4C805 /* SettingsView.swift */; };
 		B9F9A8CC27B3DBCF00B4C805 /* TapButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9F9A8CB27B3DBCF00B4C805 /* TapButton.swift */; };
 /* End PBXBuildFile section */
@@ -142,6 +149,11 @@
 		B9E532332EBD837000B1B4EA /* WTS-watch Watch AppTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "WTS-watch Watch AppTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		B9E5323D2EBD837000B1B4EA /* WTS-watch Watch AppUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "WTS-watch Watch AppUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		B9E5325B2EBD841200B1B4EA /* WhatScoreKit */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = WhatScoreKit; sourceTree = "<group>"; };
+		A27C00000000000000000002 /* ScoreboardIntents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScoreboardIntents.swift; sourceTree = "<group>"; };
+		A27C0000000000000000000A /* ScoreboardActionsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ScoreboardActionsTests.swift; path = WhatScoreKit/Tests/WhatScoreKitTests/ScoreboardActionsTests.swift; sourceTree = SOURCE_ROOT; };
+		A27C00000000000000000021 /* SportCatalogStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SportCatalogStore.swift; sourceTree = "<group>"; };
+		A27C00000000000000000023 /* catalog-v1.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = catalog-v1.json; path = sports/catalog-v1.json; sourceTree = SOURCE_ROOT; };
+		A27C00000000000000000025 /* NewGameSetupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewGameSetupView.swift; sourceTree = "<group>"; };
 		B9F9A8C927B3DAD900B4C805 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		B9F9A8CB27B3DBCF00B4C805 /* TapButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TapButton.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -157,6 +169,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A27C00000000000000000004 /* WhatScoreIntents in Frameworks */,
 				B9E5325F2EBD84B900B1B4EA /* WhatScoreKit in Frameworks */,
 				B96F151D28DE670E00349258 /* SwiftUI.framework in Frameworks */,
 				B96F151B28DE670E00349258 /* WidgetKit.framework in Frameworks */,
@@ -167,9 +180,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A27C00000000000000000003 /* WhatScoreIntents in Frameworks */,
 				B9A8A7662A86373900139043 /* FirebaseAnalytics in Frameworks */,
 				B9E5325D2EBD84AC00B1B4EA /* WhatScoreKit in Frameworks */,
-				B93805A22B4F486A00E57CC9 /* Pow in Frameworks */,
 				B9A8A76A2A86373900139043 /* FirebaseCrashlytics in Frameworks */,
 				B9A8A76E2A86373900139043 /* FirebasePerformance in Frameworks */,
 				B98539CF2954E4020084DCEC /* TelemetryClient in Frameworks */,
@@ -181,6 +194,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A27C0000000000000000000B /* WhatScoreKit in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -209,6 +223,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		A27C00000000000000000005 /* Intents */ = {
+			isa = PBXGroup;
+			children = (
+				A27C00000000000000000002 /* ScoreboardIntents.swift */,
+			);
+			path = Intents;
+			sourceTree = "<group>";
+		};
 		B919B9C127CAA69B00014942 /* Features */ = {
 			isa = PBXGroup;
 			children = (
@@ -222,6 +244,7 @@
 			isa = PBXGroup;
 			children = (
 				B9F9A8C927B3DAD900B4C805 /* SettingsView.swift */,
+				A27C00000000000000000025 /* NewGameSetupView.swift */,
 				B98539D12954EA010084DCEC /* SocialButton.swift */,
 				B9861D5627CC5D0100053D00 /* EditTeamName.swift */,
 			);
@@ -282,6 +305,7 @@
 				B97E451428DF8251001C9EF1 /* What the score.entitlements */,
 				B9A8A76F2A8637FC00139043 /* GoogleService-Info.plist */,
 				B9788A2627B3CDA900EDF754 /* ScoreMatching */,
+				A27C00000000000000000023 /* catalog-v1.json */,
 				B9861D5D27CD485A00053D00 /* ScoreMatchingScreenshots */,
 				B96F151E28DE670E00349258 /* Widget */,
 				B9E532282EBD836600B1B4EA /* WTS-watch Watch App */,
@@ -308,11 +332,13 @@
 		B9788A2627B3CDA900EDF754 /* ScoreMatching */ = {
 			isa = PBXGroup;
 			children = (
+				A27C00000000000000000005 /* Intents */,
 				B95C37F027B49144009A2C5F /* Info.plist */,
 				B9788A2727B3CDA900EDF754 /* ScoreMatchingApp.swift */,
 				B97E450A28DE84EE001C9EF1 /* AppDelegate.swift */,
 				B919B9C827CC591300014942 /* ReceiverModeView.swift */,
 				B9788A2927B3CDA900EDF754 /* ContentView.swift */,
+				A27C00000000000000000021 /* SportCatalogStore.swift */,
 				B98539D32954EABC0084DCEC /* Bundle+Extensions.swift */,
 				B99194302B574A5100E5EF87 /* ModelContainerPreview.swift */,
 				B919B9C127CAA69B00014942 /* Features */,
@@ -336,6 +362,7 @@
 		B9861D5D27CD485A00053D00 /* ScoreMatchingScreenshots */ = {
 			isa = PBXGroup;
 			children = (
+				A27C0000000000000000000A /* ScoreboardActionsTests.swift */,
 				B9861D6727CD487800053D00 /* SnapshotHelper.swift */,
 				B9861D5E27CD485A00053D00 /* ScoreMatchingScreenshots.swift */,
 			);
@@ -358,6 +385,9 @@
 			dependencies = (
 			);
 			name = WidgetExtension;
+			packageProductDependencies = (
+				A27C00000000000000000008 /* WhatScoreIntents */,
+			);
 			productName = WidgetExtension;
 			productReference = B96F151828DE670E00349258 /* WidgetExtension.appex */;
 			productType = "com.apple.product-type.app-extension";
@@ -380,12 +410,12 @@
 			);
 			name = "What the score";
 			packageProductDependencies = (
+				A27C00000000000000000007 /* WhatScoreIntents */,
 				B98539CE2954E4020084DCEC /* TelemetryClient */,
 				B9A8A7652A86373900139043 /* FirebaseAnalytics */,
 				B9A8A7692A86373900139043 /* FirebaseCrashlytics */,
 				B9A8A76B2A86373900139043 /* FirebaseInstallations */,
 				B9A8A76D2A86373900139043 /* FirebasePerformance */,
-				B93805A12B4F486A00E57CC9 /* Pow */,
 				B9E5325C2EBD84AC00B1B4EA /* WhatScoreKit */,
 			);
 			productName = ScoreMatching;
@@ -406,6 +436,9 @@
 				B9861D6327CD485A00053D00 /* PBXTargetDependency */,
 			);
 			name = ScoreMatchingScreenshots;
+			packageProductDependencies = (
+				A27C0000000000000000000C /* WhatScoreKit */,
+			);
 			productName = ScoreMatchingScreenshots;
 			productReference = B9861D5C27CD485A00053D00 /* ScoreMatchingScreenshots.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
@@ -524,7 +557,6 @@
 			packageReferences = (
 				B98539CD2954E4020084DCEC /* XCRemoteSwiftPackageReference "SwiftClient" */,
 				B9A8A7642A86373900139043 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
-				B93805A02B4F486A00E57CC9 /* XCRemoteSwiftPackageReference "Pow" */,
 			);
 			productRefGroup = B9788A2527B3CDA900EDF754 /* Products */;
 			projectDirPath = "";
@@ -555,6 +587,7 @@
 			files = (
 				B9788A2F27B3CDA900EDF754 /* Preview Assets.xcassets in Resources */,
 				B9788A2C27B3CDA900EDF754 /* Assets.xcassets in Resources */,
+				A27C00000000000000000022 /* catalog-v1.json in Resources */,
 				B9A8A7702A8637FC00139043 /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -602,10 +635,13 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A27C00000000000000000001 /* ScoreboardIntents.swift in Sources */,
 				B9861D5727CC5D0100053D00 /* EditTeamName.swift in Sources */,
 				B97E450B28DE84EE001C9EF1 /* AppDelegate.swift in Sources */,
 				B9F9A8CA27B3DAD900B4C805 /* SettingsView.swift in Sources */,
+				A27C00000000000000000024 /* NewGameSetupView.swift in Sources */,
 				B9788A2A27B3CDA900EDF754 /* ContentView.swift in Sources */,
+				A27C00000000000000000020 /* SportCatalogStore.swift in Sources */,
 				B95C37EF27B474EA009A2C5F /* Connectivity.swift in Sources */,
 				B99194312B574A5100E5EF87 /* ModelContainerPreview.swift in Sources */,
 				B95C37F227B49369009A2C5F /* ConnectivityView.swift in Sources */,
@@ -624,6 +660,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A27C00000000000000000009 /* ScoreboardActionsTests.swift in Sources */,
 				B9861D5F27CD485A00053D00 /* ScoreMatchingScreenshots.swift in Sources */,
 				B9861D6827CD487800053D00 /* SnapshotHelper.swift in Sources */,
 			);
@@ -691,7 +728,7 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
 				CODE_SIGN_ENTITLEMENTS = WidgetExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 25;
 				DEVELOPMENT_TEAM = 382G4857JD;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Widget/Info.plist;
@@ -725,7 +762,7 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
 				CODE_SIGN_ENTITLEMENTS = WidgetExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 25;
 				DEVELOPMENT_TEAM = 382G4857JD;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Widget/Info.plist;
@@ -883,7 +920,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = "What the score.entitlements";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 25;
 				DEVELOPMENT_ASSET_PATHS = "\"ScoreMatching/Preview Content\"";
 				DEVELOPMENT_TEAM = 382G4857JD;
 				ENABLE_PREVIEWS = YES;
@@ -922,7 +959,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = "What the score.entitlements";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 25;
 				DEVELOPMENT_ASSET_PATHS = "\"ScoreMatching/Preview Content\"";
 				DEVELOPMENT_TEAM = 382G4857JD;
 				ENABLE_PREVIEWS = YES;
@@ -957,7 +994,7 @@
 			baseConfigurationReference = B98539D02954E8930084DCEC /* Config.xcconfig */;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 25;
 				DEVELOPMENT_TEAM = 382G4857JD;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
@@ -966,7 +1003,7 @@
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_TARGET_NAME = ScoreMatching;
+				TEST_TARGET_NAME = "What the score";
 			};
 			name = Debug;
 		};
@@ -975,7 +1012,7 @@
 			baseConfigurationReference = B98539D02954E8930084DCEC /* Config.xcconfig */;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 25;
 				DEVELOPMENT_TEAM = 382G4857JD;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
@@ -984,7 +1021,7 @@
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_TARGET_NAME = ScoreMatching;
+				TEST_TARGET_NAME = "What the score";
 			};
 			name = Release;
 		};
@@ -996,7 +1033,7 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
 				CODE_SIGN_ENTITLEMENTS = "WTS-watch Watch App/WTS-watch Watch App.entitlements";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 25;
 				DEVELOPMENT_TEAM = 382G4857JD;
 				ENABLE_PREVIEWS = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
@@ -1035,7 +1072,7 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
 				CODE_SIGN_ENTITLEMENTS = "WTS-watch Watch App/WTS-watch Watch App.entitlements";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 25;
 				DEVELOPMENT_TEAM = 382G4857JD;
 				ENABLE_PREVIEWS = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
@@ -1071,7 +1108,7 @@
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 25;
 				DEVELOPMENT_TEAM = 382G4857JD;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -1098,7 +1135,7 @@
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 25;
 				DEVELOPMENT_TEAM = 382G4857JD;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -1123,7 +1160,7 @@
 			buildSettings = {
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 25;
 				DEVELOPMENT_TEAM = 382G4857JD;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -1149,7 +1186,7 @@
 			buildSettings = {
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 25;
 				DEVELOPMENT_TEAM = 382G4857JD;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -1238,14 +1275,6 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		B93805A02B4F486A00E57CC9 /* XCRemoteSwiftPackageReference "Pow" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/EmergeTools/Pow";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 1.0.3;
-			};
-		};
 		B98539CD2954E4020084DCEC /* XCRemoteSwiftPackageReference "SwiftClient" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/TelemetryDeck/SwiftClient";
@@ -1265,10 +1294,17 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		B93805A12B4F486A00E57CC9 /* Pow */ = {
+		A27C00000000000000000007 /* WhatScoreIntents */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = B93805A02B4F486A00E57CC9 /* XCRemoteSwiftPackageReference "Pow" */;
-			productName = Pow;
+			productName = WhatScoreIntents;
+		};
+		A27C00000000000000000008 /* WhatScoreIntents */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = WhatScoreIntents;
+		};
+		A27C0000000000000000000C /* WhatScoreKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = WhatScoreKit;
 		};
 		B98539CE2954E4020084DCEC /* TelemetryClient */ = {
 			isa = XCSwiftPackageProductDependency;

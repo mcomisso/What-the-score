@@ -6,7 +6,6 @@ import OSLog
 private let logger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "com.mcomisso.ScoreMatching", category: "ContentView")
 
 struct ContentView: View {
-    @Environment(\.verticalSizeClass) var verticalSizeClass
     @Environment(\.modelContext) var modelContext
     @Environment(\.watchSyncCoordinator) var watchSyncCoordinator
 
@@ -15,6 +14,9 @@ struct ContentView: View {
 
     @AppStorage(AppStorageValues.shouldAllowNegativePoints)
     var shouldAllowNegativePoints: Bool = false
+
+    @AppStorage(SportStorageKeys.currentSelection)
+    private var currentSportStorage = ""
 
     @Query(sort: \Team.creationDate) var teams: [Team]
     @Query(sort: \Interval.date) var intervals: [Interval]
@@ -25,18 +27,28 @@ struct ContentView: View {
     @State private var isShowingIntervals: Bool = false
     @State private var showingQuickIntervalPrompt: Bool = false
     @State private var quickIntervalName: String = ""
+    @State private var intentRouter = ScoreboardIntentRouter.shared
+
+    private var currentSport: SportSelection {
+        SportSelection(storageValue: currentSportStorage) ?? SportSelection(preset: .custom)
+    }
 
     var body: some View {
-        ZStack(alignment: .bottomTrailing) {
-            if verticalSizeClass == .regular {
-                portraitButtons
-            } else if verticalSizeClass == .compact {
-                landscapeButtons
-            }
+        GeometryReader { container in
+            ZStack(alignment: .bottom) {
+                ScoreboardTiles(
+                    teams: teams,
+                    lastTapped: $lastTapped,
+                    scoreValues: currentSport.scoreValues,
+                    bottomContentInset: container.safeAreaInsets.bottom + 80
+                )
+                .ignoresSafeArea()
 
-            bottomToolbar
-                .ignoresSafeArea(.all, edges: .all)
-                .padding()
+                bottomToolbar
+                    .frame(maxWidth: 640)
+                    .padding(.horizontal, 16)
+                    .padding(.bottom, 8)
+            }
         }
         .sheet(isPresented: $isShowingIntervals) {
             IntervalsList()
@@ -51,13 +63,13 @@ struct ContentView: View {
                     Analytics.log(.settingsOpened, with: ["team_count": "\(teams.count)"])
                 }
         })
-        .alert("Name this interval", isPresented: $showingQuickIntervalPrompt) {
-            TextField("e.g., Q1, Half 1", text: $quickIntervalName)
+        .alert("Name this \(currentSport.intervalSingular)", isPresented: $showingQuickIntervalPrompt) {
+            TextField(currentSport.intervalName(number: intervals.count + 1), text: $quickIntervalName)
             Button("Cancel", role: .cancel) {
                 quickIntervalName = ""
             }
             Button("Create") {
-                createQuickInterval(name: quickIntervalName.isEmpty ? "Interval \(intervals.count + 1)" : quickIntervalName)
+                createQuickInterval(name: quickIntervalName.isEmpty ? currentSport.intervalName(number: intervals.count + 1) : quickIntervalName)
                 quickIntervalName = ""
             }
         }
@@ -71,6 +83,13 @@ struct ContentView: View {
             if teams.isEmpty {
                 Team.createBaseData(modelContext: modelContext)
             }
+        }
+        .onChange(of: intentRouter.pendingOpenScoreboard, initial: true) { _, requested in
+            guard requested else { return }
+            isShowingIntervals = false
+            isVisualisingSettings = false
+            showingQuickIntervalPrompt = false
+            intentRouter.consumeOpenScoreboardRequest()
         }
         // WatchConnectivity sends team data changes to watch instantly
     }
@@ -98,13 +117,9 @@ struct ContentView: View {
     }
 
     private func createQuickInterval(name: String) {
-        let interval = Interval.create(name: name, from: teams)
-        modelContext.insert(interval)
-        Analytics.log(.intervalCreated, with: ["interval_count": "\(intervals.count + 1)", "source": "quick_add"])
-
-        // Immediately sync to watch after creating quick interval
         do {
-            try modelContext.save()
+            try ScoreboardActions.createInterval(name: name, enabled: hasEnabledIntervals, in: modelContext)
+            Analytics.log(.intervalCreated, with: ["interval_count": "\(intervals.count + 1)", "source": "quick_add"])
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
                 watchSyncCoordinator?.sendData()
             }
@@ -118,7 +133,7 @@ struct ContentView: View {
             if hasEnabledIntervals {
                 Group {
                     if #available(iOS 26.0, *) {
-                        Button("Timer", systemImage: "timer") {
+                        Button(currentSport.intervalPlural, systemImage: "timer") {
                             withAnimation(Animation.interactiveSpring()) {
                                 isShowingIntervals.toggle()
                             }
@@ -147,13 +162,13 @@ struct ContentView: View {
                     Button {
                         showingQuickIntervalPrompt = true
                     } label: {
-                        Label("Quick Add Interval", systemImage: "plus.circle")
+                        Label("Quick add \(currentSport.intervalSingular)", systemImage: "plus.circle")
                     }
 
                     Button {
-                        createQuickInterval(name: "Q\(intervals.count + 1)")
+                        createQuickInterval(name: currentSport.intervalName(number: intervals.count + 1))
                     } label: {
-                        Label("Add Q\(intervals.count + 1)", systemImage: "clock")
+                        Label("Add \(currentSport.intervalName(number: intervals.count + 1))", systemImage: "clock")
                     }
                 }
             }
@@ -228,14 +243,78 @@ struct ContentView: View {
         }
     }
 
-    var buttons: some View {
-        ForEach(teams) { team in
+}
+
+private struct ScoreboardTiles: View {
+    @Environment(\.watchSyncCoordinator) private var watchSyncCoordinator
+    @ScaledMetric(relativeTo: .headline) private var minimumTileHeight: CGFloat = 160
+
+    let teams: [Team]
+    @Binding var lastTapped: String?
+    let scoreValues: [Int]
+    let bottomContentInset: CGFloat
+
+    var body: some View {
+        GeometryReader { geometry in
+            let columnCount = columns(for: geometry.size)
+            let rowCount = (teams.count + columnCount - 1) / columnCount
+            let scrollHeight = max(1, geometry.size.height - bottomContentInset)
+            let rowHeight = max(minimumTileHeight, scrollHeight / CGFloat(max(rowCount, 1)))
+
+            VStack(spacing: 0) {
+                ScrollView {
+                    LazyVStack(spacing: 0) {
+                        ForEach(0..<rowCount, id: \.self) { row in
+                            HStack(spacing: 0) {
+                                ForEach(teamsForRow(row, columns: columnCount)) { team in
+                                    tile(for: team)
+                                        .frame(maxWidth: .infinity)
+                                }
+                            }
+                            .frame(height: rowHeight)
+                        }
+                    }
+                    .frame(minHeight: scrollHeight)
+                }
+                .frame(height: scrollHeight)
+                .scrollIndicators(.hidden)
+                .scrollBounceBehavior(.basedOnSize)
+                .modifier(HideTopScrollEdgeEffect())
+
+                HStack(spacing: 0) {
+                    ForEach(teamsForRow(max(0, rowCount - 1), columns: columnCount)) { team in
+                        Color(hex: team.color)
+                            .frame(maxWidth: .infinity)
+                    }
+                }
+                .frame(height: bottomContentInset)
+                .allowsHitTesting(false)
+            }
+        }
+    }
+
+    private func columns(for size: CGSize) -> Int {
+        let canFitTwoUsableTiles = size.width / 2 >= 160
+        if teams.count == 2 {
+            return size.width > size.height && canFitTwoUsableTiles ? 2 : 1
+        }
+        return min(4, max(1, Int(size.width / 220)))
+    }
+
+    private func teamsForRow(_ row: Int, columns: Int) -> [Team] {
+        let start = row * columns
+        return Array(teams[start..<min(start + columns, teams.count)])
+    }
+
+    private func tile(for team: Team) -> some View {
+        Group {
             @Bindable var bindingTeam = team
             TapButton(
                 score: $bindingTeam.score,
                 colorHex: $bindingTeam.color,
                 name: $bindingTeam.name,
                 lastTapped: $lastTapped,
+                scoreValues: scoreValues,
                 onScoreChanged: {
                     watchSyncCoordinator?.sendTeamDataToWatch()
                 }
@@ -254,19 +333,17 @@ struct ContentView: View {
             .animation(.smooth, value: lastTapped)
         }
     }
+}
 
-    var landscapeButtons: some View {
-        HStack(spacing: 0) {
-            buttons
-        }.ignoresSafeArea()
+private struct HideTopScrollEdgeEffect: ViewModifier {
+    @ViewBuilder
+    func body(content: Content) -> some View {
+        if #available(iOS 26.0, *) {
+            content.scrollEdgeEffectHidden(for: .top)
+        } else {
+            content
+        }
     }
-
-    var portraitButtons: some View {
-        VStack(spacing: 0) {
-            buttons
-        }.ignoresSafeArea()
-    }
-
 }
 
 

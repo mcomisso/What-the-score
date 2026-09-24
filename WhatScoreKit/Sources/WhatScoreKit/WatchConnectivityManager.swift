@@ -110,7 +110,9 @@ public final class WatchConnectivityManager: NSObject, @unchecked Sendable {
     /// Update application context with team data (fallback or background delivery)
     private func updateTeamDataContext(session: WCSession, message: [String: Any], teams: [[String: Any]], intervals: [[String: Any]]) {
         do {
-            try session.updateApplicationContext(message)
+            var context = session.applicationContext
+            context.merge(message) { _, latest in latest }
+            try session.updateApplicationContext(context)
             logger.info("✅ Data sent via application context: \(teams.count) teams, \(intervals.count) intervals")
             print("✅ WatchConnectivity: Sent \(teams.count) teams, \(intervals.count) intervals via application context")
         } catch {
@@ -239,7 +241,7 @@ public final class WatchConnectivityManager: NSObject, @unchecked Sendable {
                 logger.error("❌ Failed to send preferences via message: \(error.localizedDescription)")
                 print("❌ WatchConnectivity: Failed to send preferences - \(error.localizedDescription)")
                 // Fallback to application context on error
-                self?.updatePreferencesContext(session: session, message: message, preferences: preferences)
+                self?.updatePreferencesContext(session: session, preferences: preferences)
             })
             logger.info("✅ Preferences sent via immediate message: \(preferences.keys)")
             print("✅ WatchConnectivity: Sent preferences via immediate message: \(preferences.keys)")
@@ -247,14 +249,18 @@ public final class WatchConnectivityManager: NSObject, @unchecked Sendable {
             // Use application context for background delivery when not reachable
             logger.info("⏳ Watch not reachable, using application context for preferences")
             print("⏳ WatchConnectivity: Watch not reachable, using application context for preferences")
-            updatePreferencesContext(session: session, message: message, preferences: preferences)
+            updatePreferencesContext(session: session, preferences: preferences)
         }
     }
 
     /// Update application context with preferences (fallback or background delivery)
-    private func updatePreferencesContext(session: WCSession, message: [String: Any], preferences: [String: Any]) {
+    private func updatePreferencesContext(session: WCSession, preferences: [String: Any]) {
         do {
-            try session.updateApplicationContext(message)
+            var context = session.applicationContext
+            var currentPreferences = context["preferences"] as? [String: Any] ?? [:]
+            currentPreferences.merge(preferences) { _, latest in latest }
+            context["preferences"] = currentPreferences
+            try session.updateApplicationContext(context)
             logger.info("✅ Preferences sent via application context: \(preferences.keys)")
             print("✅ WatchConnectivity: Sent preferences via application context: \(preferences.keys)")
         } catch {

@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "sports": [
+    { "id": "tennis", "name": "Tennis", "symbolName": "tennisball.fill", "intervalSingular": "Set", "intervalPlural": "Sets", "scoreValues": [1] },
+    { "id": "basketball", "name": "Basketball", "symbolName": "basketball.fill", "intervalSingular": "Quarter", "intervalPlural": "Quarters", "scoreValues": [1, 2, 3] },
+    { "id": "football", "name": "Football", "symbolName": "soccerball", "intervalSingular": "Half", "intervalPlural": "Halves", "scoreValues": [1] },
+    { "id": "rugby", "name": "Rugby", "symbolName": "figure.rugby", "intervalSingular": "Half", "intervalPlural": "Halves", "scoreValues": [5, 3, 2, 7] },
+    { "id": "netball", "name": "Netball", "symbolName": "sportscourt.fill", "intervalSingular": "Quarter", "intervalPlural": "Quarters", "scoreValues": [1] },
+    { "id": "americanFootball", "name": "American football", "symbolName": "figure.american.football", "intervalSingular": "Quarter", "intervalPlural": "Quarters", "scoreValues": [6, 3, 2, 1] },
+    { "id": "hockey", "name": "Hockey", "symbolName": "hockey.puck.fill", "intervalSingular": "Period", "intervalPlural": "Periods", "scoreValues": [1] },
+    { "id": "volleyball", "name": "Volleyball", "symbolName": "volleyball.fill", "intervalSingular": "Set", "intervalPlural": "Sets", "scoreValues": [1] },
+    { "id": "cricket", "name": "Cricket", "symbolName": "cricket.ball.fill", "intervalSingular": "Innings", "intervalPlural": "Innings", "scoreValues": [1, 2, 3, 4, 6] },
+    { "id": "baseball", "name": "Baseball", "symbolName": "baseball.fill", "intervalSingular": "Inning", "intervalPlural": "Innings", "scoreValues": [1] },
+    { "id": "badminton", "name": "Badminton", "symbolName": "figure.badminton", "intervalSingular": "Set", "intervalPlural": "Sets", "scoreValues": [1] },
+    { "id": "tableTennis", "name": "Table tennis", "symbolName": "figure.table.tennis", "intervalSingular": "Set", "intervalPlural": "Sets", "scoreValues": [1] },
+    { "id": "golf", "name": "Golf", "symbolName": "figure.golf", "intervalSingular": "Hole", "intervalPlural": "Holes", "scoreValues": [1] },
+    { "id": "handball", "name": "Handball", "symbolName": "figure.handball", "intervalSingular": "Half", "intervalPlural": "Halves", "scoreValues": [1] },
+    { "id": "boxing", "name": "Boxing", "symbolName": "figure.boxing", "intervalSingular": "Round", "intervalPlural": "Rounds", "scoreValues": [1] },
+    { "id": "cardGames", "name": "Card games", "symbolName": "suit.spade.fill", "intervalSingular": "Round", "intervalPlural": "Rounds", "scoreValues": [1] }
+  ]
+}

@@ -12,17 +12,24 @@ struct IntervalsList: View {
     @Query(sort: \Interval.date) var intervals: [Interval]
     @Query(sort: \Team.creationDate) var teams: [Team]
 
+    @AppStorage(SportStorageKeys.currentSelection)
+    private var currentSportStorage = ""
+
     @State private var showingNamePrompt = false
     @State private var newIntervalName = ""
+
+    private var currentSport: SportSelection {
+        SportSelection(storageValue: currentSportStorage) ?? SportSelection(preset: .custom)
+    }
 
     var body: some View {
         NavigationStack {
             List {
                 if intervals.isEmpty {
                     ContentUnavailableView(
-                        "No Intervals Yet",
+                        "No \(currentSport.intervalPlural) yet",
                         systemImage: "clock.badge.checkmark",
-                        description: Text("Tap 'New Interval' to mark the end of a quarter, half, or period")
+                        description: Text("Add \(currentSport.intervalName(number: 1)) to save the current scores")
                     )
                 } else {
                     ForEach(Array(intervals.enumerated()), id: \.element.id) { index, interval in
@@ -52,14 +59,17 @@ struct IntervalsList: View {
                     Button {
                         showingNamePrompt = true
                     } label: {
-                        Label("New Interval", systemImage: "plus.circle.fill")
+                        Label("New \(currentSport.intervalSingular)", systemImage: "plus.circle.fill")
                     }
                 }
             }
-            .navigationTitle("Intervals")
+            .frame(maxWidth: 640)
+            .frame(maxWidth: .infinity)
+            .background(Color(uiColor: .systemGroupedBackground))
+            .navigationTitle(currentSport.intervalPlural)
             .navigationBarTitleDisplayMode(.inline)
-            .alert("Name this interval", isPresented: $showingNamePrompt) {
-                TextField("e.g., Q1, Half 1, Period 1", text: $newIntervalName)
+            .alert("Name this \(currentSport.intervalSingular)", isPresented: $showingNamePrompt) {
+                TextField(currentSport.intervalName(number: intervals.count + 1), text: $newIntervalName)
                 Button("Cancel", role: .cancel) {
                     newIntervalName = ""
                 }
@@ -67,13 +77,13 @@ struct IntervalsList: View {
                     createInterval()
                 }
             } message: {
-                Text("Give this interval a name to help identify it")
+                Text("You can edit the suggested name")
             }
         }
     }
 
     private func createInterval() {
-        let name = newIntervalName.isEmpty ? "Interval \(intervals.count + 1)" : newIntervalName
+        let name = newIntervalName.isEmpty ? currentSport.intervalName(number: intervals.count + 1) : newIntervalName
         let interval = Interval.create(name: name, from: teams)
         modelContext.insert(interval)
         newIntervalName = ""

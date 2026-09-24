@@ -8,6 +8,7 @@ private let logger = Logger(subsystem: "com.mcomisso.ScoreMatching.watchkitapp",
 struct TeamButtonView: View {
     @Binding var team: Team
     @AppStorage("shouldAllowNegativePoints") var shouldAllowNegativePoints: Bool = false
+    @AppStorage(SportStorageKeys.currentSelection) private var currentSportStorageValue = ""
     @Environment(\.modelContext) var modelContext
 
     var onScoreChanged: (() -> Void)?
@@ -15,6 +16,15 @@ struct TeamButtonView: View {
     @State private var increased: Int = 0
     @State private var decreased: Int = 0
     @State private var justAdded: Bool = false
+    @State private var showingScoreChoices = false
+
+    private var scoreValues: [Int] {
+        SportSelection(storageValue: currentSportStorageValue)?.scoreValues ?? [1]
+    }
+
+    private var tapScoreValue: Int {
+        scoreValues.first ?? 1
+    }
 
     var body: some View {
         let displayScore = shouldAllowNegativePoints ? team.score.totalScore : team.score.safeTotalScore
@@ -22,7 +32,7 @@ struct TeamButtonView: View {
         let textColor = contrastingColor(for: backgroundColor)
 
         Button {
-            incrementScore()
+            incrementScore(by: tapScoreValue)
         } label: {
             VStack(spacing: 4) {
                 Text("\(displayScore)")
@@ -40,8 +50,44 @@ struct TeamButtonView: View {
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
+        .accessibilityLabel("\(team.name), score \(displayScore), tap adds \(tapScoreValue)")
         .background(Color(hex: team.color))
         .clipShape(RoundedRectangle(cornerRadius: 12))
+        .overlay(alignment: .topTrailing) {
+            if tapScoreValue > 1 || scoreValues.count > 1 {
+                Button {
+                    showingScoreChoices = true
+                } label: {
+                    Text("+\(tapScoreValue)")
+                        .font(.caption2)
+                        .foregroundStyle(textColor)
+                        .frame(minWidth: 32, minHeight: 32)
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel("Scoring choices for \(team.name)")
+            }
+        }
+        .sheet(isPresented: $showingScoreChoices) {
+            NavigationStack {
+                List {
+                    ForEach(scoreValues, id: \.self) { value in
+                        Button("Add \(value)") {
+                            incrementScore(by: value)
+                            showingScoreChoices = false
+                        }
+                    }
+                }
+                .navigationTitle(team.name)
+                .navigationBarTitleDisplayMode(.inline)
+                .toolbar {
+                    ToolbarItem(placement: .topBarLeading) {
+                        Button("Cancel") {
+                            showingScoreChoices = false
+                        }
+                    }
+                }
+            }
+        }
         .gesture(
             DragGesture(minimumDistance: 20)
                 .onEnded { _ in
@@ -52,9 +98,9 @@ struct TeamButtonView: View {
         .sensoryFeedback(.decrease, trigger: decreased)
     }
 
-    private func incrementScore() {
+    private func incrementScore(by value: Int) {
         justAdded.toggle()
-        team.score.append(Score(time: .now, value: 1))
+        team.score.addPoint(value: value)
         increased += 1
         saveAndSync()
     }
@@ -93,4 +139,3 @@ struct TeamButtonView: View {
         return luminance > 0.5 ? .black : .white
     }
 }
-

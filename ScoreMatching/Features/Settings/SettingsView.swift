@@ -40,6 +40,8 @@ struct SettingsView: View {
     @State private var showZeroScoreAlert: Bool = false
     @State private var pdfURL: URL?
     @State private var showShareSheet: Bool = false
+    @State private var sportCatalogStore = SportCatalogStore()
+    @State private var showingDefaultSportPicker = false
 
     @AppStorage(AppStorageValues.shouldKeepScreenAwake)
     var shouldKeepScreenAwake: Bool = false
@@ -49,6 +51,16 @@ struct SettingsView: View {
 
     @AppStorage(AppStorageValues.hasEnabledIntervals)
     var hasEnabledIntervals: Bool = false
+
+    @AppStorage(SportStorageKeys.defaultSelection)
+    private var defaultSportStorage = ""
+
+    @AppStorage(SportStorageKeys.currentSelection)
+    private var currentSportStorage = ""
+
+    private var currentSport: SportSelection {
+        SportSelection(storageValue: currentSportStorage) ?? SportSelection(preset: .custom)
+    }
 
     var teamsSection: some View {
         ForEach(teams) { team in
@@ -129,6 +141,10 @@ struct SettingsView: View {
 
             VStack {
                 List {
+                    Section {
+                        NewGameButton(catalogStore: sportCatalogStore)
+                    }
+
                     // MARK: - Teams
 
                     Section("Teams") {
@@ -167,6 +183,46 @@ struct SettingsView: View {
                     
                     // MARK: - Preferences
 
+                    Section {
+                        Button {
+                            showingDefaultSportPicker = true
+                        } label: {
+                            LabeledContent("Default for new games") {
+                                Text(SportSelection(storageValue: defaultSportStorage)?.displayName ?? "Ask each time")
+                            }
+                        }
+                        .sheet(isPresented: $showingDefaultSportPicker) {
+                            SportSelectionView(
+                                initialSelection: SportSelection(storageValue: defaultSportStorage),
+                                catalogStore: sportCatalogStore,
+                                mode: .defaultSport
+                            ) { selection in
+                                defaultSportStorage = selection.storageValue
+                                watchSyncCoordinator?.sendPreferences([
+                                    SportStorageKeys.defaultSelection: selection.storageValue
+                                ])
+                                showingDefaultSportPicker = false
+                            }
+                        }
+
+                        LabeledContent("Current game") {
+                            Text(SportSelection(storageValue: currentSportStorage)?.displayName ?? "Not selected")
+                        }
+
+                        if !defaultSportStorage.isEmpty {
+                            Button("Ask each time") {
+                                defaultSportStorage = ""
+                                watchSyncCoordinator?.sendPreferences([
+                                    SportStorageKeys.defaultSelection: ""
+                                ])
+                            }
+                        }
+                    } header: {
+                        Text("Sport")
+                    } footer: {
+                        Text("The default is used when you start a new game. Leave it unset to choose a sport each time.")
+                    }
+
                     let preferencesHeader = Text("Preferences")
                     let preferencesFooter = Text("This will prevent your device from dimming the screen and going to sleep.")
                     Section(
@@ -188,9 +244,9 @@ struct SettingsView: View {
 
 
 
-                    Section(footer: Text("Enable intervals to track scores by quarters, halves, or periods.")) {
+                    Section(footer: Text("Save scores between \(currentSport.intervalPlural.lowercased()).")) {
                         Toggle(
-                            "Use intervals",
+                            "Use \(currentSport.intervalPlural.lowercased())",
                             isOn: $hasEnabledIntervals
                         )
                         .onChange(of: hasEnabledIntervals) { oldValue, newValue in
@@ -269,7 +325,9 @@ struct SettingsView: View {
                         }
                     }
                 }
+                .frame(maxWidth: 640)
             }
+            .frame(maxWidth: .infinity)
             .navigationTitle("Settings")
             .navigationBarTitleDisplayMode(.inline)
             .background(Color(uiColor: UIColor.systemGroupedBackground))
@@ -284,6 +342,9 @@ struct SettingsView: View {
                 if let pdfURL = pdfURL {
                     ShareSheet(items: [pdfURL])
                 }
+            }
+            .task {
+                await sportCatalogStore.refresh()
             }
         }
     }

@@ -20,6 +20,11 @@ struct ContentView: View {
 
     @AppStorage("shouldAllowNegativePoints") var shouldAllowNegativePoints: Bool = false
     @AppStorage("hasEnabledIntervals") var hasEnabledIntervals: Bool = false
+    @AppStorage(SportStorageKeys.currentSelection) private var currentSportStorageValue = ""
+
+    private var intervalPlural: String {
+        SportSelection(storageValue: currentSportStorageValue)?.intervalPlural ?? "Intervals"
+    }
 
     var body: some View {
         NavigationStack {
@@ -42,6 +47,7 @@ struct ContentView: View {
                         } label: {
                             Image(systemName: "timer")
                         }
+                        .accessibilityLabel(intervalPlural)
                     }
                 }
 

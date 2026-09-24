@@ -1,117 +1,70 @@
 import SwiftUI
 import SwiftData
 import WhatScoreKit
+import WhatScoreIntents
 import AppIntents
 
 #if canImport(WidgetKit)
 import WidgetKit
 
-// MARK: - App Intent for Incrementing Scores
-
-struct IncrementScoreIntent: AppIntent {
-    static var title: LocalizedStringResource = "Increment Score"
-    static var description = IntentDescription("Increments the score for a team")
-
-    @Parameter(title: "Team Name")
-    var teamName: String
-
-    init() {}
-
-    init(teamName: String) {
-        self.teamName = teamName
-    }
-
-    func perform() async throws -> some IntentResult & ReturnsValue<Bool> {
-        // Access CloudKit synced data (same container as main app)
-        let schema = Schema([Team.self, Interval.self, Game.self])
-        let modelConfiguration = ModelConfiguration(
-            schema: schema,
-            isStoredInMemoryOnly: false,
-            groupContainer: .identifier("group.mcsoftware.whatTheScore"),
-            cloudKitDatabase: .private("iCloud.com.mcomisso.ScoreMatching")
-        )
-        let modelContainer = try ModelContainer(for: schema, configurations: [modelConfiguration])
-        let context = ModelContext(modelContainer)
-
-        // Find the team
-        let descriptor = FetchDescriptor<Team>(
-            predicate: #Predicate { team in
-                team.name == teamName
-            }
-        )
-
-        guard let team = try context.fetch(descriptor).first else {
-            throw IncrementScoreError.teamNotFound
-        }
-
-        // Increment the score
-        team.score.append(Score(time: .now, value: 1))
-        Analytics.log(.widgetScoreIncrement)
-
-        try context.save()
-
-        // Reload all widget timelines
-        WidgetCenter.shared.reloadAllTimelines()
-
-        return .result(value: true)
-    }
-}
-
-enum IncrementScoreError: Error {
-    case teamNotFound
-}
-
 // MARK: - Timeline Provider
 
 struct Provider: AppIntentTimelineProvider {
-    let modelContainer: ModelContainer
-
-    init() {
-        do {
-            let schema = Schema([Team.self, Interval.self, Game.self])
-            let modelConfiguration = ModelConfiguration(
-                schema: schema,
-                isStoredInMemoryOnly: false,
-                cloudKitDatabase: .private("iCloud.com.mcomisso.ScoreMatching")
-            )
-            self.modelContainer = try ModelContainer(for: schema, configurations: [modelConfiguration])
-        } catch {
-            fatalError("Could not create ModelContainer: \(error)")
-        }
-    }
-
-    private func fetchTeams() -> [Team] {
-        let context = ModelContext(modelContainer)
-        let descriptor = FetchDescriptor<Team>(sortBy: [SortDescriptor(\.creationDate)])
-        do {
-            return try context.fetch(descriptor)
-        } catch {
-            print("Failed to fetch teams: \(error)")
-            return []
+    private func fetchTeams() async -> [WidgetTeam] {
+        await MainActor.run {
+            do {
+                let context = ModelContext(try ScoreboardStore.makeContainer())
+                try TeamIdentity.backfill(in: context)
+                let teams = try context.fetch(FetchDescriptor<Team>(sortBy: [SortDescriptor(\.creationDate)]))
+                return teams.compactMap(WidgetTeam.init(team:))
+            } catch {
+                print("Failed to fetch teams: \(error)")
+                return []
+            }
         }
     }
 
     func placeholder(in context: Context) -> SimpleEntry {
-        let teamA = Team(name: "Team A")
-        let teamB = Team(name: "Team B")
+        let teamA = WidgetTeam(id: UUID(), name: "Team A", color: "FF0000", score: 0)
+        let teamB = WidgetTeam(id: UUID(), name: "Team B", color: "0000FF", score: 0)
         return SimpleEntry(date: Date(), teams: [teamA, teamB], configuration: ConfigurationAppIntent())
     }
 
     func snapshot(for configuration: ConfigurationAppIntent, in context: Context) async -> SimpleEntry {
-        let teams = fetchTeams()
+        let teams = await fetchTeams()
         return SimpleEntry(date: Date(), teams: teams, configuration: configuration)
     }
 
     func timeline(for configuration: ConfigurationAppIntent, in context: Context) async -> Timeline<SimpleEntry> {
-        let teams = fetchTeams()
+        let teams = await fetchTeams()
         let entry = SimpleEntry(date: Date(), teams: teams, configuration: configuration)
         return Timeline(entries: [entry], policy: .atEnd)
     }
 }
 
+struct WidgetTeam: Identifiable, Sendable {
+    let id: UUID
+    let name: String
+    let color: String
+    let score: Int
+
+    @MainActor
+    init?(team: Team) {
+        guard let id = team.shortcutID else { return nil }
+        self.init(id: id, name: team.name, color: team.color, score: team.score.safeTotalScore)
+    }
+
+    init(id: UUID, name: String, color: String, score: Int) {
+        self.id = id
+        self.name = name
+        self.color = color
+        self.score = score
+    }
+}
+
 struct SimpleEntry: TimelineEntry {
     let date: Date
-    let teams: [Team]
+    let teams: [WidgetTeam]
     let configuration: ConfigurationAppIntent
 }
 
@@ -126,18 +79,8 @@ struct WidgetEntryView : View {
     var body: some View {
         VStack(spacing: 0) {
             ForEach(entry.teams) { team in
-                Button(intent: IncrementScoreIntent(teamName: team.name)) {
-                    team.resolvedColor
-                        .overlay {
-                            VStack {
-                                Text(team.name)
-                                    .font(.subheadline)
-                                Text("\(team.score.safeTotalScore)")
-                                    .font(.system(.title, design: .rounded))
-                            }
-                            .foregroundStyle(team.resolvedColor)
-                            .colorInvert()
-                        }
+                Button(intent: AddPointIntent(team: TeamEntity(id: team.id, name: team.name))) {
+                    teamTile(for: team)
                 }
                 .buttonStyle(.plain)
             }
@@ -145,6 +88,26 @@ struct WidgetEntryView : View {
         .containerBackground(for: .widget) {
             Color.clear
         }
+    }
+
+    private func teamTile(for team: WidgetTeam) -> some View {
+        Color(hex: team.color)
+            .overlay {
+                VStack {
+                    Text(team.name)
+                        .font(.subheadline)
+                    Text("\(team.score)")
+                        .font(.system(.title, design: .rounded))
+                }
+                .foregroundStyle(Color(hex: team.color))
+                .colorInvert()
+            }
+    }
+}
+
+struct CurrentStatusWidgetIntentsPackage: AppIntentsPackage {
+    static var includedPackages: [any AppIntentsPackage.Type] {
+        [WhatScoreIntentsPackage.self]
     }
 }
 
@@ -156,7 +119,6 @@ struct CurrentStatusWidget: Widget {
     var body: some WidgetConfiguration {
         AppIntentConfiguration(kind: kind, intent: ConfigurationAppIntent.self, provider: Provider()) { entry in
             WidgetEntryView(entry: entry)
-                .modelContainer(for: [Team.self, Interval.self, Game.self])
         }
         .contentMarginsDisabled()
         .supportedFamilies([.systemSmall, .systemMedium])

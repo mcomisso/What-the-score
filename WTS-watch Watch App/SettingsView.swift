@@ -15,6 +15,11 @@ struct SettingsView: View {
 
     @AppStorage("shouldAllowNegativePoints") var shouldAllowNegativePoints: Bool = false
     @AppStorage("hasEnabledIntervals") var hasEnabledIntervals: Bool = false
+    @AppStorage(SportStorageKeys.currentSelection) private var currentSportStorageValue = ""
+
+    private var intervalPlural: String {
+        SportSelection(storageValue: currentSportStorageValue)?.intervalPlural ?? "Intervals"
+    }
 
     @State private var showResetAlert = false
     @State private var showReinitializeAlert = false
@@ -31,7 +36,7 @@ struct SettingsView: View {
                             ]
                             watchSyncCoordinator?.sendPreferences(preferences)
                         }
-                    Toggle("Intervals", isOn: $hasEnabledIntervals)
+                    Toggle(intervalPlural, isOn: $hasEnabledIntervals)
                         .onChange(of: hasEnabledIntervals) { oldValue, newValue in
                             let preferences: [String: Any] = [
                                 "hasEnabledIntervals": newValue

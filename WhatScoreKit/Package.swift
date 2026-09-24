@@ -12,6 +12,10 @@ let package = Package(
             name: "WhatScoreKit",
             targets: ["WhatScoreKit"]
         ),
+        .library(
+            name: "WhatScoreIntents",
+            targets: ["WhatScoreIntents"]
+        ),
     ],
     dependencies: [
         .package(url: "https://github.com/TelemetryDeck/SwiftClient", from: "2.0.0"),
@@ -27,6 +31,10 @@ let package = Package(
             swiftSettings: [
                 .enableUpcomingFeature("ExistentialAny")
             ]
+        ),
+        .target(
+            name: "WhatScoreIntents",
+            dependencies: ["WhatScoreKit"]
         ),
         .testTarget(
             name: "WhatScoreKitTests",

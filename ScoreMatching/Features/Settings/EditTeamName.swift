@@ -10,8 +10,13 @@ struct EditView: View {
     var body: some View {
         List {
             TextField("Insert team name", text: $team.name)
+                .textInputAutocapitalization(.words)
+                .submitLabel(.done)
             ColorPicker("Team color", selection: $team.resolvedColor)
         }
+        .frame(maxWidth: 640)
+        .frame(maxWidth: .infinity)
+        .background(Color(uiColor: .systemGroupedBackground))
         .onAppear {
             originalName = team.name
         }

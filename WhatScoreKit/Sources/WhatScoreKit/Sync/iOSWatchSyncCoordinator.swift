@@ -90,6 +90,10 @@ public final class iOSWatchSyncCoordinator: WatchSyncCoordinatorProtocol {
             print("📊 iOSWatchSyncCoordinator: Created SyncData - \(syncData.teams.count) teams, \(syncData.intervals.count) intervals")
             print("📤 iOSWatchSyncCoordinator: Calling syncService.sendData()...")
             syncService.sendData(syncData)
+            syncService.sendPreferences([
+                SportStorageKeys.defaultSelection: UserDefaults.standard.string(forKey: SportStorageKeys.defaultSelection) ?? "",
+                SportStorageKeys.currentSelection: UserDefaults.standard.string(forKey: SportStorageKeys.currentSelection) ?? ""
+            ])
             print("✅ iOSWatchSyncCoordinator: syncService.sendData() completed")
         } catch {
             logger.error("Failed to create sync data for Apple Watch: \(error.localizedDescription)")

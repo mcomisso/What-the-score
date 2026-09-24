@@ -1,5 +1,6 @@
 import SwiftUI
 import WhatScoreKit
+import AppIntents
 import StoreKit
 #if canImport(WidgetKit)
 import WidgetKit
@@ -24,17 +25,8 @@ struct ScoreMatchingApp: App {
     private let modelContainer: ModelContainer
 
     init() {
-        // Initialize model container with CloudKit for automatic sync across devices
-        // CloudKit handles syncing between iOS and watchOS automatically
         do {
-            let schema = Schema([Team.self, Interval.self, Game.self])
-            let modelConfiguration = ModelConfiguration(
-                schema: schema,
-                isStoredInMemoryOnly: false,
-                groupContainer: .identifier("group.mcsoftware.whatTheScore"),
-                cloudKitDatabase: .private("iCloud.com.mcomisso.ScoreMatching")
-            )
-            modelContainer = try ModelContainer(for: schema, configurations: [modelConfiguration])
+            modelContainer = try ScoreboardStore.makeContainer()
 
             watchSyncCoordinator = iOSWatchSyncCoordinator(modelContainer: modelContainer, syncService: nil, conversionService: nil)
 
@@ -46,6 +38,8 @@ struct ScoreMatchingApp: App {
         } catch {
             fatalError("Failed to create ModelContainer: \(error)")
         }
+
+        ScoreboardShortcuts.updateAppShortcutParameters()
     }
 
     private func migrateTeamColors() {
@@ -53,6 +47,7 @@ struct ScoreMatchingApp: App {
         let descriptor = FetchDescriptor<Team>()
 
         do {
+            try TeamIdentity.backfill(in: context)
             let teams = try context.fetch(descriptor)
             var needsSave = false
 

@@ -34,6 +34,21 @@ public struct Score: Codable {
 }
 
 extension Array where Element == Score {
+    public mutating func addPoint(value: Int = 1, at date: Date = .now) {
+        append(Score(time: date, value: value))
+    }
+
+    @discardableResult
+    public mutating func subtractPoint(allowNegativePoints: Bool, at date: Date = .now) -> Bool {
+        if allowNegativePoints {
+            append(Score(time: date, value: -1))
+            return true
+        }
+        guard !isEmpty else { return false }
+        removeLast()
+        return true
+    }
+
     public var totalScore: Int {
         map(\.value).reduce(0, +)
     }
@@ -142,6 +157,8 @@ public class Team {
     public var name: String = ""
     public var color: String = ""
     public var creationDate: Date = Date.now
+    // Optional in the stored schema so existing CloudKit records can be loaded and backfilled.
+    public var shortcutID: UUID? = nil
     public var game: Game?
 
     @Transient
@@ -160,11 +177,12 @@ public class Team {
         }
     }
 
-    public init(score: [Score] = [], name: String = "", color: String = "") {
+    public init(score: [Score] = [], name: String = "", color: String = "", shortcutID: UUID = UUID()) {
         self.creationDate = .now
         self.score = score
         self.name = name
         self.color = color.isEmpty ? Color.random.toHex() : color
+        self.shortcutID = shortcutID
     }
 
     public static func createBaseData(modelContext: ModelContext) {

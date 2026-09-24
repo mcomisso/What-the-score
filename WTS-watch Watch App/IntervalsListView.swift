@@ -12,9 +12,26 @@ struct IntervalsListView: View {
 
     @Query(sort: \Team.creationDate) var teams: [Team]
     @Query(sort: \Interval.date) var intervals: [Interval]
+    @AppStorage(SportStorageKeys.currentSelection) private var currentSportStorageValue = ""
 
     @State private var showingCreatePrompt = false
     @State private var newIntervalName = ""
+
+    private var sportSelection: SportSelection? {
+        SportSelection(storageValue: currentSportStorageValue)
+    }
+
+    private var intervalSingular: String {
+        sportSelection?.intervalSingular ?? "Interval"
+    }
+
+    private var intervalPlural: String {
+        sportSelection?.intervalPlural ?? "Intervals"
+    }
+
+    private func intervalName(number: Int) -> String {
+        sportSelection?.intervalName(number: number) ?? "Interval \(number)"
+    }
 
     var body: some View {
         NavigationStack {
@@ -25,7 +42,7 @@ struct IntervalsListView: View {
                     intervalsList
                 }
             }
-            .navigationTitle("Intervals")
+            .navigationTitle(intervalPlural)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
@@ -42,8 +59,8 @@ struct IntervalsListView: View {
                     }
                 }
             }
-            .alert("Name Interval", isPresented: $showingCreatePrompt) {
-                TextField("e.g., Q1, Half 1", text: $newIntervalName)
+            .alert("Name \(intervalSingular)", isPresented: $showingCreatePrompt) {
+                TextField("e.g., \(intervalName(number: intervals.count + 1))", text: $newIntervalName)
                 Button("Cancel", role: .cancel) {
                     newIntervalName = ""
                 }
@@ -62,7 +79,7 @@ struct IntervalsListView: View {
                 .font(.system(size: 40))
                 .foregroundStyle(.secondary)
 
-            Text("No Intervals")
+            Text("No \(intervalPlural)")
                 .font(.headline)
 
             Text("Tap + to create")
@@ -120,7 +137,7 @@ struct IntervalsListView: View {
     // MARK: - Actions
 
     private func createInterval() {
-        let name = newIntervalName.isEmpty ? "Interval \(intervals.count + 1)" : newIntervalName
+        let name = newIntervalName.isEmpty ? intervalName(number: intervals.count + 1) : newIntervalName
         let interval = Interval.create(name: name, from: teams)
         modelContext.insert(interval)
         newIntervalName = ""
