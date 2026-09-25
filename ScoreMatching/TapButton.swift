@@ -19,6 +19,7 @@ struct TapButton: View {
     @Binding var lastTapped: String?
 
     var isEnabled: Bool = true
+    var allowsVerticalSwipe: Bool = true
     var scoreValues: [Int] = [1]
     var onScoreChanged: (() -> Void)?
     #if os(iOS)
@@ -32,85 +33,70 @@ struct TapButton: View {
     @State private var latestAddition = 1
     @State private var additionID = UUID()
     @State private var additionTask: Task<Void, Never>?
-    @State private var tapLocation: CGPoint?
     @State private var additionLocation: CGPoint = .zero
     @State private var additionAngle: Double = 0
 
     var body: some View {
         GeometryReader { geometryProxy in
-            Button {
-                let location = tapLocation ?? CGPoint(
-                    x: geometryProxy.size.width / 2,
-                    y: geometryProxy.size.height / 2
+            VStack(spacing: 0) {
+                let contentHeight = max(1, geometryProxy.size.height)
+                let fontSize = min(
+                    min(geometryProxy.size.width, contentHeight) / 3.5 * scoreScale,
+                    contentHeight * 0.55
                 )
-                tapLocation = nil
-                addScore(primaryScoreValue, at: location)
-            } label: {
-                VStack(spacing: 0) {
-                    let contentHeight = max(1, geometryProxy.size.height)
-                    let fontSize = min(
-                        min(geometryProxy.size.width, contentHeight) / 3.5 * scoreScale,
-                        contentHeight * 0.55
-                    )
-                    let displayScore = shouldAllowNegativePoints ? score.totalScore : score.safeTotalScore
-                    Text("\(displayScore)")
-                        .font(.system(size: fontSize, design: .rounded))
+                let displayScore = shouldAllowNegativePoints ? score.totalScore : score.safeTotalScore
+                Text("\(displayScore)")
+                    .font(.system(size: fontSize, design: .rounded))
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.25)
+                    .contentTransition(.numericText())
+                    .animation(.snappy, value: displayScore)
+                    .frame(maxWidth: .infinity,
+                           maxHeight: .infinity)
+                Text(name)
+                    .bold()
+                    .font(.system(.headline, design: .default))
+                    .multilineTextAlignment(.center)
+                    .lineLimit(3)
+                    .minimumScaleFactor(0.8)
+                    .padding(.horizontal, 12)
+                    .padding(.bottom, 12)
+                if primaryScoreValue != 1 {
+                    Text("Tap adds \(primaryScoreValue)")
+                        .font(.caption)
                         .lineLimit(1)
-                        .minimumScaleFactor(0.25)
-                        .contentTransition(.numericText())
-                        .animation(.snappy, value: displayScore)
-                        .frame(maxWidth: .infinity,
-                               maxHeight: .infinity)
-                    Text(name)
-                        .bold()
-                        .font(.system(.headline, design: .default))
-                        .multilineTextAlignment(.center)
-                        .lineLimit(3)
-                        .minimumScaleFactor(0.8)
-                        .padding(.horizontal, 12)
-                        .padding(.bottom, 12)
-                    if scoreValues.count > 1 {
-                        Text("Hold for other values")
-                            .font(.caption)
-                            .lineLimit(1)
-                            .padding(.bottom, 8)
-                    } else if primaryScoreValue != 1 {
-                        Text("Tap adds \(primaryScoreValue)")
-                            .font(.caption)
-                            .lineLimit(1)
-                            .padding(.bottom, 8)
-                    }
+                        .padding(.bottom, 8)
                 }
-                .foregroundStyle(Color(hex: colorHex))
-                .colorInvert()
-                .frame(maxWidth: .infinity,
-                       maxHeight: .infinity)
-                .contentShape(Rectangle())
             }
-            .buttonStyle(.plain)
+            .foregroundStyle(Color(hex: colorHex))
+            .colorInvert()
+            .frame(maxWidth: .infinity,
+                   maxHeight: .infinity)
+            .contentShape(Rectangle())
+            .onTapGesture { location in
+                addScore(primaryScoreValue, at: location)
+            }
+            .accessibilityElement(children: .ignore)
+            .accessibilityAddTraits(.isButton)
             .accessibilityLabel("\(name), score \(shouldAllowNegativePoints ? score.totalScore : score.safeTotalScore)")
-            .accessibilityHint("Activate to add \(primaryScoreValue), or use Remove Point")
+            .accessibilityHint("Tap to add \(primaryScoreValue), swipe to remove")
+            .accessibilityAction {
+                addScore(
+                    primaryScoreValue,
+                    at: CGPoint(x: geometryProxy.size.width / 2, y: geometryProxy.size.height / 2)
+                )
+            }
             .accessibilityAction(named: Text("Remove Point")) {
                 removePoint()
             }
-            .simultaneousGesture(
-                DragGesture(minimumDistance: 0)
-                    .onChanged { tapLocation = $0.startLocation }
-                    .onEnded(onGestureEnd)
-            )
-            .contextMenu {
-                ForEach(scoreValues, id: \.self) { value in
-                    Button("Add \(value)") {
-                        addScore(
-                            value,
-                            at: CGPoint(
-                                x: geometryProxy.size.width / 2,
-                                y: geometryProxy.size.height / 2
-                            )
-                        )
+            .gesture(
+                DragGesture(minimumDistance: allowsVerticalSwipe ? 10 : 30).onEnded { value in
+                    // Keep vertical scrolling available when the teams overflow.
+                    if allowsVerticalSwipe || abs(value.translation.width) > abs(value.translation.height) {
+                        removePoint()
                     }
                 }
-            }
+            )
             #if os(iOS)
             .sensoryFeedback(.increase, trigger: increased)
             .sensoryFeedback(.decrease, trigger: decreased)
@@ -132,18 +118,6 @@ struct TapButton: View {
     }
 
     private var primaryScoreValue: Int { scoreValues.first ?? 1 }
-
-    private func onGestureEnd(_ value: DragGesture.Value) {
-        let translation = value.translation
-        if abs(translation.width) > 12 || abs(translation.height) > 12 {
-            tapLocation = nil
-        }
-        guard abs(translation.width) >= 40,
-              abs(translation.width) > abs(translation.height) * 1.25 else {
-            return
-        }
-        removePoint()
-    }
 
     private func removePoint() {
         if score.subtractPoint(allowNegativePoints: shouldAllowNegativePoints) {

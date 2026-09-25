@@ -260,6 +260,7 @@ private struct ScoreboardTiles: View {
             let rowCount = (teams.count + columnCount - 1) / columnCount
             let scrollHeight = max(1, geometry.size.height - bottomContentInset)
             let rowHeight = max(minimumTileHeight, scrollHeight / CGFloat(max(rowCount, 1)))
+            let contentFits = rowHeight * CGFloat(rowCount) <= scrollHeight + 1
 
             VStack(spacing: 0) {
                 ScrollView {
@@ -267,7 +268,7 @@ private struct ScoreboardTiles: View {
                         ForEach(0..<rowCount, id: \.self) { row in
                             HStack(spacing: 0) {
                                 ForEach(teamsForRow(row, columns: columnCount)) { team in
-                                    tile(for: team)
+                                    tile(for: team, allowsVerticalSwipe: contentFits)
                                         .frame(maxWidth: .infinity)
                                 }
                             }
@@ -279,6 +280,7 @@ private struct ScoreboardTiles: View {
                 .frame(height: scrollHeight)
                 .scrollIndicators(.hidden)
                 .scrollBounceBehavior(.basedOnSize)
+                .scrollDisabled(contentFits)
                 .modifier(HideTopScrollEdgeEffect())
 
                 HStack(spacing: 0) {
@@ -306,7 +308,7 @@ private struct ScoreboardTiles: View {
         return Array(teams[start..<min(start + columns, teams.count)])
     }
 
-    private func tile(for team: Team) -> some View {
+    private func tile(for team: Team, allowsVerticalSwipe: Bool) -> some View {
         Group {
             @Bindable var bindingTeam = team
             TapButton(
@@ -314,6 +316,7 @@ private struct ScoreboardTiles: View {
                 colorHex: $bindingTeam.color,
                 name: $bindingTeam.name,
                 lastTapped: $lastTapped,
+                allowsVerticalSwipe: allowsVerticalSwipe,
                 scoreValues: scoreValues,
                 onScoreChanged: {
                     watchSyncCoordinator?.sendTeamDataToWatch()
