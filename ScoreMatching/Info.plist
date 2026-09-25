@@ -4,8 +4,6 @@
 <dict>
 	<key>AnalyticsID</key>
 	<string>A2B016DF-35D6-4C92-8DA4-C333E3ABD791</string>
-	<key>ITSAppUsesNonExemptEncryption</key>
-	<false/>
 	<key>NSBonjourServices</key>
 	<array>
 		<string>_com-scorekpr._udp</string>

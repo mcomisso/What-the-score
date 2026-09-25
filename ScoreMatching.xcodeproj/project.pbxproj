@@ -7,6 +7,14 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		A27C00000000000000000001 /* ScoreboardIntents.swift in Sources */ = {isa = PBXBuildFile; fileRef = A27C00000000000000000002 /* ScoreboardIntents.swift */; };
+		A27C00000000000000000003 /* WhatScoreIntents in Frameworks */ = {isa = PBXBuildFile; productRef = A27C00000000000000000007 /* WhatScoreIntents */; };
+		A27C00000000000000000004 /* WhatScoreIntents in Frameworks */ = {isa = PBXBuildFile; productRef = A27C00000000000000000008 /* WhatScoreIntents */; };
+		A27C00000000000000000009 /* ScoreboardActionsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A27C0000000000000000000A /* ScoreboardActionsTests.swift */; };
+		A27C0000000000000000000B /* WhatScoreKit in Frameworks */ = {isa = PBXBuildFile; productRef = A27C0000000000000000000C /* WhatScoreKit */; };
+		A27C00000000000000000020 /* SportCatalogStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A27C00000000000000000021 /* SportCatalogStore.swift */; };
+		A27C00000000000000000022 /* catalog-v1.json in Resources */ = {isa = PBXBuildFile; fileRef = A27C00000000000000000023 /* catalog-v1.json */; };
+		A27C00000000000000000024 /* NewGameSetupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A27C00000000000000000025 /* NewGameSetupView.swift */; };
 		B919B9C027CAA67A00014942 /* IntervalsList.swift in Sources */ = {isa = PBXBuildFile; fileRef = B919B9BF27CAA67A00014942 /* IntervalsList.swift */; };
 		B919B9C927CC591300014942 /* ReceiverModeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B919B9C827CC591300014942 /* ReceiverModeView.swift */; };
 		B95C37E927B473D7009A2C5F /* ScoreboardPDFPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = B95C37E827B473D7009A2C5F /* ScoreboardPDFPage.swift */; };
@@ -39,14 +47,6 @@
 		B9E5325D2EBD84AC00B1B4EA /* WhatScoreKit in Frameworks */ = {isa = PBXBuildFile; productRef = B9E5325C2EBD84AC00B1B4EA /* WhatScoreKit */; };
 		B9E5325F2EBD84B900B1B4EA /* WhatScoreKit in Frameworks */ = {isa = PBXBuildFile; productRef = B9E5325E2EBD84B900B1B4EA /* WhatScoreKit */; };
 		B9E532612EBD84C000B1B4EA /* WhatScoreKit in Frameworks */ = {isa = PBXBuildFile; productRef = B9E532602EBD84C000B1B4EA /* WhatScoreKit */; };
-		A27C00000000000000000001 /* ScoreboardIntents.swift in Sources */ = {isa = PBXBuildFile; fileRef = A27C00000000000000000002 /* ScoreboardIntents.swift */; };
-		A27C00000000000000000003 /* WhatScoreIntents in Frameworks */ = {isa = PBXBuildFile; productRef = A27C00000000000000000007 /* WhatScoreIntents */; };
-		A27C00000000000000000004 /* WhatScoreIntents in Frameworks */ = {isa = PBXBuildFile; productRef = A27C00000000000000000008 /* WhatScoreIntents */; };
-		A27C00000000000000000009 /* ScoreboardActionsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A27C0000000000000000000A /* ScoreboardActionsTests.swift */; };
-		A27C0000000000000000000B /* WhatScoreKit in Frameworks */ = {isa = PBXBuildFile; productRef = A27C0000000000000000000C /* WhatScoreKit */; };
-		A27C00000000000000000020 /* SportCatalogStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A27C00000000000000000021 /* SportCatalogStore.swift */; };
-		A27C00000000000000000022 /* catalog-v1.json in Resources */ = {isa = PBXBuildFile; fileRef = A27C00000000000000000023 /* catalog-v1.json */; };
-		A27C00000000000000000024 /* NewGameSetupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A27C00000000000000000025 /* NewGameSetupView.swift */; };
 		B9F9A8CA27B3DAD900B4C805 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9F9A8C927B3DAD900B4C805 /* SettingsView.swift */; };
 		B9F9A8CC27B3DBCF00B4C805 /* TapButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9F9A8CB27B3DBCF00B4C805 /* TapButton.swift */; };
 /* End PBXBuildFile section */
@@ -115,6 +115,11 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		A27C00000000000000000002 /* ScoreboardIntents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScoreboardIntents.swift; sourceTree = "<group>"; };
+		A27C0000000000000000000A /* ScoreboardActionsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ScoreboardActionsTests.swift; path = WhatScoreKit/Tests/WhatScoreKitTests/ScoreboardActionsTests.swift; sourceTree = SOURCE_ROOT; };
+		A27C00000000000000000021 /* SportCatalogStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SportCatalogStore.swift; sourceTree = "<group>"; };
+		A27C00000000000000000023 /* catalog-v1.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = "catalog-v1.json"; path = "sports/catalog-v1.json"; sourceTree = SOURCE_ROOT; };
+		A27C00000000000000000025 /* NewGameSetupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewGameSetupView.swift; sourceTree = "<group>"; };
 		B919B9BF27CAA67A00014942 /* IntervalsList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IntervalsList.swift; sourceTree = "<group>"; };
 		B919B9C827CC591300014942 /* ReceiverModeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceiverModeView.swift; sourceTree = "<group>"; };
 		B95C37E827B473D7009A2C5F /* ScoreboardPDFPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScoreboardPDFPage.swift; sourceTree = "<group>"; };
@@ -149,11 +154,6 @@
 		B9E532332EBD837000B1B4EA /* WTS-watch Watch AppTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "WTS-watch Watch AppTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		B9E5323D2EBD837000B1B4EA /* WTS-watch Watch AppUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "WTS-watch Watch AppUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		B9E5325B2EBD841200B1B4EA /* WhatScoreKit */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = WhatScoreKit; sourceTree = "<group>"; };
-		A27C00000000000000000002 /* ScoreboardIntents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScoreboardIntents.swift; sourceTree = "<group>"; };
-		A27C0000000000000000000A /* ScoreboardActionsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ScoreboardActionsTests.swift; path = WhatScoreKit/Tests/WhatScoreKitTests/ScoreboardActionsTests.swift; sourceTree = SOURCE_ROOT; };
-		A27C00000000000000000021 /* SportCatalogStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SportCatalogStore.swift; sourceTree = "<group>"; };
-		A27C00000000000000000023 /* catalog-v1.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = catalog-v1.json; path = sports/catalog-v1.json; sourceTree = SOURCE_ROOT; };
-		A27C00000000000000000025 /* NewGameSetupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewGameSetupView.swift; sourceTree = "<group>"; };
 		B9F9A8C927B3DAD900B4C805 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		B9F9A8CB27B3DBCF00B4C805 /* TapButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TapButton.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -926,6 +926,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = ScoreMatching/Info.plist;
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.lifestyle";
 				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "Find other devices running ScoreMatching";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -965,6 +966,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = ScoreMatching/Info.plist;
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.lifestyle";
 				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "Find other devices running ScoreMatching";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -1280,7 +1282,7 @@
 			repositoryURL = "https://github.com/TelemetryDeck/SwiftClient";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 2.0.0;
+				minimumVersion = 2.14.2;
 			};
 		};
 		B9A8A7642A86373900139043 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
@@ -1288,7 +1290,7 @@
 			repositoryURL = "https://github.com/firebase/firebase-ios-sdk.git";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 12.6.0;
+				minimumVersion = 12.19.2;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
