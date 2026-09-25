@@ -2,4 +2,4 @@ app_identifier("com.mcomisso.ScoreMatching") # The bundle identifier of your app
 apple_id("matteo.comisso@me.com") # Your Apple email address
 
 itc_team_id("1339105") # App Store Connect Team ID
-team_id("B82WJF6RBY") # Developer Portal Team ID
+team_id("382G4857JD") # Developer Portal Team ID
